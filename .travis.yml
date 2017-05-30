@@ -1,0 +1,26 @@
+language: python
+sudo: false
+cache: pip
+
+python:
+  - "3.4"
+  - "2.7"
+
+branches:
+  only:
+    - master
+
+# command to install requirements
+install:
+  - python setup.py -q develop
+  - pip install -r requirements-test.txt
+
+before_script:
+  - ./runflake8
+
+# command to run tests, e.g. python setup.py test
+script:
+  - coverage run --source=openwisp_network_topology runtests.py
+
+after_success:
+coveralls
