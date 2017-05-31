@@ -23,4 +23,4 @@ script:
   - coverage run --source=openwisp_network_topology runtests.py
 
 after_success:
-coveralls
+  coveralls
