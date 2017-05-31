@@ -2,20 +2,39 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = '@q4z-^s=mv59#o=uutv4*m=h@)ik4%zp1)-k^_(!_7*x_&+ze$'
-
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'openwisp_network_topology.db',
+    }
+}
+
+SECRET_KEY = '@q4z-^s=mv59#o=uutv4*m=h@)ik4%zp1)-k^_(!_7*x_&+ze$'
+
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # all-auth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # openwisp2 modules
+    'openwisp_users',
+    'openwisp_network_topology',
+    # admin
+    'django.contrib.admin',
 ]
+
+AUTH_USER_MODEL = 'openwisp_users.User'
+SITE_ID = '1'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -28,6 +47,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'urls'
+
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+STATIC_URL = '/static/'
 
 TEMPLATES = [
     {
@@ -45,34 +71,9 @@ TEMPLATES = [
     },
 ]
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'openwisp_network_topology.db',
-    }
-}
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_L10N = True
-USE_TZ = True
-STATIC_URL = '/static/'
+EMAIL_PORT = '1025'  # for testing purposes
+LOGIN_REDIRECT_URL = 'admin:index'
+ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:
