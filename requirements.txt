@@ -1,2 +1,2 @@
-django-netjsongraph<0.2.5
+django-netjsongraph>=0.3.0,<0.4.0
 openwisp-users<0.2
