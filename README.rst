@@ -1,14 +1,14 @@
 openwisp-network-topology
 =========================
 
-.. image:: https://travis-ci.org/openwisp/openwisp-network-topolgy.svg?branch=master
-    :target: https://travis-ci.org/openwisp/openwisp-network-topolgy
+.. image:: https://travis-ci.org/openwisp/openwisp-network-topology.svg?branch=master
+    :target: https://travis-ci.org/openwisp/openwisp-network-topology
 
-.. image:: https://coveralls.io/repos/github/openwisp/openwisp-network-topolgy/badge.svg
-    :target: https://coveralls.io/github/openwisp/openwisp-network-topolgy
+.. image:: https://coveralls.io/repos/github/openwisp/openwisp-network-topology/badge.svg
+    :target: https://coveralls.io/github/openwisp/openwisp-network-topology
 
-.. image:: https://requires.io/github/openwisp/openwisp-network-topolgy/requirements.svg?branch=master
-    :target: https://requires.io/github/openwisp/openwisp-network-topolgy/requirements/?branch=master
+.. image:: https://requires.io/github/openwisp/openwisp-network-topology/requirements.svg?branch=master
+    :target: https://requires.io/github/openwisp/openwisp-network-topology/requirements/?branch=master
     :alt: Requirements Status
 
 .. image:: https://badge.fury.io/py/openwisp-network-topology.svg
