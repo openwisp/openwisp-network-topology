@@ -35,7 +35,7 @@ if sys.argv[-1] == 'publish':
 
 
 setup(
-    name='openwisp_network_topology',
+    name='openwisp-network-topology',
     version=get_version(),
     license='GPL3',
     author='Rohith Asrk',
