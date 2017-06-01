@@ -1,3 +1,7 @@
-from django.conf.urls import url
+from django.conf.urls import include, url
+from .api import urls as api
 
-from . import views
+urlpatterns = [
+    url(r'^accounts/', include('openwisp_users.accounts.urls')),
+    url(r'^api/', include(api)),
+]
