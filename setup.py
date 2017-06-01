@@ -51,7 +51,7 @@ setup(
     zip_safe=False,
     install_requires=get_install_requires(),
     classifiers=[
-        'Development Status :: 1 - Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: System :: Networking',
