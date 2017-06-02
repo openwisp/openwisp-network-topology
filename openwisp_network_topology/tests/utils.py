@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.db.models import Q
 from django.urls import reverse
-
 from openwisp_users.models import OrganizationUser
 
 user_model = get_user_model()

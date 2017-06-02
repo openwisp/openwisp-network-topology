@@ -1,7 +1,8 @@
-from ..models import Topology
 from django_netjsongraph.api.generics import (BaseNetworkCollectionView,
                                               BaseNetworkGraphView,
                                               BaseReceiveTopologyView)
+
+from ..models import Topology
 
 
 class NetworkCollectionView(BaseNetworkCollectionView):
