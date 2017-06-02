@@ -1,5 +1,4 @@
 from django.db import models
-
 from django_netjsongraph.base.link import AbstractLink
 from django_netjsongraph.base.node import AbstractNode
 from django_netjsongraph.base.topology import AbstractTopology

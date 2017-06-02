@@ -12,3 +12,13 @@ def get_version():
             suffix = 0
         version = '%s%s%s' % (version, first_letter, suffix)
     return version
+
+
+# openwisp-network-topology extends and depends on these apps which
+# cannot be listed in ``settings.INSTALLED_APPS``
+# this variable is used by:
+#     - openwisp_network_topology.staticfiles.DependencyFinder
+#     - openwisp_network_topology.loaders.DependecyLoader
+__dependencies__ = (
+    'django_netjsongraph',
+)
