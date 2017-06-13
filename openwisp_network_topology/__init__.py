@@ -22,3 +22,5 @@ def get_version():
 __dependencies__ = (
     'django_netjsongraph',
 )
+
+default_app_config = 'openwisp_network_topology.apps.OpenwispNetworkTopologyConfig'
