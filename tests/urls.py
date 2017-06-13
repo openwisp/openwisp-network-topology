@@ -5,5 +5,5 @@ from openwisp_network_topology import urls as urls
 
 urlpatterns = [
     url(r'^', include(urls)),
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/', include(admin.site.urls)),
 ]

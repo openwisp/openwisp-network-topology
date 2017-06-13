@@ -2,23 +2,11 @@
 Base admin classes and mixins
 """
 from django.contrib import admin
-from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 
-class OrgVersionMixin(object):
-    """
-    Base VersionAdmin for openwisp_network_topology
-    """
-    def recoverlist_view(self, request, extra_context=None):
-        """ only superusers are allowed to recover deleted objects """
-        if not request.user.is_superuser:
-            raise PermissionDenied
-        return super(OrgVersionMixin, self).recoverlist_view(request, extra_context)
-
-
-class MultitenantAdminMixin(OrgVersionMixin):
+class MultitenantAdminMixin(object):
     """
     Mixin that makes a ModelAdmin class multitenant:
     users will see only the objects related to the organizations
@@ -95,22 +83,9 @@ class MultitenantOrgFilter(admin.RelatedFieldListFilter):
                                  limit_choices_to={self.multitenant_lookup: organizations})
 
 
-class MultitenantTopologyFilter(MultitenantOrgFilter):
+class MultitenantObjectFilter(MultitenantOrgFilter):
     """
-    Admin filter that shows only templates of
+    Admin filter that shows only objects of
     organizations the current user is associated with
     """
     multitenant_lookup = 'organization__in'
-
-
-class AlwaysHasChangedMixin(object):
-    def has_changed(self):
-        """
-        This django-admin trick ensures the settings
-        are saved even if default values are unchanged
-        (without this trick new setting objects won't be
-        created unless users change the default values)
-        """
-        if self.instance._state.adding:
-            return True
-        return super(AlwaysHasChangedMixin, self).has_changed()
