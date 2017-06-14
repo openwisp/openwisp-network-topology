@@ -1,0 +1,102 @@
+#header{
+    background-color: #464646;
+    color: #fff;
+    height: auto
+}
+
+#user-tools{ margin-top: 12px }
+
+#site-name a{
+    display: block;
+    width: 150px;
+    height: 70px;
+    background: url(../../../static/ui/openwisp/images/openwisp-logo.svg) no-repeat scroll 0 50% / 100%;
+    text-indent: -2000px;
+    overflow: hidden;
+}
+
+.login #branding{
+    float: none;
+    padding: 8px 0
+}
+.login #site-name a{ margin: 0 auto }
+
+.button.default,
+input[type=submit].default,
+.submit-row input.default,
+.object-tools a:focus,
+.object-tools a:hover{
+    background-color: #333;
+}
+
+.button.default:active, input[type=submit].default:active,
+.button.default:focus, input[type=submit].default:focus,
+.button.default:hover, input[type=submit].default:hover{
+    background-color: #000;
+}
+
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
+    color: #fff;
+}
+
+div.breadcrumbs,
+.module h2, .module caption, .inline-group h2,
+#container .selector-chosen h2{
+    background-color: #df5d43;
+    color: #fff;
+}
+
+div.breadcrumbs{
+    color: #ffcbc0
+}
+
+div.breadcrumbs a:focus, div.breadcrumbs a:hover{
+    color: #ffe8e3
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button{
+    background-color: #666;
+}
+
+.button:active, input[type=submit]:active, input[type=button]:active,
+.button:focus, input[type=submit]:focus, input[type=button]:focus,
+.button:hover, input[type=submit]:hover, input[type=button]:hover {
+    background-color: #444;
+}
+
+#user-tools a:focus, #user-tools a:hover{
+    border-bottom-color: #ffcbc0;
+    color: #ffcbc0;
+}
+
+#container .object-tools a{
+    padding: 5px 15px;
+}
+
+#container .object-tools a.addlink{ padding-right: 28px }
+
+table thead th.sorted .sortoptions a.sortremove:focus:after,
+table thead th.sorted .sortoptions a.sortremove:hover:after,
+a:link, a:visited {
+    color: #777;
+}
+
+a:focus, a:hover {
+    color: #000;
+}
+
+#changelist-filter li.selected a{
+    color: #df5d43 !important
+}
+
+#netjsonconfig-hint, #netjsonconfig-hint a,
+#container .field-backend a{ color: #df5d43 }
+
+/* temporary frontend fix */
+a.button.secondaryAction{
+    background: transparent;
+    border: 0 none;
+    padding: 0;
+    margin: 15px 0;
+    display: block;
+}

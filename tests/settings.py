@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'openwisp_users',
     'openwisp_network_topology',
     # admin
+    'openwisp_network_topology.admin_theme',
     'django.contrib.admin',
 ]
 
