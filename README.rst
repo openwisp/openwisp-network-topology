@@ -16,7 +16,7 @@ openwisp-network-topology
 
 ------------
 
-TODO:
+OpenWISP 2 network topology module (built using Python and Django web-framework).
 
 ------------
 
@@ -25,16 +25,6 @@ TODO:
    :depth: 3
 
 ------------
-
-Current features
-----------------
-
-* TODO
-
-Project goals
--------------
-
-* TODO
 
 Install stable version from pypi
 --------------------------------
@@ -71,26 +61,86 @@ If you want to contribute, install your cloned fork:
 Setup (integrate in an existing django project)
 -----------------------------------------------
 
-Add ``openwisp_network_topology`` to ``INSTALLED_APPS``:
+``INSTALLED_APPS`` in ``settings.py`` should look like the following (order is important):
 
 .. code-block:: python
 
     INSTALLED_APPS = [
-        # other apps
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        # all-auth
+        'django.contrib.sites',
+        'allauth',
+        'allauth.account',
+        'allauth.socialaccount',
+        # openwisp2 modules
+        'openwisp_users',
         'openwisp_network_topology',
+        # admin
+        'django.contrib.admin',
     ]
+
+Add ``openwisp_network_topology.staticfiles.DependencyFinder`` to ``STATICFILES_FINDERS`` in your settings.py
+
+.. code-block:: python
+
+    STATICFILES_FINDERS = [
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        'openwisp_network_topology.staticfiles.DependencyFinder',
+    ]
+
+Add ``openwisp_network_topology.loaders.DependencyLoader`` to ``TEMPLATES`` in your ``settings.py``
+
+.. code-block:: python
+
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'OPTIONS': {
+                'loaders': [
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'openwisp_network_topology.loaders.DependencyLoader',
+                ],
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        },
+    ]
+
+Add the following settings to ``settings.py``
+
+.. code-block:: python
+    
+    LOGIN_REDIRECT_URL = 'admin:index'
+    ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 
 Add the URLs to your main ``urls.py``:
 
 .. code-block:: python
 
-    urlpatterns = [
-        # ... other urls in your project ...
+    from django.conf.urls import include, url
+    from django.contrib import admin
+    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    
+    from openwisp_network_topology import urls as urls
 
-        # openwisp-network-topology urls
-        # keep the namespace argument unchanged
-        url(r'^', include('openwisp_network_topology.urls', namespace='network_topology')),
+
+    urlpatterns = [
+        url(r'^', include(urls)),
+        url(r'^admin/', include(admin.site.urls)),
     ]
+   
+    urlpatterns += staticfiles_urlpatterns()
 
 Then run:
 
@@ -129,11 +179,19 @@ Create database:
     ./manage.py migrate
     ./manage.py createsuperuser
 
-Launch development server:
+Set ``EMAIL_PORT`` in ``settings.py`` to a port number (eg: ``1025``):
+
+.. code-block:: python
+
+    EMAIL_PORT = '1025'
+
+Launch development server and SMTP deubgging server:
 
 .. code-block:: shell
 
     ./manage.py runserver
+    # open another session and run
+    python -m smtpd -n -c DebuggingServer localhost:1025
 
 You can access the admin interface at http://127.0.0.1:8000/admin/.
 
@@ -143,23 +201,16 @@ Run tests with:
 
     ./runtests.py
 
-Settings
---------
-
-TODO
-
 Contributing
 ------------
 
-1. Announce your intentions in the `OpenWISP Mailing List <https://groups.google.com/d/forum/openwisp>`_
-2. Fork this repo and install it
+1. Announce your intentions in the `OpenWISP Mailing List <https://groups.google.com/d/forum/openwisp>`_ and open relavant issues using the `issue tracker <https://github.com/openwisp/openwisp-network-topology/issues>`_
+2. Fork this repo and install the project following the `instructions <https://github.com/openwisp/openwisp-network-topology#install-development-version>`_
 3. Follow `PEP8, Style Guide for Python Code`_
-4. Write code
-5. Write tests for your code
-6. Ensure all tests pass
-7. Ensure test coverage does not decrease
-8. Document your changes
-9. Send pull request
+4. Write code and corresponding tests
+5. Ensure that all tests pass and the test coverage does not decrease
+6. Document your changes
+7. Send a pull request
 
 .. _PEP8, Style Guide for Python Code: http://www.python.org/dev/peps/pep-0008/
 
