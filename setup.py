@@ -56,7 +56,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: System :: Networking',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD 3-Clause License (BSD-3-Clause)',
+        'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Framework :: Django',
         'Programming Language :: Python :: 2.7',
