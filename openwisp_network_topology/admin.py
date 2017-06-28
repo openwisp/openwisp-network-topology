@@ -4,7 +4,7 @@ from django_netjsongraph.base.admin import (AbstractLinkAdmin,
                                             AbstractTopologyAdmin)
 
 from openwisp_utils.admin import (MultitenantAdminMixin,
-                                  MultitenantObjectFilter,
+                                  MultitenantRelatedOrgFilter,
                                   MultitenantOrgFilter)
 from .models import Link, Node, Topology
 
@@ -22,7 +22,7 @@ class NodeAdmin(MultitenantAdminMixin, AbstractNodeAdmin):
     model = Node
     list_display = ['name', 'organization', 'topology', 'addresses']
     list_filter = [('organization', MultitenantOrgFilter),
-                   ('topology', MultitenantObjectFilter)]
+                   ('topology', MultitenantRelatedOrgFilter)]
     multitenant_shared_relations = ('topology',)
     fields = ['label', 'organization', 'addresses', 'properties', 'topology',
               'created', 'modified']
@@ -34,7 +34,7 @@ class LinkAdmin(MultitenantAdminMixin, AbstractLinkAdmin):
                     'cost_text']
     list_filter = ['status',
                    ('organization', MultitenantOrgFilter),
-                   ('topology', MultitenantObjectFilter)]
+                   ('topology', MultitenantRelatedOrgFilter)]
     multitenant_shared_relations = ('topology', 'source', 'target')
     fields = ['organization', 'cost', 'cost_text', 'status', 'properties',
               'topology', 'source', 'target', 'created', 'modified']
