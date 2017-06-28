@@ -3,9 +3,9 @@ from django_netjsongraph.base.admin import (AbstractLinkAdmin,
                                             AbstractNodeAdmin,
                                             AbstractTopologyAdmin)
 
-from .base.admin import (MultitenantAdminMixin,
-                         MultitenantObjectFilter,
-                         MultitenantOrgFilter)
+from openwisp_utils.admin import (MultitenantAdminMixin,
+                                  MultitenantObjectFilter,
+                                  MultitenantOrgFilter)
 from .models import Link, Node, Topology
 
 

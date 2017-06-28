@@ -14,13 +14,4 @@ def get_version():
     return version
 
 
-# openwisp-network-topology extends and depends on these apps which
-# cannot be listed in ``settings.INSTALLED_APPS``
-# this variable is used by:
-#     - openwisp_network_topology.staticfiles.DependencyFinder
-#     - openwisp_network_topology.loaders.DependecyLoader
-__dependencies__ = (
-    'django_netjsongraph',
-)
-
 default_app_config = 'openwisp_network_topology.apps.OpenwispNetworkTopologyConfig'

@@ -1,2 +1,3 @@
 django-netjsongraph>=0.3.0,<0.4.0
 openwisp-users<0.2
+openwisp-utils<0.2

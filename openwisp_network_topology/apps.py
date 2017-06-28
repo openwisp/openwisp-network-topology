@@ -1,5 +1,5 @@
-from django_netjsongraph.apps import DjangoNetjsongraphConfig
 from django.utils.translation import ugettext_lazy as _
+from django_netjsongraph.apps import DjangoNetjsongraphConfig
 
 
 class OpenwispNetworkTopologyConfig(DjangoNetjsongraphConfig):
