@@ -2,13 +2,14 @@ from django.test import TestCase
 from django.urls import reverse
 
 from openwisp_users.tests.utils import TestOrganizationMixin
+from openwisp_utils.tests.utils import TestMultitenantAdminMixin
 
 from . import CreateMixin
 from ..models import Link, Node, Topology
-from .utils import TestAdminMixin
 
 
-class TestAdmin(CreateMixin, TestAdminMixin, TestOrganizationMixin, TestCase):
+class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
+                TestOrganizationMixin, TestCase):
     topology_model = Topology
     node_model = Node
     link_model = Link

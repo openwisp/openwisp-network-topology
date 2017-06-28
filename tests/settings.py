@@ -28,10 +28,13 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # openwisp2 modules
     'openwisp_users',
+    'openwisp_utils',
     'openwisp_network_topology',
     # admin
     'django.contrib.admin',
 ]
+
+EXTENDED_APPS = ['django_netjsongraph']
 
 AUTH_USER_MODEL = 'openwisp_users.User'
 SITE_ID = '1'
@@ -39,7 +42,7 @@ SITE_ID = '1'
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'openwisp_network_topology.staticfiles.DependencyFinder',
+    'openwisp_utils.staticfiles.DependencyFinder',
 ]
 
 MIDDLEWARE = [
@@ -69,7 +72,7 @@ TEMPLATES = [
             'loaders': [
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
-                'openwisp_network_topology.loaders.DependencyLoader',
+                'openwisp_utils.loaders.DependencyLoader',
             ],
             'context_processors': [
                 'django.template.context_processors.debug',
