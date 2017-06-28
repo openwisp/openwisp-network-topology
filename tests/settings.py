@@ -39,6 +39,11 @@ EXTENDED_APPS = ['django_netjsongraph']
 AUTH_USER_MODEL = 'openwisp_users.User'
 SITE_ID = '1'
 
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'openwisp_utils.staticfiles.DependencyFinder',
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
