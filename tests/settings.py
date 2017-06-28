@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # openwisp2 modules
     'openwisp_users',
-    'openwisp_utils',
     'openwisp_network_topology',
     # admin
     'django.contrib.admin',

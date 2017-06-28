@@ -71,6 +71,8 @@ Setup (integrate in an existing django project)
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
+        # for customized openwisp admin theme
+        'openwisp_utils.admin_theme',
         # all-auth
         'django.contrib.sites',
         'allauth',
@@ -83,17 +85,17 @@ Setup (integrate in an existing django project)
         'django.contrib.admin',
     ]
 
-Add ``openwisp_network_topology.staticfiles.DependencyFinder`` to ``STATICFILES_FINDERS`` in your settings.py
+Add ``openwisp_utils.staticfiles.DependencyFinder`` to ``STATICFILES_FINDERS`` in your settings.py
 
 .. code-block:: python
 
     STATICFILES_FINDERS = [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-        'openwisp_network_topology.staticfiles.DependencyFinder',
+        'openwisp_utils.staticfiles.DependencyFinder',
     ]
 
-Add ``openwisp_network_topology.loaders.DependencyLoader`` to ``TEMPLATES`` in your ``settings.py``
+Add ``openwisp_utils.loaders.DependencyLoader`` to ``TEMPLATES`` in your ``settings.py``
 
 .. code-block:: python
 
@@ -105,7 +107,7 @@ Add ``openwisp_network_topology.loaders.DependencyLoader`` to ``TEMPLATES`` in y
                 'loaders': [
                     'django.template.loaders.filesystem.Loader',
                     'django.template.loaders.app_directories.Loader',
-                    'openwisp_network_topology.loaders.DependencyLoader',
+                    'openwisp_utils.loaders.DependencyLoader',
                 ],
                 'context_processors': [
                     'django.template.context_processors.debug',
