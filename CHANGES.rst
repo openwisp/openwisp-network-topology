@@ -1,7 +1,7 @@
 Changelog
 =========
 
-Version 0.1 [unreleased]
+Version 0.1 [2017-06-29]
 ------------------------
 
-WIP
+- Added multi-tenancy and integrated `django-netjsongraph <https://github.com/netjson/django-netjsongraph>`_
