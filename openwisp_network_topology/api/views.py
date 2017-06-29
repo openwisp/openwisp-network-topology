@@ -1,5 +1,4 @@
-from django_netjsongraph.api.generics import (BaseNetworkCollectionView,
-                                              BaseNetworkGraphView,
+from django_netjsongraph.api.generics import (BaseNetworkCollectionView, BaseNetworkGraphView,
                                               BaseReceiveTopologyView)
 
 from ..models import Topology
