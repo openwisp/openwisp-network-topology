@@ -1,7 +1,13 @@
 Changelog
 =========
 
-Version 0.1.1 [2017-07-11]
+Version 0.1.2 [unreleased]
+--------------------------
+
+WIP
+
+
+Version 0.1.1 [2017-07-10]
 --------------------------
 
 - `95f8ade <https://github.com/openwisp/openwisp-network-topology/commit/95f8ade>`_: [admin] Moved submit_line.html to `openwisp-utils <https://github.com/openwisp/openwisp-utils>`_
