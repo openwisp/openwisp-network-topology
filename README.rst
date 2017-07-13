@@ -81,6 +81,7 @@ Setup (integrate in an existing django project)
         # openwisp2 modules
         'openwisp_users',
         'openwisp_network_topology',
+        'rest_framework',
         # admin
         'django.contrib.admin',
     ]
@@ -122,7 +123,7 @@ Add ``openwisp_utils.loaders.DependencyLoader`` to ``TEMPLATES`` in your ``setti
 Add the following settings to ``settings.py``
 
 .. code-block:: python
-    
+
     LOGIN_REDIRECT_URL = 'admin:index'
     ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 
@@ -133,7 +134,7 @@ Add the URLs to your main ``urls.py``:
     from django.conf.urls import include, url
     from django.contrib import admin
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-    
+
     from openwisp_network_topology import urls as urls
 
 
@@ -141,7 +142,7 @@ Add the URLs to your main ``urls.py``:
         url(r'^', include(urls)),
         url(r'^admin/', include(admin.site.urls)),
     ]
-   
+
     urlpatterns += staticfiles_urlpatterns()
 
 Then run:

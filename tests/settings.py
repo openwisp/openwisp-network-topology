@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     # openwisp2 modules
     'openwisp_users',
     'openwisp_network_topology',
+    'rest_framework',
     # admin
     'django.contrib.admin',
 ]
