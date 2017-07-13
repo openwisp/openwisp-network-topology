@@ -6,5 +6,5 @@ from .visualizer import urls as visualizer_urls
 urlpatterns = [
     url(r'^accounts/', include('openwisp_users.accounts.urls')),
     url(r'^api/', include(api)),
-    url(r'', include(visualizer_urls)),
+    url(r'^topology/', include(visualizer_urls)),
 ]
