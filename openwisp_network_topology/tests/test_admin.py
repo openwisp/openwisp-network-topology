@@ -57,7 +57,7 @@ class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
     def test_topology_queryset(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse('admin:openwisp_network_topology_topology_changelist'),
+            url=reverse('admin:topology_topology_changelist'),
             visible=[data['t1'].label, data['org1'].name],
             hidden=[data['t2'].label, data['org2'].name,
                     data['t3_inactive'].label]
@@ -66,7 +66,7 @@ class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
     def test_topology_organization_fk_queryset(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse('admin:openwisp_network_topology_topology_add'),
+            url=reverse('admin:topology_topology_add'),
             visible=[data['org1'].name],
             hidden=[data['org2'].name, data['inactive']],
             select_widget=True
@@ -75,7 +75,7 @@ class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
     def test_node_queryset(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse('admin:openwisp_network_topology_node_changelist'),
+            url=reverse('admin:topology_node_changelist'),
             visible=[data['n11'].label, data['n12'].label, data['org1'].name],
             hidden=[data['n21'].label, data['n22'].label, data['org2'].name,
                     data['n31'].label, data['n32'].label, data['inactive']]
@@ -84,7 +84,7 @@ class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
     def test_node_organization_fk_queryset(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse('admin:openwisp_network_topology_node_add'),
+            url=reverse('admin:topology_node_add'),
             visible=[data['org1'].name],
             hidden=[data['org2'].name, data['inactive']],
             select_widget=True
@@ -93,7 +93,7 @@ class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
     def test_link_queryset(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse('admin:openwisp_network_topology_link_changelist'),
+            url=reverse('admin:topology_link_changelist'),
             visible=[str(data['l1']), data['org1'].name],
             hidden=[str(data['l2']), data['org2'].name,
                     str(data['l3_inactive'])]
@@ -102,7 +102,7 @@ class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
     def test_link_organization_fk_queryset(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse('admin:openwisp_network_topology_link_add'),
+            url=reverse('admin:topology_link_add'),
             visible=[data['org1'].name],
             hidden=[data['org2'].name, data['inactive']],
             select_widget=True
@@ -111,7 +111,7 @@ class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
     def test_node_topology_fk_queryset(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse('admin:openwisp_network_topology_node_add'),
+            url=reverse('admin:topology_node_add'),
             visible=[data['t1'].label],
             hidden=[data['t2'].label, data['t3_inactive'].label]
         )
@@ -119,7 +119,7 @@ class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
     def test_link_topology_fk_queryset(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse('admin:openwisp_network_topology_link_add'),
+            url=reverse('admin:topology_link_add'),
             visible=[data['t1'].label],
             hidden=[data['t2'].label, data['t3_inactive'].label]
         )
@@ -128,7 +128,7 @@ class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
         data = self._create_multitenancy_test_env()
         t_special = self._create_topology(label='special', organization=data['org1'])
         self._test_multitenant_admin(
-            url=reverse('admin:openwisp_network_topology_node_changelist'),
+            url=reverse('admin:topology_node_changelist'),
             visible=[data['t1'].label, t_special.label],
             hidden=[data['t2'].label, data['t3_inactive'].label]
         )
@@ -137,7 +137,7 @@ class TestAdmin(CreateMixin, TestMultitenantAdminMixin,
         data = self._create_multitenancy_test_env()
         t_special = self._create_topology(label='special', organization=data['org1'])
         self._test_multitenant_admin(
-            url=reverse('admin:openwisp_network_topology_link_changelist'),
+            url=reverse('admin:topology_link_changelist'),
             visible=[data['t1'].label, t_special.label],
             hidden=[data['t2'].label, data['t3_inactive'].label]
         )
