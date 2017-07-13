@@ -207,8 +207,11 @@ Run tests with:
 Contributing
 ------------
 
-1. Announce your intentions in the `OpenWISP Mailing List <https://groups.google.com/d/forum/openwisp>`_ and open relavant issues using the `issue tracker <https://github.com/openwisp/openwisp-network-topology/issues>`_
-2. Fork this repo and install the project following the `instructions <https://github.com/openwisp/openwisp-network-topology#install-development-version>`_
+1. Announce your intentions in the `OpenWISP Mailing List <https://groups.google.com/d/forum/openwisp>`_
+   and open relavant issues using the `issue tracker
+   <https://github.com/openwisp/openwisp-network-topology/issues>`_
+2. Fork this repo and install the project following the `instructions
+   <https://github.com/openwisp/openwisp-network-topology#install-development-version>`_
 3. Follow `PEP8, Style Guide for Python Code`_
 4. Write code and corresponding tests
 5. Ensure that all tests pass and the test coverage does not decrease
