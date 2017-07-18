@@ -23,5 +23,17 @@ class Node(OrgMixin, AbstractNode):
 
 
 class Topology(OrgMixin, AbstractTopology):
+    def _create_node(self, **kwargs):
+        options = dict(organization=self.organization,
+                       topology=self)
+        options.update(kwargs)
+        return self.node_model(**options)
+
+    def _create_link(self, **kwargs):
+        options = dict(organization=self.organization,
+                       topology=self)
+        options.update(kwargs)
+        return self.link_model(**options)
+
     class Meta(AbstractTopology.Meta):
         abstract = False
