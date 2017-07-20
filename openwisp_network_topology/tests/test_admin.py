@@ -1,15 +1,41 @@
 from django.test import TestCase
 from django.urls import reverse
 from django_netjsongraph.tests import CreateGraphObjectsMixin
+from django_netjsongraph.tests.utils import TestAdminMixin
 
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.tests.utils import TestMultitenantAdminMixin
 
+from . import CreateOrgMixin
+from ..apps import OpenwispNetworkTopologyConfig as appconfig
 from ..models import Link, Node, Topology
 
 
-class TestAdmin(CreateGraphObjectsMixin, TestMultitenantAdminMixin,
-                TestOrganizationMixin, TestCase):
+class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin,
+                TestAdminMixin, TestCase):
+    topology_model = Topology
+    link_model = Link
+    node_model = Node
+
+    def prefix(self):
+        return 'admin:{0}'.format(appconfig.label)
+
+    def setUp(self):
+        org = self._create_org()
+        t = self._create_topology(organization=org)
+        self._create_node(label="node1",
+                          addresses="192.168.0.1;",
+                          topology=t,
+                          organization=org)
+        self._create_node(label="node2",
+                          addresses="192.168.0.2;",
+                          topology=t,
+                          organization=org)
+        super(TestAdmin, self).setUp()
+
+
+class TestMultitenantAdmin(CreateGraphObjectsMixin, TestMultitenantAdminMixin,
+                           TestOrganizationMixin, TestCase):
     topology_model = Topology
     node_model = Node
     link_model = Link

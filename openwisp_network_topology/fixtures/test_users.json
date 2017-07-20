@@ -1,0 +1,17 @@
+[
+    {
+        "model": "openwisp_users.user",
+        "pk": "973671cc-b921-45b4-a050-69ac6ee5fc06",
+        "fields": {
+            "username": "admin",
+            "password": "pbkdf2_sha256$36000$IOv0fxVQd1dz$Chkj/ckIU/rQjRcFtWAe1/ea6YP8NmkBah8FRzLjE+f=",
+            "first_name": "Admin",
+            "last_name": "Admin",
+            "email": "admin@admin.org",
+            "is_active": true,
+            "is_staff": true,
+            "is_superuser": true,
+            "groups": []
+        }
+    }
+]
