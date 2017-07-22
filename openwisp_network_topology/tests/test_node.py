@@ -1,16 +1,15 @@
 from django.test import TestCase
 from django_netjsongraph.tests import CreateGraphObjectsMixin
-from django_netjsongraph.tests.base.api import TestApiMixin
+from django_netjsongraph.tests.base.node import TestNodeMixin
 
 from . import CreateOrgMixin
-from ..models import Link, Node, Topology
+from ..models import Node, Topology
 
 
-class TestRestFramework(TestCase, TestApiMixin,
-                        CreateGraphObjectsMixin, CreateOrgMixin):
+class TestNode(TestNodeMixin, CreateGraphObjectsMixin, CreateOrgMixin, TestCase):
     topology_model = Topology
     node_model = Node
-    link_model = Link
+    maxDiff = 0
 
     def setUp(self):
         org = self._create_org()

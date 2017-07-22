@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django_netjsongraph.tests import CreateGraphObjectsMixin
-from django_netjsongraph.tests.utils import TestAdminMixin
+from django_netjsongraph.tests.base.admin import TestAdminMixin
 
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.tests.utils import TestMultitenantAdminMixin

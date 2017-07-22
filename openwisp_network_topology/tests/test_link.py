@@ -1,13 +1,13 @@
 from django.test import TestCase
 from django_netjsongraph.tests import CreateGraphObjectsMixin
-from django_netjsongraph.tests.base.api import TestApiMixin
+from django_netjsongraph.tests.base.link import TestLinkMixin
 
 from . import CreateOrgMixin
 from ..models import Link, Node, Topology
 
 
-class TestRestFramework(TestCase, TestApiMixin,
-                        CreateGraphObjectsMixin, CreateOrgMixin):
+class TestLink(TestLinkMixin, CreateOrgMixin,
+               CreateGraphObjectsMixin, TestCase):
     topology_model = Topology
     node_model = Node
     link_model = Link
