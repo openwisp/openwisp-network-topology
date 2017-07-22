@@ -13,7 +13,6 @@ branches:
 # command to install requirements
 install:
   - python setup.py -q develop
-  - pip install https://github.com/netjson/django-netjsongraph/tarball/master
   - pip install -r requirements-test.txt
 
 before_script:
