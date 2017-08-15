@@ -1,6 +1,7 @@
 from django.db import models
 from django_netjsongraph.base.link import AbstractLink
 from django_netjsongraph.base.node import AbstractNode
+from django_netjsongraph.base.snapshot import AbstractSnapshot
 from django_netjsongraph.base.topology import AbstractTopology
 
 from openwisp_users.mixins import OrgMixin
@@ -22,6 +23,13 @@ class Node(OrgMixin, AbstractNode):
         abstract = False
 
 
+class Snapshot(OrgMixin, AbstractSnapshot):
+    topology = models.ForeignKey('topology.Topology')
+
+    class Meta(AbstractSnapshot.Meta):
+        abstract = False
+
+
 class Topology(OrgMixin, AbstractTopology):
     def _create_node(self, **kwargs):
         options = dict(organization=self.organization,
@@ -34,6 +42,11 @@ class Topology(OrgMixin, AbstractTopology):
                        topology=self)
         options.update(kwargs)
         return self.link_model(**options)
+
+    def save_snapshot(self, **kwargs):
+        options = dict(organization=self.organization)
+        options.update(kwargs)
+        super(Topology, self).save_snapshot(**options)
 
     class Meta(AbstractTopology.Meta):
         abstract = False

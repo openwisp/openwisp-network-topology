@@ -17,6 +17,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin,
     link_model = Link
     node_model = Node
 
+    @property
     def prefix(self):
         return 'admin:{0}'.format(appconfig.label)
 

@@ -3,7 +3,7 @@ from django_netjsongraph.tests import CreateGraphObjectsMixin
 from django_netjsongraph.tests.base.api import TestApiMixin
 
 from . import CreateOrgMixin
-from ..models import Link, Node, Topology
+from ..models import Link, Node, Snapshot, Topology
 
 
 class TestRestFramework(TestCase, TestApiMixin,
@@ -11,6 +11,7 @@ class TestRestFramework(TestCase, TestApiMixin,
     topology_model = Topology
     node_model = Node
     link_model = Link
+    snapshot_model = Snapshot
 
     def setUp(self):
         org = self._create_org()
