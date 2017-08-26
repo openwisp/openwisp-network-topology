@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django_netjsongraph.tests import CreateGraphObjectsMixin
-from django_netjsongraph.tests.base.link import TestLinkMixin
+from django_netjsongraph.tests.base.test_link import TestLinkMixin
 
 from . import CreateOrgMixin
 from ..models import Link, Node, Topology
