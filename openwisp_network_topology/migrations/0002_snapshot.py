@@ -12,7 +12,6 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('openwisp_users', '0002_auto_20170719_0052'),
         ('topology', '0001_initial'),
     ]
 
