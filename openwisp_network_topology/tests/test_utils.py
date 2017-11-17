@@ -30,10 +30,10 @@ class TestUtils(TestCase, TestUtilsMixin,
                        properties={},
                        organization=org)
         options.update(kwargs)
-        l = self.link_model(**options)
-        l.full_clean()
-        l.save()
-        return l
+        link = self.link_model(**options)
+        link.full_clean()
+        link.save()
+        return link
 
     def test_save_snapshot_all_method(self, **kwargs):
         org = self._create_org()
