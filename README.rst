@@ -18,6 +18,10 @@ openwisp-network-topology
 
 OpenWISP 2 network topology module (built using Python and Django web-framework).
 
+.. figure:: docs/images/visualizer.png
+   :align: center
+   :alt: 
+
 ------------
 
 .. contents:: **Table of Contents**:
