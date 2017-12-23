@@ -7,7 +7,7 @@ openwisp_admin()
 
 urlpatterns = [
     url(r'^', include('openwisp_network_topology.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
