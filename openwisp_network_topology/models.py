@@ -10,7 +10,7 @@ from openwisp_users.mixins import OrgMixin
 class Link(OrgMixin, AbstractLink):
     topology = models.ForeignKey('topology.Topology', on_delete=models.CASCADE)
     source = models.ForeignKey('topology.Node', related_name='source_link_set', on_delete=models.CASCADE)
-    target = models.ForeignKey('topology.Node', related_name='source_target_set', on_delete=models.CASCADE)
+    target = models.ForeignKey('topology.Node', related_name='target_link_set', on_delete=models.CASCADE)
 
     class Meta(AbstractLink.Meta):
         abstract = False
