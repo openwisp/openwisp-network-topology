@@ -32,6 +32,7 @@ before_script:
 # command to run tests, e.g. python setup.py test
 script:
   - coverage run --source=openwisp_network_topology runtests.py
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.4 ]]; then ./tests/manage.py makemigrations topology --dry-run | grep "No changes detected"; fi
 
 after_success:
   coveralls
