@@ -1,10 +1,19 @@
 Changelog
 =========
 
-Version 0.2.0 [unreleased]
+Version 0.2.0 [2018-02-20]
 --------------------------
 
-WIP
+- `cb7366 <https://github.com/openwisp/openwisp-network-topology/commit/cb7366>`_:
+   [migrations] Added a migration file for link_status_changed and openvpn_parser
+- `#22 <https://github.com/openwisp/openwisp-network-topology/pull/22>`_:
+  Added support to django 2.0
+- `d40032 <https://github.com/openwisp/openwisp-network-topology/commit/d40032>`_:
+  [qa] Fixed variable name error
+- `de45b6 <https://github.com/openwisp/openwisp-network-topology/commit/de45b6>`_:
+  Upgraded code according to latest django-netjsongraph 0.4.0 changes
+- `#17 <https://github.com/openwisp/openwisp-network-topology/pull/17>`_:
+  Integrated topology history feature from django-netjsongraph
 
 Version 0.1.2 [2017-07-22]
 --------------------------
