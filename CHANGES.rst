@@ -1,10 +1,11 @@
 Changelog
 =========
 
-Verison 0.2.1 [unreleased]
+Verison 0.2.1 [2018-02-24]
 --------------------------
 
-WIP
+- `fe9077c <https://github.com/openwisp/openwisp-network-topology/commit/fe9077c>`_:
+   [models] Fixed related name of Link.target
 
 Version 0.2.0 [2018-02-20]
 --------------------------
