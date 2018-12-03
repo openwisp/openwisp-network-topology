@@ -1,5 +1,4 @@
 coverage
 coveralls
-isort
-flake8
 responses
+openwisp-utils[qa]>=0.2.1
