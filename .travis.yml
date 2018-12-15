@@ -26,6 +26,8 @@ install:
   - pip install -r requirements-test.txt
   # Temporary: remove when openwisp-utils 0.3 is released
   - pip install -U https://github.com/openwisp/openwisp-utils/tarball/master
+  # Temporary: remove when django-netjsongraph 0.4.4 is released
+  - pip install -U https://github.com/netjson/django-netjsongraph/tarball/master
 
 before_script:
   - ./runflake8
