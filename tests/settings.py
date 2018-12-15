@@ -144,6 +144,9 @@ EMAIL_PORT = '1025'  # for testing purposes
 LOGIN_REDIRECT_URL = 'admin:index'
 ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 
+OPENWISP_ORGANIZATON_USER_ADMIN = True
+OPENWISP_ORGANIZATON_OWNER_ADMIN = True
+
 # local settings must be imported before test runner otherwise they'll be ignored
 try:
     from local_settings import *
