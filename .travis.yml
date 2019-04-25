@@ -3,17 +3,17 @@ sudo: false
 cache: pip
 
 python:
-  - "3.4"
+  - "3.5"
   - "2.7"
 
 env:
   - DJANGO="django>=1.11,<1.12"
-  - DJANGO="django>=2.0,<2.1"
+  - DJANGO="django>=2.1,<2.2"
 
 matrix:
   exclude:
    - python: "2.7"
-     env: DJANGO="django>=2.0,<2.1"
+     env: DJANGO="django>=2.1,<2.2"
 
 branches:
   only:
@@ -28,6 +28,7 @@ install:
   - pip install -U https://github.com/openwisp/openwisp-users/tarball/master
   # Temporary: remove when django-netjsongraph 0.4.4 is released
   - pip install -U https://github.com/netjson/django-netjsongraph/tarball/master
+  - pip install -U https://github.com/openwisp/openwisp-utils/tarball/master
 
 before_script:
   - flake8
