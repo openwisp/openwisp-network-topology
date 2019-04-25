@@ -8,23 +8,30 @@ from openwisp_users.mixins import OrgMixin
 
 
 class Link(OrgMixin, AbstractLink):
-    topology = models.ForeignKey('topology.Topology', on_delete=models.CASCADE)
-    source = models.ForeignKey('topology.Node', related_name='source_link_set', on_delete=models.CASCADE)
-    target = models.ForeignKey('topology.Node', related_name='target_link_set', on_delete=models.CASCADE)
+    topology = models.ForeignKey('topology.Topology',
+                                 on_delete=models.CASCADE)
+    source = models.ForeignKey('topology.Node',
+                               related_name='source_link_set',
+                               on_delete=models.CASCADE)
+    target = models.ForeignKey('topology.Node',
+                               related_name='target_link_set',
+                               on_delete=models.CASCADE)
 
     class Meta(AbstractLink.Meta):
         abstract = False
 
 
 class Node(OrgMixin, AbstractNode):
-    topology = models.ForeignKey('topology.Topology', on_delete=models.CASCADE)
+    topology = models.ForeignKey('topology.Topology',
+                                 on_delete=models.CASCADE)
 
     class Meta(AbstractNode.Meta):
         abstract = False
 
 
 class Snapshot(OrgMixin, AbstractSnapshot):
-    topology = models.ForeignKey('topology.Topology', on_delete=models.CASCADE)
+    topology = models.ForeignKey('topology.Topology',
+                                 on_delete=models.CASCADE)
 
     class Meta(AbstractSnapshot.Meta):
         abstract = False
