@@ -20,7 +20,7 @@ OpenWISP 2 network topology module (built using Python and Django web-framework)
 
 .. figure:: docs/images/visualizer.png
    :align: center
-   :alt: 
+   :alt:
 
 ------------
 
@@ -83,8 +83,8 @@ Setup (integrate in an existing django project)
         'allauth.account',
         'allauth.socialaccount',
         # openwisp2 modules
-        'openwisp_users',
         'openwisp_network_topology',
+        'openwisp_users',
         'rest_framework',
         # admin
         'django.contrib.admin',
@@ -103,14 +103,15 @@ Add ``openwisp_utils.staticfiles.DependencyFinder`` to ``STATICFILES_FINDERS`` i
         'openwisp_utils.staticfiles.DependencyFinder',
     ]
 
-Add ``openwisp_utils.loaders.DependencyLoader`` to ``TEMPLATES`` in your ``settings.py``
+Add ``openwisp_utils.loaders.DependencyLoader`` to template loaders
+and ``openwisp_utils.admin_theme.context_processor.menu_items`` to
+context processors in the ``TEMPLATES`` setting of ``settings.py``:
 
 .. code-block:: python
 
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [],
             'OPTIONS': {
                 'loaders': [
                     'django.template.loaders.filesystem.Loader',
@@ -122,9 +123,10 @@ Add ``openwisp_utils.loaders.DependencyLoader`` to ``TEMPLATES`` in your ``setti
                     'django.template.context_processors.request',
                     'django.contrib.auth.context_processors.auth',
                     'django.contrib.messages.context_processors.messages',
+                    'openwisp_utils.admin_theme.context_processor.menu_items'
                 ],
             },
-        },
+        }
     ]
 
 Add the following settings to ``settings.py``

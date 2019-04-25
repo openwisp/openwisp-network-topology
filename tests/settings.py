@@ -28,8 +28,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     # openwisp2 modules
-    'openwisp_users',
     'openwisp_network_topology',
+    'openwisp_users',
     # admin
     'django.contrib.admin',
     # rest framework
@@ -81,6 +81,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'openwisp_utils.admin_theme.context_processor.menu_items'
             ],
         },
     },
