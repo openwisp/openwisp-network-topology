@@ -1,4 +1,4 @@
 django-netjsongraph>=0.4.3
 openwisp-users>=0.1.10
 # minimum version will have to be 0.3.0
-openwisp-utils>=0.3
+openwisp-utils>=0.2.2
