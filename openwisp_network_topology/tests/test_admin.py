@@ -3,8 +3,7 @@ from django.urls import reverse
 from django_netjsongraph.tests import CreateGraphObjectsMixin
 from django_netjsongraph.tests.base.test_admin import TestAdminMixin
 
-from openwisp_users.tests.utils import TestOrganizationMixin
-from openwisp_utils.tests.utils import TestMultitenantAdminMixin
+from openwisp_users.tests.utils import TestMultitenantAdminMixin, TestOrganizationMixin
 
 from . import CreateOrgMixin
 from ..apps import OpenwispNetworkTopologyConfig as appconfig
