@@ -18,9 +18,9 @@ class TestUtils(TestCase, TestUtilsMixin,
     def setUp(self):
         org = self._create_org()
         t = self._create_topology(organization=org)
-        self._create_node(label="node1", addresses="192.168.0.1;",
+        self._create_node(label="node1", addresses=["192.168.0.1"],
                           topology=t, organization=org)
-        self._create_node(label="node2", addresses="192.168.0.2;",
+        self._create_node(label="node2", addresses=["192.168.0.2"],
                           topology=t, organization=org)
 
     def _create_link(self, **kwargs):
