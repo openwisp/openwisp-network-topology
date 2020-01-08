@@ -1,4 +1,4 @@
 coveralls
 responses
 freezegun
-openwisp-utils[qa]>=0.3.0
+openwisp-utils[qa]>=0.3.1
