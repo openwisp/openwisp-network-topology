@@ -21,15 +21,11 @@ branches:
   only:
     - master
 
-# command to install requirements
 install:
   - pip install $DJANGO
-  # Temporary: remove when django-netjsongraph 0.4.4 is released
-  - pip install -U https://github.com/netjson/django-netjsongraph/tarball/master
   - python setup.py -q develop
   - pip install -r requirements-test.txt
 
-# command to run tests, e.g. python setup.py test
 script:
   - openwisp-utils-qa-checks --migration-path "./openwisp_network_topology" --migration-module topology
   - coverage run --source=openwisp_network_topology runtests.py
