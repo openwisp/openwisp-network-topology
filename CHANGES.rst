@@ -1,10 +1,11 @@
 Changelog
 =========
 
-Verison 0.2.2 [unreleased]
+Verison 0.2.2 [2020-01-13]
 --------------------------
 
-WIP
+- Updated dependencies
+- Upgraded implementation of node addresses (via django-netjsongraph 0.5.0)
 
 Verison 0.2.1 [2018-02-24]
 --------------------------
