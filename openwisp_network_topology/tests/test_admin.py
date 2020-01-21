@@ -5,9 +5,9 @@ from django_netjsongraph.tests.base.test_admin import TestAdminMixin
 
 from openwisp_users.tests.utils import TestMultitenantAdminMixin, TestOrganizationMixin
 
-from . import CreateOrgMixin
 from ..apps import OpenwispNetworkTopologyConfig as appconfig
 from ..models import Link, Node, Topology
+from . import CreateOrgMixin
 
 
 class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin,
@@ -31,7 +31,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin,
                           addresses=["192.168.0.2"],
                           topology=t,
                           organization=org)
-        super(TestAdmin, self).setUp()
+        super().setUp()
 
 
 class TestMultitenantAdmin(CreateGraphObjectsMixin, TestMultitenantAdminMixin,

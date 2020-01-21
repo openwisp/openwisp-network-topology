@@ -2,20 +2,12 @@ language: python
 cache: pip
 
 python:
-  - "3.5"
-  - "2.7"
+  - "3.6"
+  - "3.7"
 
 env:
-  - DJANGO="django>=1.11,<1.12"
-  - DJANGO="django>=2.1,<2.2"
-  - DJANGO="django>=2.2,<2.3"
-
-matrix:
-  exclude:
-   - python: "2.7"
-     env: DJANGO="django>=2.1,<2.2"
-   - python: "2.7"
-     env: DJANGO="django>=2.2,<2.3"
+  - DJANGO="django>=2.2,<3.0"
+  - DJANGO="django>=3.0,<3.1"
 
 branches:
   only:
@@ -23,6 +15,7 @@ branches:
 
 install:
   - pip install $DJANGO
+  - pip install -e git+git://github.com/openwisp/django-netjsongraph#egg=django-netjsongraph
   - python setup.py -q develop
   - pip install -r requirements-test.txt
 

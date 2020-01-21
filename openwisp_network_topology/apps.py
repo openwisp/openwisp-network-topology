@@ -7,7 +7,7 @@ class OpenwispNetworkTopologyConfig(DjangoNetjsongraphConfig):
     label = 'topology'
 
     def ready(self, *args, **kwargs):
-        super(OpenwispNetworkTopologyConfig, self).ready(*args, **kwargs)
+        super().ready(*args, **kwargs)
         self.add_default_menu_items()
 
     def add_default_menu_items(self):

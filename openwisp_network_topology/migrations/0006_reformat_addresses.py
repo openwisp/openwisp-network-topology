@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 def reformat_address_forward(apps, schema_editor):
     Node = apps.get_model('topology', 'Node')
     for node in Node.objects.all():

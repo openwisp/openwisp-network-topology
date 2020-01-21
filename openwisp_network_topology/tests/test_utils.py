@@ -4,8 +4,8 @@ from django_netjsongraph.tests.utils import TestUtilsMixin
 
 from openwisp_users.models import Organization
 
-from . import CreateOrgMixin
 from ..models import Link, Node, Snapshot, Topology
+from . import CreateOrgMixin
 
 
 class TestUtils(TestCase, TestUtilsMixin,
@@ -39,4 +39,4 @@ class TestUtils(TestCase, TestUtilsMixin,
         org = self._create_org()
         options = dict(organization=org)
         options.update(**kwargs)
-        super(TestUtils, self).test_save_snapshot_all_method(**options)
+        super().test_save_snapshot_all_method(**options)
