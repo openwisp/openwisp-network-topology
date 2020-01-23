@@ -2,8 +2,8 @@ from django.test import TestCase
 from django_netjsongraph.tests import CreateGraphObjectsMixin
 from django_netjsongraph.tests.base.test_visualizer import TestVisualizerMixin
 
-from . import CreateOrgMixin
 from ..models import Node, Topology
+from . import CreateOrgMixin
 
 
 class TestVisualizer(TestVisualizerMixin, CreateOrgMixin,

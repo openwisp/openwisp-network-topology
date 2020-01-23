@@ -53,7 +53,7 @@ class Topology(OrgMixin, AbstractTopology):
     def save_snapshot(self, **kwargs):
         options = dict(organization=self.organization)
         options.update(kwargs)
-        super(Topology, self).save_snapshot(**options)
+        super().save_snapshot(**options)
 
     class Meta(AbstractTopology.Meta):
         abstract = False
