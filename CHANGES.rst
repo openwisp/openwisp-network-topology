@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Verison 0.3.0 [2020-02-06]
+--------------------------
+
+- Dropped support python 3.5 and below
+- Dropped support django 2.1 and below
+- Dropped support openwisp-users below 0.2.0
+- Dropped support openwisp-utils 0.4.1 and below
+- Dropped support django-netjsongraph below 0.6.0
+- Added support for django 3.0
+
 Verison 0.2.2 [2020-01-13]
 --------------------------
 

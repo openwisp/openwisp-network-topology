@@ -15,7 +15,6 @@ branches:
 
 install:
   - pip install $DJANGO
-  - pip install -e git+git://github.com/openwisp/django-netjsongraph#egg=django-netjsongraph
   - python setup.py -q develop
   - pip install -r requirements-test.txt
 
