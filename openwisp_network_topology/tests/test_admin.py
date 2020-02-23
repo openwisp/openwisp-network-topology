@@ -15,6 +15,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin,
     topology_model = Topology
     link_model = Link
     node_model = Node
+    module = 'openwisp_network_topology'
 
     @property
     def prefix(self):
