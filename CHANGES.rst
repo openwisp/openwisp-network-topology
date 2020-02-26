@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Verison 0.3.1 [2020-02-26]
+--------------------------
+
+- bumped min openwisp-utils 0.4.3
+- bumped django-netjsongraph 0.6.1
+
 Verison 0.3.0 [2020-02-06]
 --------------------------
 
