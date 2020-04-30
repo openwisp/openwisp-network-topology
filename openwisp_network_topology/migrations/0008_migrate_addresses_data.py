@@ -12,6 +12,4 @@ class Migration(migrations.Migration):
         ('topology', '0007_create_new_address_field'),
     ]
 
-    operations = [
-        migrations.RunPython(migrate_addresses)
-    ]
+    operations = [migrations.RunPython(migrate_addresses)]

@@ -12,9 +12,7 @@ class OpenwispNetworkTopologyConfig(DjangoNetjsongraphConfig):
 
     def add_default_menu_items(self):
         menu_setting = 'OPENWISP_DEFAULT_ADMIN_MENU_ITEMS'
-        items = [
-            {'model': 'topology.Topology'}
-        ]
+        items = [{'model': 'topology.Topology'}]
         if not hasattr(settings, menu_setting):
             setattr(settings, menu_setting, items)
         else:

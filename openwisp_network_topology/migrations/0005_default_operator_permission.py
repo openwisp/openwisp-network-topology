@@ -34,26 +34,25 @@ def assign_permissions_to_groups(apps, schema_editor):
             operator.permissions.add(permission.pk)
     for model_name in operators_read_only_admins_manage:
         try:
-            permission = Permission.objects.get(
-                codename="view_{}".format(model_name)
-            )
+            permission = Permission.objects.get(codename="view_{}".format(model_name))
             operator.permissions.add(permission.pk)
         except Permission.DoesNotExist:
-            pass        
+            pass
         for operation in manage_operations:
             admin.permissions.add(
-                Permission.objects.get(codename="{}_{}".format(operation, model_name)).pk
+                Permission.objects.get(
+                    codename="{}_{}".format(operation, model_name)
+                ).pk
             )
 
 
 class Migration(migrations.Migration):
     dependencies = [
         ('openwisp_users', '0004_default_groups'),
-        ('topology', '0004_fixed_target_link_set')
+        ('topology', '0004_fixed_target_link_set'),
     ]
     operations = [
         migrations.RunPython(
-            assign_permissions_to_groups,
-            reverse_code=migrations.RunPython.noop
+            assign_permissions_to_groups, reverse_code=migrations.RunPython.noop
         )
     ]

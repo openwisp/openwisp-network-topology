@@ -12,9 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name='node',
-            old_name='addresses',
-            new_name='addresses_old',
+            model_name='node', old_name='addresses', new_name='addresses_old',
         ),
         migrations.AddField(
             model_name='node',
