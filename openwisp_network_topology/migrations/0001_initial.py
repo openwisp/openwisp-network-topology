@@ -8,7 +8,7 @@ import uuid
 import django.core.validators
 import django.db.models.deletion
 import django.utils.timezone
-import django_netjsongraph.utils
+import openwisp_network_topology.utils
 import jsonfield.fields
 import model_utils.fields
 from django.db import migrations, models

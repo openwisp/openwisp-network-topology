@@ -1,11 +1,10 @@
 from django.test import TestCase
-from django_netjsongraph.tests import CreateGraphObjectsMixin
-from django_netjsongraph.tests.utils import TestUtilsMixin
 
 from openwisp_users.models import Organization
 
 from ..models import Link, Node, Snapshot, Topology
-from . import CreateOrgMixin
+from . import CreateGraphObjectsMixin, CreateOrgMixin
+from .utils import TestUtilsMixin
 
 
 class TestUtils(TestCase, TestUtilsMixin, CreateGraphObjectsMixin, CreateOrgMixin):

@@ -1,0 +1,9 @@
+{% extends 'netjsongraph/base.html' %}
+{% block title %}{{ topology.label }}{% endblock %}
+{% block body %}
+    {% include './netjsongraph-content.html' %}
+{% endblock %}
+{% block script %}
+    {{ block.super }}
+    {% include './netjsongraph-script.html' %}
+{% endblock %}

@@ -1,0 +1,167 @@
+body.frontend{
+    margin: 0;
+    padding: 8px
+}
+
+.njg-overlay,
+.njg-metadata,
+.njg-switcher{
+    background: #fbfbfb;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    color: #1e1d1d;
+    font-family: Arial, sans-serif;
+    font-family: sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    height: auto;
+    max-width: 400px;
+    min-width: 200px;
+    padding: 0 15px;
+    top: 10px;
+    right: 10px;
+    width: auto;
+}
+
+.njg-metadata{
+    left: 10px;
+    right: auto;
+    max-width: 500px;
+    min-width: 200px;
+    padding-bottom: 10px
+}
+
+.njg-overlay{
+    padding-top: 10px;
+    padding-bottom: 10px
+}
+
+.njg-metadata h3 {
+    font-family: "Georgia", serif;
+    font-style: italic;
+    margin-bottom: 8px
+}
+
+.njg-overlay p,
+.njg-metadata p{
+    margin: 8px 0;
+}
+
+.njg-node{
+    stroke-width: 7px;
+    stroke-alignment: inner;
+    stroke: #f4d18c;
+    fill: #2b2b2b;
+}
+
+.njg-node:hover,
+.njg-node.njg-open {
+    stroke: #fff;
+    fill: #000;
+}
+
+.njg-link{
+    cursor: pointer;
+    stroke: #1ba619;
+    stroke-width: 3;
+    stroke-opacity: 0.8;
+}
+
+.njg-link:hover,
+.njg-link.njg-open{
+    stroke-width: 4 !important;
+    stroke-opacity: 1;
+    stroke: #3acc38;
+}
+
+.njg-tooltip{ fill: #fff; opacity: 0.8 }
+
+body.frontend {
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    line-height: 20px;
+    background-color: #2b2b2b
+}
+#menu{
+    list-style: none outside;
+}
+#menu li{
+    margin-bottom: 10px;
+}
+#menu li a{
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    text-decoration: none;
+    padding: 5px 15px;
+    margin-right: 5px;
+}
+#menu li a:hover{
+    background: rgba(0, 0, 0, 0.7)
+}
+.down{
+    stroke: #c92517;
+    stroke-dasharray: 10, 5
+}
+.down:hover,.down.njg-open{
+    stroke: red;
+}
+
+/* legend */
+#legend{
+    position: absolute;
+    top: auto;
+    left: 5px;
+    bottom: 5px;
+    width: auto;
+    height: auto;
+    max-width: 250px;
+    padding: 0 15px;
+    background: #fbfbfb;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    font-family: Arial, sans-serif;
+    font-family: sans-serif;
+    font-size: 14px;
+}
+#legend p{ line-height: 16px; margin: 10px 0 }
+#legend span{
+    width: 16px;
+    margin-right: 5px;
+}
+#legend span.link{
+    display: inline-block;
+    height: 5px;
+    border-bottom-width: 6px;
+    border-bottom-style: solid;
+}
+#legend .up{ border-color: #3acc38 }
+#legend .down{ border-color: red }
+
+.njg-switcher{
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    top: auto;
+    padding: 10px 15px;
+    min-width: auto;
+}
+
+#njg-datepicker{
+    margin: 0 0 0 5px !important;
+    font-size: 13px;
+    padding: 5px 10px;
+    width: 75px;
+}
+
+#ui-datepicker-div{
+    font-size: 15px;
+    line-height: initial
+}
+
+.ui-datepicker thead th{
+    line-height: normal;
+    text-transform: uppercase;
+    font-size: 11px;
+    background: #f6f6f6;
+}

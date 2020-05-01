@@ -1,1 +1,10 @@
-{% extends "admin/django_netjsongraph/visualize.html" %}
+{% load i18n admin_urls %}
+{% load static %}
+
+{% block content %}
+<a class="close" href="#">&times; {% trans 'Close' %}</a>
+{% include '../../netjsongraph/netjsongraph-content.html' %}
+{% block script %}
+{% include '../../netjsongraph/netjsongraph-script.html' %}
+{% endblock %}
+{% endblock %}

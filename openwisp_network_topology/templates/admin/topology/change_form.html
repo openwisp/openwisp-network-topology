@@ -1,1 +1,16 @@
-{% extends "admin/django_netjsongraph/change_form.html" %}
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify %}
+
+{% block object-tools-items %}
+{{ block.super }}
+{% endblock %}
+
+{% block submit_buttons_top %}{% submit_row %}{% endblock %}
+{% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div class="djnjg-overlay">
+    <div class="inner"></div>
+</div>
+{% endblock %}

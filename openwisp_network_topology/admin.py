@@ -1,9 +1,4 @@
 from django.contrib import admin
-from django_netjsongraph.base.admin import (
-    AbstractLinkAdmin,
-    AbstractNodeAdmin,
-    AbstractTopologyAdmin,
-)
 
 from openwisp_users.multitenancy import (
     MultitenantAdminMixin,
@@ -11,65 +6,20 @@ from openwisp_users.multitenancy import (
     MultitenantRelatedOrgFilter,
 )
 
+from .base.admin import AbstractLinkAdmin, AbstractNodeAdmin, AbstractTopologyAdmin
 from .models import Link, Node, Topology
 
 
-class TopologyAdmin(MultitenantAdminMixin, AbstractTopologyAdmin):
+class TopologyAdmin(AbstractTopologyAdmin):
     model = Topology
 
 
-TopologyAdmin.list_display += ('organization',)
-TopologyAdmin.list_filter += (('organization', MultitenantOrgFilter),)
-TopologyAdmin.fields.insert(1, 'organization')
-
-
-class NodeAdmin(MultitenantAdminMixin, AbstractNodeAdmin):
+class NodeAdmin(AbstractNodeAdmin):
     model = Node
-    list_display = ['name', 'organization', 'topology', 'addresses']
-    list_filter = [
-        ('organization', MultitenantOrgFilter),
-        ('topology', MultitenantRelatedOrgFilter),
-    ]
-    multitenant_shared_relations = ('topology',)
-    fields = [
-        'label',
-        'organization',
-        'addresses',
-        'properties',
-        'topology',
-        'created',
-        'modified',
-    ]
 
 
-class LinkAdmin(MultitenantAdminMixin, AbstractLinkAdmin):
+class LinkAdmin(AbstractLinkAdmin):
     model = Link
-    list_display = [
-        '__str__',
-        'organization',
-        'topology',
-        'status',
-        'cost',
-        'cost_text',
-    ]
-    list_filter = [
-        'status',
-        ('organization', MultitenantOrgFilter),
-        ('topology', MultitenantRelatedOrgFilter),
-    ]
-    multitenant_shared_relations = ('topology', 'source', 'target')
-    fields = [
-        'organization',
-        'cost',
-        'cost_text',
-        'status',
-        'properties',
-        'topology',
-        'source',
-        'target',
-        'created',
-        'modified',
-    ]
 
 
 admin.site.register(Link, LinkAdmin)

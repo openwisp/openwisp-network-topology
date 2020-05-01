@@ -1,13 +1,12 @@
 from django.test import TestCase
 from django.urls import reverse
-from django_netjsongraph.tests import CreateGraphObjectsMixin
-from django_netjsongraph.tests.base.test_admin import TestAdminMixin
 
 from openwisp_users.tests.utils import TestMultitenantAdminMixin, TestOrganizationMixin
 
 from ..apps import OpenwispNetworkTopologyConfig as appconfig
 from ..models import Link, Node, Topology
-from . import CreateOrgMixin
+from . import CreateGraphObjectsMixin, CreateOrgMixin
+from .base.test_admin import TestAdminMixin
 
 
 class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, TestAdminMixin, TestCase):

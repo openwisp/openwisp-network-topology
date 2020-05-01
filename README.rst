@@ -89,9 +89,9 @@ Setup (integrate in an existing django project)
         # admin
         'django.contrib.admin',
     ]
-    EXTENDED_APPS = ('django_netjsongraph',)
+    EXTENDED_APPS = ('openwisp_network_topology',)
 
-Note that the ``EXTENDED_APPS`` may contain other names (if you installed other modules), in that case you should just add ``django_netjsongraph``.
+Note that the ``EXTENDED_APPS`` may contain other names (if you installed other modules), in that case you should just add ``openwisp_network_topology``.
 
 Add ``openwisp_utils.staticfiles.DependencyFinder`` to ``STATICFILES_FINDERS`` in your settings.py
 

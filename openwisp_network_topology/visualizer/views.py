@@ -1,9 +1,5 @@
-from django_netjsongraph.visualizer.generics import (
-    BaseTopologyDetailView,
-    BaseTopologyListView,
-)
-
 from ..models import Topology
+from .generics import BaseTopologyDetailView, BaseTopologyListView
 
 
 class TopologyListView(BaseTopologyListView):

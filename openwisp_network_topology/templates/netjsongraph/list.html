@@ -1,0 +1,12 @@
+{% extends 'netjsongraph/base.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Topology list' %}{% endblock %}
+{% block body %}
+    <ul id="menu">
+        {% for topology in topologies %}
+            <li>
+                <a href="{% url 'topology_detail' topology.id %}">{{ topology.label }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

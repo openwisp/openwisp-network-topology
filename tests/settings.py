@@ -36,8 +36,6 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
-EXTENDED_APPS = ['django_netjsongraph']
-
 AUTH_USER_MODEL = 'openwisp_users.User'
 SITE_ID = '1'
 
@@ -126,7 +124,7 @@ LOGGING = {
     'loggers': {'py.warnings': {'handlers': ['console'],}},
 }
 
-TEST_RUNNER = 'django_netjsongraph.tests.utils.LoggingDisabledTestRunner'
+TEST_RUNNER = 'openwisp_network_topology.tests.utils.LoggingDisabledTestRunner'
 
 EMAIL_PORT = '1025'  # for testing purposes
 LOGIN_REDIRECT_URL = 'admin:index'
