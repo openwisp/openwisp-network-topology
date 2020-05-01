@@ -1,3 +1,4 @@
+import swapper
 from django.apps import AppConfig
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -17,7 +18,7 @@ class OpenwispNetworkTopologyConfig(AppConfig):
 
     def add_default_menu_items(self):
         menu_setting = 'OPENWISP_DEFAULT_ADMIN_MENU_ITEMS'
-        items = [{'model': 'topology.Topology'}]
+        items = [{'model': swapper.get_model_name('topology', 'Topology')}]
         if not hasattr(settings, menu_setting):
             setattr(settings, menu_setting, items)
         else:

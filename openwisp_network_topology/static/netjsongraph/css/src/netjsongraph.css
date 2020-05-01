@@ -3,7 +3,7 @@
     visibility: hidden !important;
 }
 
-.njg-tooltip{
+.njg-tooltip {
     font-family: sans-serif;
     font-size: 10px;
     fill: #fff;
@@ -11,28 +11,36 @@
     text-anchor: middle;
 }
 
-.njg-overlay{
+.njg-overlay {
     display: none;
     position: absolute;
     z-index: 11;
 }
 
-.njg-close{
+.njg-close {
     cursor: pointer;
     position: absolute;
     right: 10px;
     top: 10px;
 }
-.njg-close:before { content: "\2716"; }
 
-.njg-metadata{
+.njg-close:before {
+    content: "\2716";
+}
+
+.njg-metadata {
     display: none;
     position: absolute;
     z-index: 12;
 }
 
-.njg-node{ cursor: pointer }
-.njg-link{ cursor: pointer }
+.njg-node {
+    cursor: pointer
+}
+
+.njg-link {
+    cursor: pointer
+}
 
 #njg-select-group {
     text-align: center;

@@ -2,6 +2,7 @@ import json
 from collections import OrderedDict
 from datetime import timedelta
 
+import swapper
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -20,7 +21,9 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
     NetJSON NetworkGraph Node Object implementation
     """
 
-    topology = models.ForeignKey('topology.Topology', on_delete=models.CASCADE)
+    topology = models.ForeignKey(
+        swapper.get_model_name('topology', 'Topology'), on_delete=models.CASCADE
+    )
     label = models.CharField(max_length=64, blank=True)
     # netjson ID and local_addresses
     addresses = JSONField(default=[])

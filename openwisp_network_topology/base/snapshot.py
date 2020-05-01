@@ -1,3 +1,4 @@
+import swapper
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -10,7 +11,9 @@ class AbstractSnapshot(OrgMixin, TimeStampedEditableModel):
     NetJSON NetworkGraph Snapshot implementation
     """
 
-    topology = models.ForeignKey('topology.Topology', on_delete=models.CASCADE)
+    topology = models.ForeignKey(
+        swapper.get_model_name('topology', 'Topology'), on_delete=models.CASCADE
+    )
     data = models.TextField(blank=False)
     date = models.DateField(auto_now=True)
 

@@ -2,6 +2,7 @@ import json
 from collections import OrderedDict
 from datetime import timedelta
 
+import swapper
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -24,12 +25,18 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
     NetJSON NetworkGraph Link Object implementation
     """
 
-    topology = models.ForeignKey('topology.Topology', on_delete=models.CASCADE)
+    topology = models.ForeignKey(
+        swapper.get_model_name('topology', 'Topology'), on_delete=models.CASCADE
+    )
     source = models.ForeignKey(
-        'topology.Node', related_name='source_link_set', on_delete=models.CASCADE
+        swapper.get_model_name('topology', 'Node'),
+        related_name='source_link_set',
+        on_delete=models.CASCADE,
     )
     target = models.ForeignKey(
-        'topology.Node', related_name='target_link_set', on_delete=models.CASCADE
+        swapper.get_model_name('topology', 'Node'),
+        related_name='target_link_set',
+        on_delete=models.CASCADE,
     )
     cost = models.FloatField()
     cost_text = models.CharField(max_length=24, blank=True)

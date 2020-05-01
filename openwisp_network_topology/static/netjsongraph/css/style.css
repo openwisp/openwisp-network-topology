@@ -1,11 +1,11 @@
-body.frontend{
+body.frontend {
     margin: 0;
     padding: 8px
 }
 
 .njg-overlay,
 .njg-metadata,
-.njg-switcher{
+.njg-switcher {
     background: #fbfbfb;
     border-radius: 3px;
     border: 1px solid #ccc;
@@ -23,7 +23,7 @@ body.frontend{
     width: auto;
 }
 
-.njg-metadata{
+.njg-metadata {
     left: 10px;
     right: auto;
     max-width: 500px;
@@ -31,7 +31,7 @@ body.frontend{
     padding-bottom: 10px
 }
 
-.njg-overlay{
+.njg-overlay {
     padding-top: 10px;
     padding-bottom: 10px
 }
@@ -43,11 +43,11 @@ body.frontend{
 }
 
 .njg-overlay p,
-.njg-metadata p{
+.njg-metadata p {
     margin: 8px 0;
 }
 
-.njg-node{
+.njg-node {
     stroke-width: 7px;
     stroke-alignment: inner;
     stroke: #f4d18c;
@@ -60,7 +60,7 @@ body.frontend{
     fill: #000;
 }
 
-.njg-link{
+.njg-link {
     cursor: pointer;
     stroke: #1ba619;
     stroke-width: 3;
@@ -68,13 +68,16 @@ body.frontend{
 }
 
 .njg-link:hover,
-.njg-link.njg-open{
+.njg-link.njg-open {
     stroke-width: 4 !important;
     stroke-opacity: 1;
     stroke: #3acc38;
 }
 
-.njg-tooltip{ fill: #fff; opacity: 0.8 }
+.njg-tooltip {
+    fill: #fff;
+    opacity: 0.8
+}
 
 body.frontend {
     overflow: hidden;
@@ -82,13 +85,16 @@ body.frontend {
     line-height: 20px;
     background-color: #2b2b2b
 }
-#menu{
+
+#menu {
     list-style: none outside;
 }
-#menu li{
+
+#menu li {
     margin-bottom: 10px;
 }
-#menu li a{
+
+#menu li a {
     display: inline-block;
     background: #000;
     color: #fff;
@@ -96,19 +102,25 @@ body.frontend {
     padding: 5px 15px;
     margin-right: 5px;
 }
-#menu li a:hover{
+
+#menu li a:hover {
     background: rgba(0, 0, 0, 0.7)
 }
-.down{
+
+.down {
     stroke: #c92517;
     stroke-dasharray: 10, 5
 }
-.down:hover,.down.njg-open{
+
+.down:hover,
+.down.njg-open {
     stroke: red;
 }
 
+
 /* legend */
-#legend{
+
+#legend {
     position: absolute;
     top: auto;
     left: 5px;
@@ -124,21 +136,33 @@ body.frontend {
     font-family: sans-serif;
     font-size: 14px;
 }
-#legend p{ line-height: 16px; margin: 10px 0 }
-#legend span{
+
+#legend p {
+    line-height: 16px;
+    margin: 10px 0
+}
+
+#legend span {
     width: 16px;
     margin-right: 5px;
 }
-#legend span.link{
+
+#legend span.link {
     display: inline-block;
     height: 5px;
     border-bottom-width: 6px;
     border-bottom-style: solid;
 }
-#legend .up{ border-color: #3acc38 }
-#legend .down{ border-color: red }
 
-.njg-switcher{
+#legend .up {
+    border-color: #3acc38
+}
+
+#legend .down {
+    border-color: red
+}
+
+.njg-switcher {
     position: absolute;
     bottom: 5px;
     right: 5px;
@@ -147,19 +171,19 @@ body.frontend {
     min-width: auto;
 }
 
-#njg-datepicker{
+#njg-datepicker {
     margin: 0 0 0 5px !important;
     font-size: 13px;
     padding: 5px 10px;
     width: 75px;
 }
 
-#ui-datepicker-div{
+#ui-datepicker-div {
     font-size: 15px;
     line-height: initial
 }
 
-.ui-datepicker thead th{
+.ui-datepicker thead th {
     line-height: normal;
     text-transform: uppercase;
     font-size: 11px;

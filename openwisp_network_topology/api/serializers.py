@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+import swapper
 from rest_framework import serializers
 
 
@@ -30,4 +31,6 @@ class NetworkGraphSerializer(serializers.ModelSerializer):
         return obj.json(dict=True)
 
     class Meta:
+        model = swapper.load_model('topology', 'Topology')
+        fields = '__all__'
         list_serializer_class = NetworkCollectionSerializer

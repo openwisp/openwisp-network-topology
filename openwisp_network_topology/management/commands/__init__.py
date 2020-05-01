@@ -1,8 +1,12 @@
+import swapper
 from django.core.management.base import BaseCommand
+
+Topology = swapper.load_model('topology', 'Topology')
 
 
 class BaseUpdateCommand(BaseCommand):
     help = 'Update network topology'
+    topology_model = Topology
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -18,6 +22,7 @@ class BaseUpdateCommand(BaseCommand):
 
 class BaseSaveSnapshotCommand(BaseCommand):
     help = 'Save network topology graph snapshot'
+    topology_model = Topology
 
     def add_arguments(self, parser):
         parser.add_argument(
