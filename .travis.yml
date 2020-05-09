@@ -22,7 +22,7 @@ install:
 
 script:
   - coverage run --source=openwisp_network_topology runtests.py
-  - bash run-qa-checks
+  - ./run-qa-checks
 
 after_success:
   coveralls

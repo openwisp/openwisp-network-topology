@@ -213,6 +213,12 @@ Run tests with:
 
     ./runtests.py
 
+Run qa tests:
+
+.. code-block:: shell
+
+    ./run-qa-checks
+
 Contributing
 ------------
 
