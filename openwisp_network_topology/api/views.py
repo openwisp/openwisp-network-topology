@@ -4,8 +4,13 @@ from django_netjsongraph.api.generics import (
     BaseNetworkGraphView,
     BaseReceiveTopologyView,
 )
+from django_netjsongraph.api.serializers import NetworkGraphSerializer
 
 from ..models import Snapshot, Topology
+
+# TODO: use swappable model loading to define this at serializer level
+NetworkGraphSerializer.Meta.model = Topology
+NetworkGraphSerializer.Meta.fields = '__all__'
 
 
 class NetworkCollectionView(BaseNetworkCollectionView):
