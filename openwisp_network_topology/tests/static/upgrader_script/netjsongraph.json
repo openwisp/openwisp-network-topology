@@ -1,0 +1,585 @@
+[
+    {
+        "model": "django_netjsongraph.topology",
+        "pk": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+        "fields": {
+            "created": "2020-05-03T10:34:13.061Z",
+            "modified": "2020-05-03T10:34:20.740Z",
+            "label": "default",
+            "parser": "netdiff.NetJsonParser",
+            "strategy": "fetch",
+            "url": "https://openwisp.nnxx.ninux.org/api/topology/36d5ba3e-1364-49d2-9e29-1f6dceb7cbbb/?format=json",
+            "key": "mT6rTZTlQgNv0JuWgOuJZ47gPVCjHzSb",
+            "expiration_time": 0,
+            "published": true,
+            "protocol": "olsrv2",
+            "version": "0.14.1-1",
+            "revision": "",
+            "metric": "ff_dat_metric"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "0330f23c-13be-43b4-91b9-5dc688e7a570",
+        "fields": {
+            "created": "2020-05-03T10:34:23.536Z",
+            "modified": "2020-05-03T10:34:23.537Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "",
+            "addresses": "[\"id_10.27.22.1_0.0.0.0/0\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.22.1\",\n    \"router_id\": \"id_10.27.22.1\",\n    \"type\": \"attached\",\n    \"created\": \"2017-08-20T17:10:02.336000Z\",\n    \"modified\": \"2020-01-17T16:49:10.829505Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "0509e9c2-b2d7-4475-8df2-e76a8725fd36",
+        "fields": {
+            "created": "2020-05-03T10:34:21.238Z",
+            "modified": "2020-05-03T10:34:21.240Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.27.24.1",
+            "addresses": "[\"id_10.27.24.1\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.24.1\",\n    \"router_id\": \"id_10.27.24.1\",\n    \"dualstack_id\": \"id_fd25:fc4:1261::1\",\n    \"type\": \"node\",\n    \"dualstack_addr\": \"fd25:fc4:1261::1\",\n    \"created\": \"2018-03-31T17:30:01.070000Z\",\n    \"modified\": \"2020-01-17T16:49:10.785919Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "106ed897-a5d2-4e9f-a6b2-d3e85f4e0c6f",
+        "fields": {
+            "created": "2020-05-03T10:34:22.259Z",
+            "modified": "2020-05-03T10:34:22.263Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.27.23.1 - 10.27.23.0/24",
+            "addresses": "[\"id_10.27.23.1_10.27.23.0/24\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.23.1\",\n    \"router_id\": \"id_10.27.23.1\",\n    \"type\": \"attached\",\n    \"created\": \"2018-06-23T12:19:39.852000Z\",\n    \"modified\": \"2020-01-17T16:49:10.796726Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "1497433d-6500-4093-966a-c36c8f8f63ce",
+        "fields": {
+            "created": "2020-05-03T10:34:23.283Z",
+            "modified": "2020-05-03T10:34:23.287Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "Kali-Matera-net",
+            "addresses": "[\"id_10.27.0.1_10.27.0.0/24\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.0.1\",\n    \"router_id\": \"id_10.27.0.1\",\n    \"type\": \"lan\",\n    \"created\": \"2017-07-19T16:44:20.660000Z\",\n    \"modified\": \"2020-01-17T16:49:10.826859Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "178d518e-7e43-4751-9197-30a3d38c4d50",
+        "fields": {
+            "created": "2020-05-03T10:34:23.425Z",
+            "modified": "2020-05-03T10:34:23.429Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "",
+            "addresses": "[\"id_10.27.10.1_0.0.0.0/0\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.10.1\",\n    \"router_id\": \"id_10.27.10.1\",\n    \"type\": \"attached\",\n    \"created\": \"2017-07-19T16:44:19.702000Z\",\n    \"modified\": \"2020-01-17T16:49:10.829051Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "32229436-ec61-490e-96d2-6010200b5670",
+        "fields": {
+            "created": "2020-05-03T10:34:22.826Z",
+            "modified": "2020-05-03T10:34:22.829Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.3.5.3 - 10.27.22.0/25",
+            "addresses": "[\"id_10.3.5.3_10.27.22.0/25\"]",
+            "properties": "{\n    \"router_addr\": \"10.3.5.3\",\n    \"router_id\": \"id_10.3.5.3\",\n    \"type\": \"attached\",\n    \"created\": \"2018-04-22T10:05:02.029000Z\",\n    \"modified\": \"2020-01-17T16:49:10.801491Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "431ef1be-000e-483b-b898-75fbc933c204",
+        "fields": {
+            "created": "2020-05-03T10:34:22.048Z",
+            "modified": "2020-05-03T10:34:22.050Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.27.22.1 - 0.0.0.0",
+            "addresses": "[\"id_10.27.22.1_0.0.0.0\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.22.1\",\n    \"router_id\": \"id_10.27.22.1\",\n    \"type\": \"lan\",\n    \"created\": \"2018-09-13T17:35:07.331000Z\",\n    \"modified\": \"2020-01-17T16:49:10.793818Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "4a118a25-3347-4d6c-b61f-ecb24c788197",
+        "fields": {
+            "created": "2020-05-03T10:34:23.696Z",
+            "modified": "2020-05-03T10:34:23.698Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "Syskrack-router",
+            "addresses": "[\"id_10.27.10.1\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.10.1\",\n    \"router_id\": \"id_10.27.10.1\",\n    \"dualstack_id\": \"id_fdb5:a1cc:bb86::1\",\n    \"type\": \"node\",\n    \"dualstack_addr\": \"fdb5:a1cc:bb86::1\",\n    \"created\": \"2017-07-19T16:44:19.816000Z\",\n    \"modified\": \"2020-01-17T16:49:10.829944Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "72fbafaf-b11b-4737-a5b9-45f8db8cbe29",
+        "fields": {
+            "created": "2020-05-03T10:34:22.570Z",
+            "modified": "2020-05-03T10:34:22.572Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "172.27.85.36",
+            "addresses": "[\"id_172.27.85.36\"]",
+            "properties": "{\n    \"router_addr\": \"172.27.85.36\",\n    \"router_id\": \"id_172.27.85.36\",\n    \"dualstack_id\": \"id_fdd1:50f2:2dfa::1\",\n    \"type\": \"local\",\n    \"dualstack_addr\": \"fdd1:50f2:2dfa::1\",\n    \"created\": \"2018-07-15T18:47:39.836000Z\",\n    \"modified\": \"2020-01-17T16:49:10.798336Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "7bdf0877-5be6-45ab-91c2-a8d62a359575",
+        "fields": {
+            "created": "2020-05-03T10:34:22.146Z",
+            "modified": "2020-05-03T10:34:22.148Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "Kali Oppido Lucano",
+            "addresses": "[\"id_10.27.22.1_10.27.22.0/24\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.22.1\",\n    \"router_id\": \"id_10.27.22.1\",\n    \"type\": \"attached\",\n    \"created\": \"2017-08-20T17:10:02.423000Z\",\n    \"modified\": \"2020-01-17T16:49:10.795115Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "8199162d-6f00-45c9-91b9-6aa97888a338",
+        "fields": {
+            "created": "2020-05-03T10:34:22.713Z",
+            "modified": "2020-05-03T10:34:22.714Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.27.23.1",
+            "addresses": "[\"id_10.27.23.1\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.23.1\",\n    \"router_id\": \"id_10.27.23.1\",\n    \"dualstack_id\": \"id_fd02:c1d0:c7a7::1\",\n    \"dualstack_addr\": \"fd02:c1d0:c7a7::1\",\n    \"type\": \"node\",\n    \"created\": \"2018-06-23T12:19:39.743000Z\",\n    \"modified\": \"2020-01-17T16:49:10.798739Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "8847787e-1c7f-4854-add3-ab7b979f1b0d",
+        "fields": {
+            "created": "2020-05-03T10:34:22.936Z",
+            "modified": "2020-05-03T10:34:22.938Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "",
+            "addresses": "[\"id_10.27.0.1_0.0.0.0/0\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.0.1\",\n    \"router_id\": \"id_10.27.0.1\",\n    \"type\": \"lan\",\n    \"created\": \"2017-07-19T16:44:19.439000Z\",\n    \"modified\": \"2020-01-17T16:49:10.816051Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "8a513df6-43b2-4759-88f9-ca5fc15487fe",
+        "fields": {
+            "created": "2020-05-03T10:34:21.893Z",
+            "modified": "2020-05-03T10:34:21.895Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.3.5.3 - 10.27.22.0/24",
+            "addresses": "[\"id_10.3.5.3_10.27.22.0/24\"]",
+            "properties": "{\n    \"router_addr\": \"10.3.5.3\",\n    \"router_id\": \"id_10.3.5.3\",\n    \"type\": \"lan\",\n    \"created\": \"2018-04-07T23:55:00.820000Z\",\n    \"modified\": \"2020-01-17T16:49:10.792987Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "96aeba3b-c577-4e36-81c6-8e43fcccbaca",
+        "fields": {
+            "created": "2020-05-03T10:34:21.081Z",
+            "modified": "2020-05-03T10:34:21.083Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.3.5.3 - 0.0.0.0/0",
+            "addresses": "[\"id_10.3.5.3_0.0.0.0/0\"]",
+            "properties": "{\n    \"router_addr\": \"10.3.5.3\",\n    \"router_id\": \"id_10.3.5.3\",\n    \"type\": \"lan\",\n    \"created\": \"2018-04-07T23:55:01.525000Z\",\n    \"modified\": \"2020-01-17T16:49:10.784182Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "a7996217-e3b9-493a-a005-81eccbf1aa19",
+        "fields": {
+            "created": "2020-05-03T10:34:20.969Z",
+            "modified": "2020-05-03T10:34:20.970Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.27.24.1 - 0.0.0.0/0",
+            "addresses": "[\"id_10.27.24.1_0.0.0.0/0\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.24.1\",\n    \"router_id\": \"id_10.27.24.1\",\n    \"type\": \"attached\",\n    \"created\": \"2018-06-30T21:50:10.722000Z\",\n    \"modified\": \"2020-01-17T16:49:10.782324Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "ad910800-3efa-46c2-b98e-908c07013e63",
+        "fields": {
+            "created": "2020-05-03T10:34:20.846Z",
+            "modified": "2020-05-03T10:34:20.848Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.27.24.1 - 10.27.24.0/24",
+            "addresses": "[\"id_10.27.24.1_10.27.24.0/24\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.24.1\",\n    \"router_id\": \"id_10.27.24.1\",\n    \"type\": \"attached\",\n    \"created\": \"2018-06-30T21:50:10.807000Z\",\n    \"modified\": \"2020-01-17T16:49:10.797938Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "b56221c1-12e4-46de-9a29-0648a8a17af1",
+        "fields": {
+            "created": "2020-05-03T10:34:21.549Z",
+            "modified": "2020-05-03T10:34:21.551Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "172.27.85.36 - 10.27.23.0/24",
+            "addresses": "[\"id_172.27.85.36_10.27.23.0/24\"]",
+            "properties": "{\n    \"router_addr\": \"172.27.85.36\",\n    \"router_id\": \"id_172.27.85.36\",\n    \"type\": \"lan\",\n    \"created\": \"2018-07-15T18:47:39.762000Z\",\n    \"modified\": \"2020-01-17T16:49:10.788011Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "c36421b6-16bb-4bda-b64b-610e355a14da",
+        "fields": {
+            "created": "2020-05-03T10:34:21.657Z",
+            "modified": "2020-05-03T10:34:21.658Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.27.253.61",
+            "addresses": "[\"id_10.27.253.61\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.253.61\",\n    \"router_id\": \"id_10.27.253.61\",\n    \"dualstack_id\": \"id_fe80::8c60:fcff:fe3b:5f9f\",\n    \"dualstack_addr\": \"fe80::8c60:fcff:fe3b:5f9f\",\n    \"type\": \"node\",\n    \"created\": \"2018-04-23T10:20:00.681000Z\",\n    \"modified\": \"2020-01-17T16:49:10.788426Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "c665a3c1-7428-476f-af90-1238a65235a1",
+        "fields": {
+            "created": "2020-05-03T10:34:23.159Z",
+            "modified": "2020-05-03T10:34:23.161Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "",
+            "addresses": "[\"id_10.27.253.1\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.253.1\",\n    \"router_id\": \"id_10.27.253.1\",\n    \"dualstack_id\": \"id_fe80::d446:ecff:fefd:3abe\",\n    \"type\": \"node\",\n    \"dualstack_addr\": \"fe80::d446:ecff:fefd:3abe\",\n    \"created\": \"2017-07-19T16:44:20.129000Z\",\n    \"modified\": \"2020-01-17T16:49:10.818089Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "d2cbd620-6715-409b-99e7-3dff58579e89",
+        "fields": {
+            "created": "2020-05-03T10:34:23.048Z",
+            "modified": "2020-05-03T10:34:23.051Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "Kali-Oppido-router",
+            "addresses": "[\"id_10.27.22.1\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.22.1\",\n    \"router_id\": \"id_10.27.22.1\",\n    \"dualstack_id\": \"id_fe80::c66e:1fff:feff:223\",\n    \"type\": \"node\",\n    \"dualstack_addr\": \"fe80::c66e:1fff:feff:223\",\n    \"created\": \"2017-08-20T17:10:02.218000Z\",\n    \"modified\": \"2020-01-17T16:49:10.816460Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "f0a27194-a5ca-4a38-befa-7705405503ad",
+        "fields": {
+            "created": "2020-05-03T10:34:21.391Z",
+            "modified": "2020-05-03T10:34:21.393Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "10.3.5.3",
+            "addresses": "[\"id_10.3.5.3\"]",
+            "properties": "{\n    \"router_addr\": \"10.3.5.3\",\n    \"router_id\": \"id_10.3.5.3\",\n    \"dualstack_addr\": \"fd25:fc4:1261::1\",\n    \"type\": \"local\",\n    \"dualstack_id\": \"id_fd25:fc4:1261::1\",\n    \"created\": \"2018-04-07T23:55:01.193000Z\",\n    \"modified\": \"2020-01-17T16:49:10.787183Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "f2fb7d7f-c5f6-49c2-b811-0918f90ffef2",
+        "fields": {
+            "created": "2020-05-03T10:34:23.825Z",
+            "modified": "2020-05-03T10:34:23.829Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "Kali-Matera-router",
+            "addresses": "[\"id_10.27.0.1\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.0.1\",\n    \"router_id\": \"id_10.27.0.1\",\n    \"dualstack_id\": \"id_fd5c:257b:b54e::1\",\n    \"type\": \"local\",\n    \"dualstack_addr\": \"fd5c:257b:b54e::1\",\n    \"created\": \"2017-07-19T16:44:20.255000Z\",\n    \"modified\": \"2020-01-17T16:49:10.830356Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.node",
+        "pk": "f55d08e5-7b5c-4db0-8e3c-2b8e0b300a8a",
+        "fields": {
+            "created": "2020-05-03T10:34:22.414Z",
+            "modified": "2020-05-03T10:34:22.416Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "label": "Syskrack-net",
+            "addresses": "[\"id_10.27.10.1_10.27.10.0/24\"]",
+            "properties": "{\n    \"router_addr\": \"10.27.10.1\",\n    \"router_id\": \"id_10.27.10.1\",\n    \"type\": \"attached\",\n    \"created\": \"2017-07-19T16:44:20.003000Z\",\n    \"modified\": \"2020-01-17T16:49:10.797127Z\"\n}"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "09497e93-3952-45a2-afb2-7423c15fbc08",
+        "fields": {
+            "created": "2020-05-03T10:34:25.435Z",
+            "modified": "2020-05-03T10:34:25.438Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "d2cbd620-6715-409b-99e7-3dff58579e89",
+            "target": "4a118a25-3347-4d6c-b61f-ecb24c788197",
+            "cost": 2105088.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"target_addr\": \"10.27.10.1\",\n    \"type\": \"node\",\n    \"in_cost\": 2105088,\n    \"source_addr\": \"10.27.22.1\",\n    \"links\": [\n        {\n            \"target_addr\": \"10.27.253.49\",\n            \"in_cost\": 2105088,\n            \"source_addr\": \"10.27.253.3\",\n            \"interface\": \"vpnbas\",\n            \"outgoing_tree\": \"true\",\n            \"in_text\": \"1020bit/s\",\n            \"cost_text\": \"1020bit/s\",\n            \"cost\": 2105088\n        }\n    ],\n    \"in_text\": \"1020bit/s\",\n    \"outgoing_tree\": \"false\",\n    \"created\": \"2017-08-20T17:10:02.639000Z\",\n    \"modified\": \"2018-02-24T19:04:15.149000Z\",\n    \"status_changed\": \"2018-02-24T19:04:15.149000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:25.439Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "0a7536d4-3a34-4603-8872-769e69c3b1ea",
+        "fields": {
+            "created": "2020-05-03T10:34:25.541Z",
+            "modified": "2020-05-03T10:34:25.544Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "d2cbd620-6715-409b-99e7-3dff58579e89",
+            "target": "f2fb7d7f-c5f6-49c2-b811-0918f90ffef2",
+            "cost": 2105088.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"target_addr\": \"10.27.22.1\",\n    \"type\": \"node\",\n    \"in_cost\": 2105088,\n    \"source_addr\": \"10.27.0.1\",\n    \"links\": [\n        {\n            \"target_addr\": \"10.27.253.43\",\n            \"in_cost\": 2105088,\n            \"source_addr\": \"169.254.115.155\",\n            \"interface\": \"vpnbas\",\n            \"outgoing_tree\": \"true\",\n            \"in_text\": \"1020bit/s\",\n            \"cost_text\": \"1020bit/s\",\n            \"cost\": 2105088\n        }\n    ],\n    \"in_text\": \"1020bit/s\",\n    \"outgoing_tree\": \"false\",\n    \"created\": \"2017-08-25T18:47:03.958000Z\",\n    \"modified\": \"2018-02-24T19:04:14.731000Z\",\n    \"status_changed\": \"2018-02-24T19:04:14.731000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:25.545Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "1278cf7e-7bdb-4f6b-9f96-c58e8e6ce37b",
+        "fields": {
+            "created": "2020-05-03T10:34:25.862Z",
+            "modified": "2020-05-03T10:34:25.866Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "c665a3c1-7428-476f-af90-1238a65235a1",
+            "target": "f2fb7d7f-c5f6-49c2-b811-0918f90ffef2",
+            "cost": 2309888.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"in_text\": \"1020bit/s\",\n    \"source_addr\": \"10.27.253.1\",\n    \"outgoing_tree\": \"false\",\n    \"in_cost\": 2105088,\n    \"target_addr\": \"10.27.0.1\",\n    \"type\": \"node\",\n    \"links\": [\n        {\n            \"interface\": \"vpnbas\",\n            \"cost\": 2105088,\n            \"cost_text\": \"1020bit/s\",\n            \"in_text\": \"1020bit/s\",\n            \"in_cost\": 2105088,\n            \"target_addr\": \"10.27.253.1\",\n            \"source_addr\": \"10.27.253.43\",\n            \"outgoing_tree\": \"true\"\n        }\n    ],\n    \"created\": \"2017-07-19T16:44:22.269000Z\",\n    \"modified\": \"2018-02-24T19:04:15.341000Z\",\n    \"status_changed\": \"2018-02-24T19:04:15.341000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:25.867Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "17ed8f40-4290-422e-bd52-f9e185fc785c",
+        "fields": {
+            "created": "2020-05-03T10:34:26.114Z",
+            "modified": "2020-05-03T10:34:26.116Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "178d518e-7e43-4751-9197-30a3d38c4d50",
+            "target": "4a118a25-3347-4d6c-b61f-ecb24c788197",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"type\": \"attached\",\n    \"target_addr\": \"0.0.0.0/0\",\n    \"hopcount\": 2,\n    \"source_addr\": \"10.27.10.1\",\n    \"outgoing_tree\": \"false\",\n    \"created\": \"2017-07-19T16:44:21.453000Z\",\n    \"modified\": \"2018-02-24T19:04:16.287000Z\",\n    \"status_changed\": \"2018-02-24T19:04:16.287000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:26.117Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "27b901fc-e0a1-4e79-97e6-17a5a3bc9536",
+        "fields": {
+            "created": "2020-05-03T10:34:24.361Z",
+            "modified": "2020-05-03T10:34:24.364Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "f0a27194-a5ca-4a38-befa-7705405503ad",
+            "target": "32229436-ec61-490e-96d2-6010200b5670",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"target_addr\": \"10.27.22.0/25\",\n    \"type\": \"attached\",\n    \"outgoing_tree\": \"true\",\n    \"source_addr\": \"10.3.5.3\",\n    \"hopcount\": 2,\n    \"created\": \"2018-04-23T22:10:00.759000Z\",\n    \"modified\": \"2018-05-08T19:10:01.494000Z\",\n    \"status_changed\": \"2018-05-08T19:10:01.494000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:24.364Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "27cc2e79-4cc2-4d5a-8a58-0c973f0d6853",
+        "fields": {
+            "created": "2020-05-03T10:34:24.513Z",
+            "modified": "2020-05-03T10:34:24.516Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "b56221c1-12e4-46de-9a29-0648a8a17af1",
+            "target": "72fbafaf-b11b-4737-a5b9-45f8db8cbe29",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"type\": \"lan\",\n    \"hopcount\": 2,\n    \"source_addr\": \"172.27.85.36\",\n    \"target_addr\": \"10.27.23.0/24\",\n    \"outgoing_tree\": \"true\",\n    \"created\": \"2018-07-15T18:47:39.930000Z\",\n    \"modified\": \"2018-07-15T22:15:14.222000Z\",\n    \"status_changed\": \"2018-07-15T22:15:14.222000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:24.517Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "363bdd3f-34cc-407f-aeb1-91e898220d5f",
+        "fields": {
+            "created": "2020-05-03T10:34:24.254Z",
+            "modified": "2020-05-03T10:34:24.261Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "f0a27194-a5ca-4a38-befa-7705405503ad",
+            "target": "c36421b6-16bb-4bda-b64b-610e355a14da",
+            "cost": 2105088.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"target_addr\": \"10.3.5.3\",\n    \"in_text\": \"1020bit/s\",\n    \"type\": \"node\",\n    \"outgoing_tree\": \"false\",\n    \"source_addr\": \"10.27.253.61\",\n    \"in_cost\": 2105088,\n    \"created\": \"2018-04-23T10:40:01.946000Z\",\n    \"modified\": \"2018-05-04T10:20:02.559000Z\",\n    \"status_changed\": \"2018-05-04T10:20:02.559000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:24.262Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "39dd8d50-f92e-498f-b79d-85825f59c309",
+        "fields": {
+            "created": "2020-05-03T10:34:25.211Z",
+            "modified": "2020-05-03T10:34:25.215Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "d2cbd620-6715-409b-99e7-3dff58579e89",
+            "target": "0330f23c-13be-43b4-91b9-5dc688e7a570",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"type\": \"attached\",\n    \"source_addr\": \"10.27.22.1\",\n    \"outgoing_tree\": \"false\",\n    \"hopcount\": 2,\n    \"target_addr\": \"0.0.0.0/0\",\n    \"created\": \"2017-11-02T22:15:02.046000Z\",\n    \"modified\": \"2018-02-24T19:04:14.447000Z\",\n    \"status_changed\": \"2018-02-24T19:04:14.447000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:25.215Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "41335807-3074-42be-865c-bd709910836d",
+        "fields": {
+            "created": "2020-05-03T10:34:24.805Z",
+            "modified": "2020-05-03T10:34:24.807Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "106ed897-a5d2-4e9f-a6b2-d3e85f4e0c6f",
+            "target": "8199162d-6f00-45c9-91b9-6aa97888a338",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"hopcount\": 2,\n    \"target_addr\": \"10.27.23.0/24\",\n    \"type\": \"attached\",\n    \"outgoing_tree\": \"false\",\n    \"source_addr\": \"10.27.23.1\",\n    \"created\": \"2018-06-28T23:29:31.780000Z\",\n    \"modified\": \"2018-09-18T13:15:02.837652Z\",\n    \"status_changed\": \"2018-09-18T13:15:02.837666Z\"\n}",
+            "status_changed": "2020-05-03T10:34:24.808Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "5412c5ae-bfa3-4061-a9aa-dc135f165418",
+        "fields": {
+            "created": "2020-05-03T10:34:25.111Z",
+            "modified": "2020-05-03T10:34:25.114Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "8847787e-1c7f-4854-add3-ab7b979f1b0d",
+            "target": "f2fb7d7f-c5f6-49c2-b811-0918f90ffef2",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"type\": \"lan\",\n    \"target_addr\": \"0.0.0.0/0\",\n    \"hopcount\": 2,\n    \"source_addr\": \"10.27.0.1\",\n    \"outgoing_tree\": \"true\",\n    \"created\": \"2017-07-19T16:44:20.793000Z\",\n    \"modified\": \"2018-02-24T19:04:17.120000Z\",\n    \"status_changed\": \"2018-02-24T19:04:17.120000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:25.115Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "551d0a07-6cfe-4122-a5b2-ca990320824d",
+        "fields": {
+            "created": "2020-05-03T10:34:24.156Z",
+            "modified": "2020-05-03T10:34:24.159Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "f0a27194-a5ca-4a38-befa-7705405503ad",
+            "target": "8a513df6-43b2-4759-88f9-ca5fc15487fe",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"outgoing_tree\": \"true\",\n    \"source_addr\": \"10.3.5.3\",\n    \"hopcount\": 2,\n    \"type\": \"lan\",\n    \"target_addr\": \"10.27.22.0/24\",\n    \"created\": \"2018-04-07T23:55:02.581000Z\",\n    \"modified\": \"2018-04-22T10:05:01.766000Z\",\n    \"status_changed\": \"2018-04-22T10:05:01.766000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:24.159Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "6389cd91-faaa-4ebb-b2b5-08f68e7bfe88",
+        "fields": {
+            "created": "2020-05-03T10:34:24.667Z",
+            "modified": "2020-05-03T10:34:24.669Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "7bdf0877-5be6-45ab-91c2-a8d62a359575",
+            "target": "d2cbd620-6715-409b-99e7-3dff58579e89",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"target_addr\": \"10.27.22.0/24\",\n    \"type\": \"attached\",\n    \"source_addr\": \"10.27.22.1\",\n    \"hopcount\": 2,\n    \"outgoing_tree\": \"true\",\n    \"created\": \"2017-08-20T17:10:02.521000Z\",\n    \"modified\": \"2018-02-24T19:04:14.572000Z\",\n    \"status_changed\": \"2018-02-24T19:04:14.572000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:24.670Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "6e199196-c690-4b98-b4d2-034e6d238242",
+        "fields": {
+            "created": "2020-05-03T10:34:25.736Z",
+            "modified": "2020-05-03T10:34:25.739Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "c665a3c1-7428-476f-af90-1238a65235a1",
+            "target": "4a118a25-3347-4d6c-b61f-ecb24c788197",
+            "cost": 2170624.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"target_addr\": \"10.27.10.1\",\n    \"in_text\": \"1020bit/s\",\n    \"in_cost\": 2105088,\n    \"source_addr\": \"10.27.253.1\",\n    \"type\": \"node\",\n    \"outgoing_tree\": \"false\",\n    \"created\": \"2017-07-19T16:44:21.731000Z\",\n    \"modified\": \"2018-02-24T19:04:15.594000Z\",\n    \"status_changed\": \"2018-02-24T19:04:15.594000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:25.741Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "77d68a04-0447-4c95-ab85-7ec83789b0ef",
+        "fields": {
+            "created": "2020-05-03T10:34:26.256Z",
+            "modified": "2020-05-03T10:34:26.258Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "4a118a25-3347-4d6c-b61f-ecb24c788197",
+            "target": "f2fb7d7f-c5f6-49c2-b811-0918f90ffef2",
+            "cost": 2105088.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"in_text\": \"1020bit/s\",\n    \"source_addr\": \"10.27.10.1\",\n    \"outgoing_tree\": \"false\",\n    \"in_cost\": 2105088,\n    \"target_addr\": \"10.27.0.1\",\n    \"type\": \"node\",\n    \"links\": [\n        {\n            \"interface\": \"vpnbas\",\n            \"cost\": 2105088,\n            \"cost_text\": \"1020bit/s\",\n            \"in_text\": \"1020bit/s\",\n            \"in_cost\": 2105088,\n            \"target_addr\": \"10.27.253.3\",\n            \"source_addr\": \"10.27.253.43\",\n            \"outgoing_tree\": \"true\"\n        }\n    ],\n    \"created\": \"2017-07-19T16:44:22Z\",\n    \"modified\": \"2018-02-24T19:04:17.410000Z\",\n    \"status_changed\": \"2018-02-24T19:04:17.410000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:26.260Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "8f011eb1-48e7-4e31-92f3-3468bff06ebf",
+        "fields": {
+            "created": "2020-05-03T10:34:23.958Z",
+            "modified": "2020-05-03T10:34:23.961Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "a7996217-e3b9-493a-a005-81eccbf1aa19",
+            "target": "0509e9c2-b2d7-4475-8df2-e76a8725fd36",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"outgoing_tree\": \"false\",\n    \"target_addr\": \"0.0.0.0/0\",\n    \"type\": \"attached\",\n    \"source_addr\": \"10.27.24.1\",\n    \"hopcount\": 2,\n    \"created\": \"2018-07-04T15:20:52.178000Z\",\n    \"modified\": \"2018-07-07T07:46:22.300000Z\",\n    \"status_changed\": \"2018-07-07T07:46:22.300000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:23.962Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "af9e2b8b-5bfd-4c71-bf65-9ff718993826",
+        "fields": {
+            "created": "2020-05-03T10:34:24.963Z",
+            "modified": "2020-05-03T10:34:24.965Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "f55d08e5-7b5c-4db0-8e3c-2b8e0b300a8a",
+            "target": "4a118a25-3347-4d6c-b61f-ecb24c788197",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"type\": \"attached\",\n    \"target_addr\": \"10.27.10.0/24\",\n    \"hopcount\": 2,\n    \"source_addr\": \"10.27.10.1\",\n    \"outgoing_tree\": \"true\",\n    \"created\": \"2017-07-19T16:44:21.590000Z\",\n    \"modified\": \"2018-02-24T19:04:15.826000Z\",\n    \"status_changed\": \"2018-02-24T19:04:15.826000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:24.966Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "b31bb460-cc79-4413-9170-3f79ec979423",
+        "fields": {
+            "created": "2020-05-03T10:34:25.988Z",
+            "modified": "2020-05-03T10:34:25.990Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "1497433d-6500-4093-966a-c36c8f8f63ce",
+            "target": "f2fb7d7f-c5f6-49c2-b811-0918f90ffef2",
+            "cost": 1.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"type\": \"lan\",\n    \"target_addr\": \"10.27.0.0/24\",\n    \"hopcount\": 2,\n    \"source_addr\": \"10.27.0.1\",\n    \"outgoing_tree\": \"true\",\n    \"created\": \"2017-07-19T16:44:22.636000Z\",\n    \"modified\": \"2018-02-24T19:04:16.038000Z\",\n    \"status_changed\": \"2018-02-24T19:04:16.038000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:25.991Z"
+        }
+    },
+    {
+        "model": "django_netjsongraph.link",
+        "pk": "e891ac25-266a-4adc-8376-5c5e18f8946a",
+        "fields": {
+            "created": "2020-05-03T10:34:25.321Z",
+            "modified": "2020-05-03T10:34:25.323Z",
+            "topology": "f74fe30e-29b4-4235-a62b-f6c44359c7a3",
+            "source": "d2cbd620-6715-409b-99e7-3dff58579e89",
+            "target": "c665a3c1-7428-476f-af90-1238a65235a1",
+            "cost": 2170624.0,
+            "cost_text": "",
+            "status": "up",
+            "properties": "{\n    \"status\": \"up\",\n    \"target_addr\": \"10.27.22.1\",\n    \"type\": \"node\",\n    \"in_cost\": 2105088,\n    \"source_addr\": \"10.27.253.1\",\n    \"in_text\": \"1020bit/s\",\n    \"outgoing_tree\": \"false\",\n    \"created\": \"2017-08-20T17:10:02.763000Z\",\n    \"modified\": \"2018-02-24T19:04:14.909000Z\",\n    \"status_changed\": \"2018-02-24T19:04:14.910000Z\"\n}",
+            "status_changed": "2020-05-03T10:34:25.324Z"
+        }
+    }
+]

@@ -55,7 +55,7 @@ target/
 
 # editors
 *.komodoproject
-vscode/
+.vscode/
 
 # other
 *.DS_Store*
@@ -65,3 +65,4 @@ Pipfile
 local_settings.py
 *.db
 *.tar.gz
+*_loaded.json
