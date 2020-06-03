@@ -6,7 +6,6 @@ openwisp-network-topology
    :target: https://travis-ci.org/openwisp/openwisp-network-topology
    :alt: CI build status
 
-
 .. image:: https://coveralls.io/repos/github/openwisp/openwisp-network-topology/badge.svg
    :target: https://coveralls.io/github/openwisp/openwisp-network-topology
    :alt: Test Coverage
@@ -31,11 +30,14 @@ openwisp-network-topology
    :target: https://pypi.org/project/black/
    :alt: code style: black
 
-.. image:: https://raw.githubusercontent.com/openwisp/openwisp2-docs/master/assets/design/openwisp-logo-black.svg
-  :target: http://openwisp.org
-
 .. image:: https://github.com/openwisp/openwisp-network-topology/raw/master/docs/demo_network_topology.gif
    :alt: Features Highlights
+
+Network Topology Collector and Visualizer for OpenWISP, available also as a standalone django-app or as a reusable and extensible base library on top of which you can build your own network topology solution.
+
+.. image:: https://raw.githubusercontent.com/openwisp/openwisp2-docs/master/assets/design/openwisp-logo-black.svg
+  :target: http://openwisp.org
+  :alt: OpenWISP
 
 .. contents:: **Table of Contents**:
    :backlinks: none
@@ -62,6 +64,7 @@ Project goals
 -------------
 
 * make it easy to visualize network topology data for the formats supported by `netdiff <https://github.com/openwisp/netdiff>`_
+* allow standalone usage (without the rest of OpenWISP)
 * expose topology data via RESTful resources in *NetJSON NetworkGraph* format
 * make it easy to integrate in larger django projects to improve reusability
 * make it easy to extend its models by providing abstract models
@@ -229,7 +232,6 @@ The management command accepts a ``--label`` argument that will be used to searc
 topology labels, eg::
 
     ./manage.py save_snapshot --label mytopology
-
 
 Logging
 -------
