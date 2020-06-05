@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Verison 0.3.2 [2020-06-02]
+--------------------------
+
+- [add] Support for openwisp-utils~=0.5.0
+- [fix] swagger API fix for serializer
+
 Verison 0.3.1 [2020-02-26]
 --------------------------
 
