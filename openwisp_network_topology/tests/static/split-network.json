@@ -1,0 +1,21 @@
+{
+    "type": "NetworkGraph",
+    "protocol": "OLSR",
+    "version": "0.8",
+    "metric": "ETX",
+    "nodes": [
+        {
+            "id": "192.168.0.10"
+        },
+        {
+            "id": "192.168.0.20"
+        }
+    ],
+    "links": [
+        {
+            "source": "192.168.0.10",
+            "target": "192.168.0.20",
+            "cost": 1.1
+        }
+    ]
+}

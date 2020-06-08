@@ -1,1 +1,42 @@
-{% extends 'admin/django_netjsongraph/node/change_form.html' %}
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% block after_field_sets %}
+{% if not add %}
+<h2>{% trans 'Links to other nodes' %}: {{ node_links|length }}</h2>
+<fieldset class="module">
+    {% for link in node_links %}
+    <div class="form-row link">
+        <div>
+            <p>
+                <a href="{% url admin_url link.pk %}">
+                    {% if link.source_id|lower == object_id|lower %}
+                    {{ link.target }}
+                    {% else %}
+                    {{ link.source }}
+                    {% endif %}
+                </a>
+            </p>
+            <p>
+                <label>{% trans 'status' %}</label>:
+                <span style="font-weight:bold; color:{% if link.status == 'up' %}green{% else %}red{% endif %}">
+                    {{ link.status }}
+                </span>
+            </p>
+            <p>
+                <label>{% trans 'cost' %}</label>: {{ link.cost }}
+            </p>
+        </div>
+    </div>
+    {% endfor %}
+    {% if not node_links %}
+    <div class="form-row link">
+        <div>
+            <p>
+                {% trans 'This node is not connected to any other node' %}.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</fieldset>
+{% endif %}
+{% endblock %}

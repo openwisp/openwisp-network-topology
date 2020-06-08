@@ -1,0 +1,79 @@
+{
+  "router_id": "Own AS not provided",
+  "version": "",
+  "protocol": "BGP",
+  "links": [
+    {
+      "source": "sv1gsd",
+      "cost": 1.0,
+      "target": "downlots3"
+    },
+    {
+      "source": "sv1gsd",
+      "cost": 1.0,
+      "target": "SV1CIM-SOFIKO-SV1GSD"
+    },
+    {
+      "source": "sofiko_WNK",
+      "cost": 1.0,
+      "target": "Geolos"
+    },
+    {
+      "source": "Kalloni",
+      "cost": 1.0,
+      "target": "Benz_Kalloni_2"
+    },
+    {
+      "source": "sv1gsd",
+      "cost": 1.0,
+      "target": "SV1EGD"
+    },
+    {
+      "source": "sv1gsd_2",
+      "cost": 1.0,
+      "target": "SV1CIM-SOFIKO-SV1GSD"
+    },
+    {
+      "source": "Kalloni",
+      "cost": 1.0,
+      "target": "Metamorfosi"
+    },
+    {
+      "source": "Kalloni",
+      "cost": 1.0,
+      "target": "Benz_Kalloni"
+    },
+    {
+      "source": "sofiko_WNK",
+      "cost": 1.0,
+      "target": "Sv1gyk-Sofiko"
+    },
+    {
+      "source": "Kalloni",
+      "cost": 1.0,
+      "target": "Taktikoupoli"
+    },
+    {
+      "source": "sofiko_WNK",
+      "cost": 1.0,
+      "target": "SV1CIM-SOFIKO-SV1GSD"
+    }
+  ],
+  "metric": "eBGP",
+  "type": "NetworkGraph",
+  "nodes": [
+    {"id": "Sv1gyk-Sofiko"},
+    {"id": "Kalloni"},
+    {"id": "sv1gsd"},
+    {"id": "Benz_Kalloni_2"},
+    {"id": "Metamorfosi"},
+    {"id": "Taktikoupoli"},
+    {"id": "SV1EGD"},
+    {"id": "downlots3"},
+    {"id": "Geolos"},
+    {"id": "SV1CIM-SOFIKO-SV1GSD"},
+    {"id": "sv1gsd_2"},
+    {"id": "sofiko_WNK"},
+    {"id": "Benz_Kalloni"}
+  ]
+}

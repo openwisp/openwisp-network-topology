@@ -1,0 +1,14 @@
+OpenVPN CLIENT LIST
+Updated,Sun Oct  8 19:46:06 2017
+Common Name,Real Address,Bytes Received,Bytes Sent,Connected Since
+Syskrack,87.7.9.213:56857,417209,6046898,Sun Oct  8 08:39:11 2017
+Kali-Matera,2.226.154.66:52091,6020304,444463,Sun Oct  8 08:39:10 2017
+pomezia,87.3.36.166:63999,347430,6034094,Sun Oct  8 08:35:10 2017
+ROUTING TABLE
+Virtual Address,Common Name,Real Address,Last Ref
+c0:4a:00:2d:05:fc,pomezia,87.3.36.166:63999,Sun Oct  8 19:41:18 2017
+46:8a:69:e7:46:24,Kali-Matera,2.226.154.66:52091,Sun Oct  8 19:45:37 2017
+9e:c2:f2:55:f4:33,Syskrack,87.7.9.213:56857,Sun Oct  8 19:45:37 2017
+GLOBAL STATS
+Max bcast/mcast queue length,6
+END

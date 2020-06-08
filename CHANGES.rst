@@ -1,6 +1,17 @@
 Changelog
 =========
 
+Verison 0.4.0 [unreleased]
+--------------------------
+
+WIP
+
+- Merged openwisp-network-topology & django-netjsongraph
+- [**breaking change**]: URLS at ``/api/`` moved to ``/api/v1/``
+- [docs] Reordered & Improved docs
+- [add] swapper~=1.1
+- [docs] Added tutorial for extending openwisp-network-topology
+
 Verison 0.3.2 [2020-06-02]
 --------------------------
 

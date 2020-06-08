@@ -1,7 +1,5 @@
-from django_netjsongraph.management.commands import BaseSaveSnapshotCommand
-
-from ...models import Topology
+from . import BaseSaveSnapshotCommand
 
 
 class Command(BaseSaveSnapshotCommand):
-    topology_model = Topology
+    pass

@@ -34,9 +34,9 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     # rest framework
     'rest_framework',
+    'django_extensions',
+    # 'debug_toolbar',
 ]
-
-EXTENDED_APPS = ['django_netjsongraph']
 
 AUTH_USER_MODEL = 'openwisp_users.User'
 SITE_ID = '1'
@@ -55,9 +55,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-ROOT_URLCONF = 'urls'
+# INTERNAL_IPS = ['127.0.0.1']
+
+ROOT_URLCONF = 'openwisp2.urls'
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -126,7 +129,7 @@ LOGGING = {
     'loggers': {'py.warnings': {'handlers': ['console'],}},
 }
 
-TEST_RUNNER = 'django_netjsongraph.tests.utils.LoggingDisabledTestRunner'
+TEST_RUNNER = 'openwisp_network_topology.tests.utils.LoggingDisabledTestRunner'
 
 EMAIL_PORT = '1025'  # for testing purposes
 LOGIN_REDIRECT_URL = 'admin:index'
@@ -134,6 +137,17 @@ ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 
 OPENWISP_ORGANIZATON_USER_ADMIN = True
 OPENWISP_ORGANIZATON_OWNER_ADMIN = True
+
+
+if os.environ.get('SAMPLE_APP', False):
+    INSTALLED_APPS.remove('openwisp_network_topology')
+    EXTENDED_APPS = ['openwisp_network_topology']
+    INSTALLED_APPS.append('openwisp2.sample_network_topology')
+    TOPOLOGY_LINK_MODEL = 'sample_network_topology.Link'
+    TOPOLOGY_NODE_MODEL = 'sample_network_topology.Node'
+    TOPOLOGY_SNAPSHOT_MODEL = 'sample_network_topology.Snapshot'
+    TOPOLOGY_TOPOLOGY_MODEL = 'sample_network_topology.Topology'
+
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:

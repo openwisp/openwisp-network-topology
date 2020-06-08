@@ -3,5 +3,19 @@
 set -e
 
 openwisp-qa-check \
-      --migration-path "./openwisp_network_topology" \
+      --migration-path './openwisp_network_topology/migrations' \
       --migration-module topology
+
+
+echo ''
+echo 'Running checks for SAMPLE_APP'
+
+SAMPLE_APP=1 openwisp-qa-check \
+              --skip-isort \
+              --skip-flake8 \
+              --skip-black \
+              --skip-checkmigrations \
+              --skip-checkendline \
+              --skip-checkcommit \
+              --migration-path './tests/openwisp2/sample_network_topology/migrations' \
+              --migration-module sample_network_topology

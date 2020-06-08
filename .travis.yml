@@ -21,6 +21,8 @@ install:
 script:
   - coverage run --source=openwisp_network_topology runtests.py
   - ./run-qa-checks
+  # SAMPLE tests do not influence coverage, so we can speed up tests with --parallel
+  - SAMPLE_APP=1 ./runtests.py --parallel --keepdb
 
 after_success:
   coveralls

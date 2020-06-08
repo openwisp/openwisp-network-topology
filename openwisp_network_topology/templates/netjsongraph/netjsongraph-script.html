@@ -1,0 +1,29 @@
+<script>
+    // the graph may be loaded elsewhere than body
+    window.__njg_el__ = window.__njg_el__ || "body";
+    // default API url
+    window.__njg_default_url__ = "{{ graph_url }}";
+    // loadGraph wrapper is used to reload
+    // the graph with data from older snapshots
+    window.loadNetJsonGraph = function(graph){
+        graph = graph || window.__njg_default_url__;
+        // destroy HTML elements if present
+        d3.select("svg").remove();
+        d3.select(".njg-overlay").remove();
+        d3.select(".njg-metadata").remove();
+        // load graph
+        return d3.netJsonGraph(graph, {
+            el: window.__njg_el__,
+            linkClassProperty: "status",
+            defaultStyle: false,
+            labelDy: "-1.5em",
+            circleRadius: 7,
+            charge: -300,
+            gravity: 0.1,
+            linkDistance: 70,
+            linkStrength: 0.1
+        });
+    };
+    window.graph = window.loadNetJsonGraph();
+    window.initTopologyHistory(jQuery);
+</script>
