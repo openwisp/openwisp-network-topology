@@ -68,6 +68,12 @@ class TestNode(CreateGraphObjectsMixin, CreateOrgMixin, TestCase):
         n.label = 'test node'
         self.assertEqual(n.name, 'test node')
 
+    def test_node_without_name(self):
+        # According to the RFC, a node MAY not have name nor local_addresses defined
+        t = self.topology_model.objects.first()
+        n = t._create_node(addresses=[])
+        self.assertEqual(n.name, '')
+
     def test_json(self):
         t = self.topology_model.objects.first()
         n = t._create_node(

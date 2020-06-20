@@ -20,6 +20,7 @@
             "source": "192.168.0.1",
             "target": "192.168.0.2",
             "cost": 1.0,
+            "cost_text": "10 Mbps",
             "properties": {
                 "pretty": true
             }
