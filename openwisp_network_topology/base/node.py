@@ -26,12 +26,12 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
     )
     label = models.CharField(max_length=64, blank=True)
     # netjson ID and local_addresses
-    addresses = JSONField(default=[])
+    addresses = JSONField(default=[], blank=True)
     properties = JSONField(
         default=dict,
         blank=True,
         load_kwargs={'object_pairs_hook': OrderedDict},
-        dump_kwargs={'indent': 4},
+        dump_kwargs={'indent': 4, 'cls': JSONEncoder},
     )
 
     class Meta:
@@ -59,9 +59,7 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
 
     @property
     def name(self):
-        if self.label:
-            return self.label
-        return self.netjson_id
+        return self.label or self.netjson_id or ''
 
     def json(self, dict=False, **kwargs):
         """

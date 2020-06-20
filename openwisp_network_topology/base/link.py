@@ -46,7 +46,7 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
         default=dict,
         blank=True,
         load_kwargs={'object_pairs_hook': OrderedDict},
-        dump_kwargs={'indent': 4},
+        dump_kwargs={'indent': 4, 'cls': JSONEncoder},
     )
     status_changed = models.DateTimeField(auto_now=True)
 
@@ -82,18 +82,18 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
                 ('source', self.source.netjson_id),
                 ('target', self.target.netjson_id),
                 ('cost', self.cost),
+                ('cost_text', self.cost_text or ''),
             )
         )
-        if self.cost_text:
-            netjson['cost_text'] = self.cost_text
         # properties contain status by default
         properties = OrderedDict((('status', self.status),))
         if self.properties:
             properties.update(self.properties)
+        properties['created'] = self.created
+        properties['modified'] = self.modified
+        properties['status_changed'] = self.status_changed
+
         netjson['properties'] = properties
-        netjson['properties']['created'] = self.created
-        netjson['properties']['modified'] = self.modified
-        netjson['properties']['status_changed'] = self.status_changed
         if dict:
             return netjson
         return json.dumps(netjson, cls=JSONEncoder, **kwargs)

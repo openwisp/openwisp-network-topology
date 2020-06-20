@@ -17,6 +17,8 @@ install:
   - pip install $DJANGO
   - python setup.py -q develop
   - pip install -r requirements-test.txt
+  # Temporary
+  - pip install --upgrade https://github.com/openwisp/netdiff/tarball/issue/39-detect-node-changes
 
 script:
   - coverage run --source=openwisp_network_topology runtests.py

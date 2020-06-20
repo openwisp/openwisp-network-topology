@@ -72,6 +72,9 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
     revision = models.CharField(_('revision'), max_length=64, blank=True)
     metric = models.CharField(_('metric'), max_length=24, blank=True)
 
+    status = {'added': 'up', 'removed': 'down', 'changed': 'up'}
+    action = {'added': 'add', 'changed': 'change', 'removed': 'remove'}
+
     class Meta:
         verbose_name_plural = _('topologies')
         abstract = True
@@ -180,71 +183,117 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
         link = self.link_model(**options)
         return link
 
-    def update(self, data=None):
-        """
-        Updates topology
-        Links are not deleted straightaway but set as "down"
-        """
+    def _update_added_items(self, items):
         Link, Node = self.link_model, self.node_model
-        diff = self.diff(data)
 
-        status = {'added': 'up', 'removed': 'down', 'changed': 'up'}
-        action = {'added': 'add', 'changed': 'change', 'removed': 'remove'}
-
-        try:
-            added_nodes = diff['added']['nodes']
-        except TypeError:
-            added_nodes = []
-
-        for node_dict in added_nodes:
+        for node_dict in items.get('nodes', []):
             node = Node.count_address(node_dict['id'], topology=self)
-            # if node exists skip to next iteration
-            if node:  # pragma no cover
+            # if node exists, update its properties
+            if node:
+                self._update_node_properties(node, node_dict, section='added')
                 continue
             # if node doesn't exist create new
             addresses = [node_dict['id']]
             addresses += node_dict.get('local_addresses', [])
+            label = node_dict.get('label', '')
             properties = node_dict.get('properties', {})
-            node = self._create_node(addresses=addresses, properties=properties)
-            if 'label' in node_dict:
-                node.label = node_dict.get('label')
+            node = self._create_node(
+                label=label, addresses=addresses, properties=properties
+            )
             node.full_clean()
             node.save()
 
-        for section, graph in sorted(diff.items()):
-            # if graph is empty skip to next one
-            if not graph:
+        for link_dict in items.get('links', []):
+            link = Link.get_from_nodes(
+                link_dict['source'], link_dict['target'], topology=self
+            )
+            # if link exists, update its properties
+            if link:
+                self._update_link_properties(link, link_dict, section='added')
                 continue
-            for link_dict in graph['links']:
-                changed = False
+            # if link does not exist create new
+            source = Node.get_from_address(link_dict['source'], self)
+            target = Node.get_from_address(link_dict['target'], self)
+            link = self._create_link(
+                source=source,
+                target=target,
+                cost=link_dict['cost'],
+                cost_text=link_dict['cost_text'],
+                properties=link_dict['properties'],
+                topology=self,
+            )
+            link.full_clean()
+            link.save()
+
+    def _update_node_properties(self, node, node_dict, section):
+        changed = False
+        if node.label != node_dict['label']:
+            changed = True
+            node.label = node_dict['label']
+        if node.addresses != node_dict['local_addresses']:
+            changed = True
+            node.addresses = [node_dict['id']] + node_dict['local_addresses']
+        if node.properties != node_dict['properties']:
+            changed = True
+            node.properties = node_dict['properties']
+        # perform writes only if needed
+        if changed:
+            with log_failure(self.action[section], node):
+                node.full_clean()
+                node.save()
+
+    def _update_link_properties(self, link, link_dict, section):
+        changed = False
+        # if status of link is changed
+        if self.link_status_changed(link, self.status[section]):
+            link.status = self.status[section]
+            changed = True
+        if link.cost != link_dict['cost']:
+            link.cost = link_dict['cost']
+            changed = True
+        if link.cost_text != link_dict['cost_text']:
+            link.cost_text = link_dict['cost_text']
+            changed = True
+        if link.properties != link_dict['properties']:
+            link.properties = link_dict['properties']
+            changed = True
+        # perform writes only if needed
+        if changed:
+            with log_failure(self.action[section], link):
+                link.full_clean()
+                link.save()
+
+    def _update_changed_items(self, items, section='changed'):
+        Link, Node = self.link_model, self.node_model
+        for node_dict in items.get('nodes', []):
+            node = Node.get_from_address(node_dict['id'], topology=self)
+            self._update_node_properties(node, node_dict, section=section)
+
+        for link_dict in items.get('links', []):
+            link = Link.get_from_nodes(
+                link_dict['source'], link_dict['target'], topology=self
+            )
+            self._update_link_properties(link, link_dict, section=section)
+
+    def update(self, data=None):
+        """
+        Updates topology
+        Removed nodes are not deleted or modified
+        Links are not deleted straightaway but set as "down"
+        """
+        diff = self.diff(data)
+
+        if diff['added']:
+            self._update_added_items(diff['added'])
+        if diff['changed']:
+            self._update_changed_items(diff['changed'])
+        if diff['removed']:
+            Link = self.link_model
+            for link_dict in diff['removed'].get('links', []):
                 link = Link.get_from_nodes(
                     link_dict['source'], link_dict['target'], topology=self
                 )
-                # if link does not exist create new
-                if not link:
-                    source = Node.get_from_address(link_dict['source'], self)
-                    target = Node.get_from_address(link_dict['target'], self)
-                    link = self._create_link(
-                        source=source,
-                        target=target,
-                        cost=link_dict['cost'],
-                        properties=link_dict.get('properties', {}),
-                        topology=self,
-                    )
-                    changed = True
-                # if status of link is changed
-                if self.link_status_changed(link, status[section]):
-                    link.status = status[section]
-                    changed = True
-                # if cost of link has changed
-                if link.cost != link_dict['cost']:
-                    link.cost = link_dict['cost']
-                    changed = True
-                # perform writes only if needed
-                if changed:
-                    with log_failure(action[section], link):
-                        link.full_clean()
-                        link.save()
+                self._update_link_properties(link, link_dict, section='removed')
 
     def save_snapshot(self, **kwargs):
         """
