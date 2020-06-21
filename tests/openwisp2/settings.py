@@ -122,7 +122,6 @@ LOGGING = {
             'filename': os.path.join(BASE_DIR, 'error.log'),
             'maxBytes': 5242880.0,
             'backupCount': 3,
-            'formatter': 'verbose',
         },
     },
     'root': {'level': 'INFO', 'handlers': ['main_log', 'console', 'mail_admins'],},
