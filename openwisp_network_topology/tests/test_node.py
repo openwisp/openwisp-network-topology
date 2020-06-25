@@ -1,5 +1,6 @@
 import swapper
 from django.test import TestCase
+from rest_framework.utils.encoders import JSONEncoder
 
 from .utils import CreateGraphObjectsMixin, CreateOrgMixin
 
@@ -89,8 +90,8 @@ class TestNode(CreateGraphObjectsMixin, CreateOrgMixin, TestCase):
                 'local_addresses': ['10.0.0.1'],
                 'properties': {
                     'gateway': True,
-                    'created': n.created,
-                    'modified': n.modified,
+                    'created': JSONEncoder().default(n.created),
+                    'modified': JSONEncoder().default(n.modified),
                 },
             },
         )
