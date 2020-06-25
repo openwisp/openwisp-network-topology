@@ -65,3 +65,4 @@ Pipfile
 local_settings.py
 *.db
 *.tar.gz
+*_loaded.json
