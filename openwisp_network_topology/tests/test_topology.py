@@ -211,7 +211,9 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         self.assertEqual(link.properties, {'pretty': True})
         self.assertEqual(link.cost, 1.5)
         self.assertEqual(link.cost_text, '15 Mbps')
-        link = self.link_model.objects.last()
+        link = self.link_model.get_from_nodes(
+            source='192.168.0.1', target='192.168.0.3', topology=t
+        )
         self.assertEqual(link.properties, {'pretty': False})
         self.assertEqual(link.cost, 2.0)
         self.assertEqual(link.cost_text, '20 Mbps')

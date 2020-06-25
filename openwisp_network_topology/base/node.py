@@ -70,8 +70,8 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
             value = getattr(self, attr)
             if value or attr == 'properties':
                 netjson[attr] = value
-        netjson['properties']['created'] = self.created
-        netjson['properties']['modified'] = self.modified
+        netjson['properties']['created'] = JSONEncoder().default(self.created)
+        netjson['properties']['modified'] = JSONEncoder().default(self.modified)
         if dict:
             return netjson
         return json.dumps(netjson, cls=JSONEncoder, **kwargs)
