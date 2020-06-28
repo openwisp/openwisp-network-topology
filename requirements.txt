@@ -1,9 +1,8 @@
-openwisp-users>=0.2.0,<0.3
+openwisp-users>=0.2.0,<=0.4.0
 openwisp-utils~=0.5.0
 swapper~=1.1
 django>=2.2,<3.1
 djangorestframework>=3.3,<3.12
 django-model-utils~=4.0.0
-# TODO: require netdiff >= 0.8.0
-netdiff>=0.7.0,<0.8.0
+netdiff~=0.8.0
 jsonfield>=3.1.0,<4.0.0
