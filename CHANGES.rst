@@ -1,16 +1,16 @@
 Changelog
 =========
 
-Verison 0.4.0 [2020-06-22]
+Verison 0.4.0 [2020-06-28]
 --------------------------
 
-- Merged openwisp-network-topology & django-netjsongraph
+- [refactoring] Merged code of django-netjsongraph in openwisp-network-topology
 - [**breaking change**]: URLS at ``/api/`` moved to ``/api/v1/``
 - [docs] Reordered & Improved docs
-- [add] requirement swapper~=1.1
+- [add] Requirement swapper~=1.1
 - [docs] Added tutorial for extending openwisp-network-topology
-- [add] upgrader script to upgrade from django-netjsongraph to openwisp-network-topology
-- [add] support for netdiff~=0.8.0
+- [feature] Upgrader script to upgrade from django-netjsongraph to openwisp-network-topology
+- [change] Requirement netdiff~=0.8.0
 
 Verison 0.3.2 [2020-06-02]
 --------------------------
