@@ -72,6 +72,9 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
             raise ValidationError(_('source and target must not be the same'))
         if self.properties is None:
             self.properties = {}
+        # prevent overriding the real status
+        if 'status' in self.properties:
+            del self.properties['status']
 
     def json(self, dict=False, **kwargs):
         """

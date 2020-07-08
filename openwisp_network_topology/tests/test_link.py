@@ -43,6 +43,16 @@ class TestLink(CreateOrgMixin, CreateGraphObjectsMixin, TestCase):
         link.full_clean()
         self.assertEqual(link.properties, {})
 
+    def test_clean_properties_status(self):
+        t = self.topology_model.objects.first()
+        node1, node2 = self._get_nodes()
+        link = t._create_link(
+            source=node1, target=node2, cost=1.0, properties={'status': 'up'}
+        )
+        link.full_clean()
+        # status must not be saved in properties or it will override the real status
+        self.assertEqual(link.properties, {})
+
     def test_same_source_and_target_id(self):
         t = self.topology_model.objects.first()
         node_id = self.node_model.objects.first().pk
@@ -84,6 +94,14 @@ class TestLink(CreateOrgMixin, CreateGraphObjectsMixin, TestCase):
             },
         )
         self.assertIsInstance(link.json(), str)
+        link.status = 'down'
+        link.save()
+        link.refresh_from_db()
+        netjson = link.json(dict=True)
+        with self.subTest('status should not be saved in properties'):
+            self.assertNotIn('status', link.properties)
+        with self.subTest('status should not be overridden'):
+            self.assertEqual(netjson['properties']['status'], 'down')
 
     def test_get_from_nodes(self):
         t = self.topology_model.objects.first()

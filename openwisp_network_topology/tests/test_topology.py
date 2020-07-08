@@ -346,6 +346,32 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         self.assertIn('192.168.0.3', [link.source.netjson_id, link.target.netjson_id])
         self.assertEqual(link.cost, 2.0)
 
+    def test_receive_removed_bug(self):
+        t = self._set_receive(parser='netdiff.OpenvpnParser')
+        self.node_model.objects.all().delete()
+        data = self._load('static/openvpn.txt')
+        t.receive(data)
+        self.assertEqual(self.node_model.objects.count(), 4)
+        self.assertEqual(self.link_model.objects.count(), 3)
+        self.assertEqual(self.link_model.objects.filter(status='up').count(), 3)
+        self.assertEqual(self.link_model.objects.filter(status='down').count(), 0)
+        data = self._load('static/openvpn-0-links.txt')
+        t.receive(data)
+        self.assertEqual(self.node_model.objects.count(), 4)
+        self.assertEqual(self.link_model.objects.count(), 3)
+        self.assertEqual(self.link_model.objects.filter(status='down').count(), 3)
+        self.assertEqual(self.link_model.objects.filter(status='up').count(), 0)
+        t.refresh_from_db()
+        netjson = t.json(dict=True)
+        for link in self.link_model.objects.all():
+            with self.subTest(f'status should not be saved in properties ({link})'):
+                self.assertNotIn('status', link.properties)
+        for link in netjson['links']:
+            with self.subTest(
+                f'status should be down ({link["source"]} - {link["target"]})'
+            ):
+                self.assertEqual(link['properties']['status'], 'down')
+
     def test_receive_status_existing_link(self):
         t = self._set_receive()
         n1 = self.node_model.objects.all()[0]
