@@ -9,6 +9,7 @@ urlpatterns = []
 
 if os.environ.get('SAMPLE_APP', False):
     from openwisp_network_topology.utils import get_visualizer_urls
+
     from .sample_network_topology.visualizer import views
 
     urlpatterns += [
