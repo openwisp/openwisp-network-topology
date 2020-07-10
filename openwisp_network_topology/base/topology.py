@@ -187,8 +187,8 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
         Link, Node = self.link_model, self.node_model
 
         for node_dict in items.get('nodes', []):
-            node = Node.count_address(node_dict['id'], topology=self)
             # if node exists, update its properties
+            node = Node.get_from_address(node_dict['id'], topology=self)
             if node:
                 self._update_node_properties(node, node_dict, section='added')
                 continue
@@ -227,15 +227,18 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
 
     def _update_node_properties(self, node, node_dict, section):
         changed = False
-        if node.label != node_dict['label']:
+        if node.label != node_dict.get('label'):
             changed = True
-            node.label = node_dict['label']
-        if node.addresses != node_dict['local_addresses']:
+            node.label = node_dict.get('label')
+        local_addresses = node_dict.get('local_addresses')
+        if node.addresses != local_addresses:
             changed = True
-            node.addresses = [node_dict['id']] + node_dict['local_addresses']
-        if node.properties != node_dict['properties']:
+            node.addresses = [node_dict['id']]
+            if local_addresses:
+                node.addresses += local_addresses
+        if node.properties != node_dict.get('properties'):
             changed = True
-            node.properties = node_dict['properties']
+            node.properties = node_dict.get('properties')
         # perform writes only if needed
         if changed:
             with log_failure(self.action[section], node):
@@ -248,14 +251,14 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
         if self.link_status_changed(link, self.status[section]):
             link.status = self.status[section]
             changed = True
-        if link.cost != link_dict['cost']:
-            link.cost = link_dict['cost']
+        if link.cost != link_dict.get('cost'):
+            link.cost = link_dict.get('cost')
             changed = True
-        if link.cost_text != link_dict['cost_text']:
-            link.cost_text = link_dict['cost_text']
+        if link.cost_text != link_dict.get('cost_text'):
+            link.cost_text = link_dict.get('cost_text')
             changed = True
-        if link.properties != link_dict['properties']:
-            link.properties = link_dict['properties']
+        if link.properties != link_dict.get('properties'):
+            link.properties = link_dict.get('properties')
             changed = True
         # perform writes only if needed
         if changed:
@@ -267,13 +270,15 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
         Link, Node = self.link_model, self.node_model
         for node_dict in items.get('nodes', []):
             node = Node.get_from_address(node_dict['id'], topology=self)
-            self._update_node_properties(node, node_dict, section=section)
+            if node:
+                self._update_node_properties(node, node_dict, section=section)
 
         for link_dict in items.get('links', []):
             link = Link.get_from_nodes(
                 link_dict['source'], link_dict['target'], topology=self
             )
-            self._update_link_properties(link, link_dict, section=section)
+            if link:
+                self._update_link_properties(link, link_dict, section=section)
 
     def update(self, data=None):
         """
@@ -293,7 +298,8 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
                 link = Link.get_from_nodes(
                     link_dict['source'], link_dict['target'], topology=self
                 )
-                self._update_link_properties(link, link_dict, section='removed')
+                if link:
+                    self._update_link_properties(link, link_dict, section='removed')
 
     def save_snapshot(self, **kwargs):
         """

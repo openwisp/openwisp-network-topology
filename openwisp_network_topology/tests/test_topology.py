@@ -499,3 +499,16 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         t.receive(data)
         self.assertEqual(t.node_set.all().count(), 13)
         self.assertEqual(t.link_set.all().count(), 11)
+
+    def test_update_added_items_regression_74_first(self):
+        t = self._set_receive(parser='netdiff.OpenvpnParser')
+        t.save()
+        node = t.node_set.first()
+        items = {'nodes': [{'id': node.netjson_id}]}
+        t._update_added_items(items)
+
+    def test_update_added_items_regression_74_second(self):
+        t = self._set_receive(parser='netdiff.OpenvpnParser')
+        t.save()
+        items = {'nodes': [{'id': 'bogus'}]}
+        t._update_changed_items(items)
