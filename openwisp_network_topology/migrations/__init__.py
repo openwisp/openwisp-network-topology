@@ -1,9 +1,9 @@
 # Manually written, used during migrations
 
 
-def migrate_addresses(apps, schema_editor, app='openwisp_network_topology'):
+def migrate_addresses(apps, schema_editor, app='topology'):
     Node = apps.get_model(app, 'Node')
-    for node in Node.objects.all():
+    for node in Node.objects.iterator():
         addresses = node.addresses_old.replace(' ', '')
         if addresses.startswith(';'):
             addresses = addresses[1:]

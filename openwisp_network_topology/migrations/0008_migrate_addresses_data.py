@@ -3,8 +3,6 @@
 from django.db import migrations
 from openwisp_network_topology.migrations import migrate_addresses
 
-migrate_addresses.__defaults__ = ('topology',)
-
 
 class Migration(migrations.Migration):
 
@@ -12,4 +10,6 @@ class Migration(migrations.Migration):
         ('topology', '0007_create_new_address_field'),
     ]
 
-    operations = [migrations.RunPython(migrate_addresses)]
+    operations = [
+        migrations.RunPython(migrate_addresses, reverse_code=migrations.RunPython.noop)
+    ]
