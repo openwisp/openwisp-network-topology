@@ -139,18 +139,24 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
         current = NetJsonParser(self.json(dict=True, omit_down=True))
         return diff(current, latest)
 
+    def get_nodes_queryset(self):
+        return self.node_set.all()
+
+    def get_links_queryset(self):
+        return self.link_set.select_related('source', 'target')
+
     def json(self, dict=False, omit_down=False, **kwargs):
         """ returns a dict that represents a NetJSON NetworkGraph object """
         nodes = []
         links = []
-        link_queryset = self.link_set.select_related('source', 'target')
+        links_queryset = self.get_links_queryset()
         # needed to detect links coming back online
         if omit_down:
-            link_queryset = link_queryset.filter(status='up')
+            links_queryset = links_queryset.filter(status='up')
         # populate graph
-        for link in link_queryset:
+        for link in links_queryset:
             links.append(link.json(dict=True))
-        for node in self.node_set.all():
+        for node in self.get_nodes_queryset():
             nodes.append(node.json(dict=True))
         netjson = OrderedDict(
             (

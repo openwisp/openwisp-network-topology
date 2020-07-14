@@ -61,12 +61,22 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
     def name(self):
         return self.label or self.netjson_id or ''
 
+    def get_label(self):
+        """
+        May be overridden/monkey patched to get the node name
+        from other sources (e.g: device name in openwisp-controller)
+        """
+        return self.label
+
     def json(self, dict=False, **kwargs):
         """
         returns a NetJSON NetworkGraph Node object
         """
         netjson = OrderedDict({'id': self.netjson_id})
-        for attr in ['label', 'local_addresses', 'properties']:
+        label = self.get_label()
+        if label:
+            netjson['label'] = label
+        for attr in ['local_addresses', 'properties']:
             value = getattr(self, attr)
             if value or attr == 'properties':
                 netjson[attr] = value

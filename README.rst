@@ -59,6 +59,8 @@ Current features
 * **admin interface** that allows to easily manage, audit, visualize and debug topologies and their relative data (nodes, links)
 * **receive topology** from multiple nodes
 * **topology history**: allows saving daily snapshots of each topology that can be viewed in the frontend
+* **faster monitoring**: `integrates with OpenWISP Controller and OpenWISP Monitoring <#integration-with-openwisp-controller-and-openwisp-monitoring>`_
+  for faster detection of critical events in the network
 
 Project goals
 -------------
@@ -117,13 +119,17 @@ If you want to contribute, install your cloned fork:
 Setup (integrate in an existing django project)
 -----------------------------------------------
 
-Add ``openwisp_network_topology`` to ``INSTALLED_APPS``:
+Add ``openwisp_network_topology`` and its dependencies to ``INSTALLED_APPS``:
 
 .. code-block:: python
 
     INSTALLED_APPS = [
         # other apps
         'openwisp_network_topology',
+        'allauth',
+        'allauth.account',
+        'openwisp_users',
+        'rest_framework',
     ]
 
 Add the URLs to your main ``urls.py``:
@@ -303,6 +309,38 @@ by nodes to send the topology, this way links will be flagged as "down" only if
 they haven't been detected for a while. This mechanism allows to visualize the
 topology even if the network has been split in several parts, the disadvantage
 is that it will take a bit more time to detect links that go offline.
+
+Integration with OpenWISP Controller and OpenWISP Monitoring
+------------------------------------------------------------
+
+If you use `OpenWISP Controller <https://github.com/openwisp/openwisp-controller>`_
+or `OpenWISP Monitoring <https://github.com/openwisp/openwisp-monitoring>`_
+and you use OpenVPN for the management VPN, you can use the integration available in
+``openwisp_network_topology.integrations.device``.
+
+This additional and optional module provides the following features:
+
+- whenever the stauts of an OpenVPN link changes:
+
+  - the management IP address of the related device is updated straightaway
+  - if OpenWISP Monitoring is enabled, the device checks are triggered (e.g.: ping)
+
+This integration makes the whole system a lot faster in detecting important events in the network.
+
+In order to use this module simply add
+``openwisp_network_topology.integrations.device`` to ``INSTALLED_APPS``:
+
+.. code-block:: python
+
+    INSTALLED_APPS = [
+        # other apps (eg: openwisp-controller, openwisp-monitoring)
+        'openwisp_network_topology',
+        'openwisp_network_topology.integrations.device',
+        'allauth',
+        'allauth.account',
+        'openwisp_users',
+        'rest_framework',
+    ]
 
 Settings
 --------
@@ -508,6 +546,11 @@ A django app is nothing more than a
 
     django-admin startapp sample_network_topology
 
+If you use the integration with openwisp-controller, you may want to extend also the
+integration app if you need::
+
+    django-admin startapp sample_integration_device
+
 Keep in mind that the command mentioned above must be called from a directory
 which is available in your `PYTHON_PATH <https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH>`_
 so that you can then import the result into your project.
@@ -521,6 +564,8 @@ ensuring also that ``openwisp_network_topology`` has been removed:
         # ... other apps ...
         # 'openwisp_network_topology'  <-- comment out or delete this line
         'sample_network_topology'
+        # optional, only if you need to extend the integration app
+        'sample_integration_device'
     ]
 
 For more information about how to work with django projects and django apps,
@@ -592,6 +637,11 @@ Please refer to the following files in the sample app of the test project:
 - `sample_network_topology/__init__.py <https://github.com/openwisp/openwisp-network-topology/tree/master/tests/openwisp2/sample_network_topology/__init__.py>`_.
 - `sample_network_topology/apps.py <https://github.com/openwisp/openwisp-network-topology/tree/master/tests/openwisp2/sample_network_topology/apps.py>`_.
 
+For the integration with openwisp-controller, see:
+
+- `sample_integration_device/__init__.py <https://github.com/openwisp/openwisp-network-topology/tree/master/tests/openwisp2/sample_integration_device/__init__.py>`_.
+- `sample_integration_device/apps.py <https://github.com/openwisp/openwisp-network-topology/tree/master/tests/openwisp2/sample_integration_device/apps.py>`_.
+
 You have to replicate and adapt that code in your project.
 
 For more information regarding the concept of ``AppConfig`` please refer to
@@ -622,6 +672,8 @@ Once you have created the models, add the following to your ``settings.py``:
     TOPOLOGY_NODE_MODEL = 'sample_network_topology.Node'
     TOPOLOGY_SNAPSHOT_MODEL = 'sample_network_topology.Snapshot'
     TOPOLOGY_TOPOLOGY_MODEL = 'sample_network_topology.Topology'
+    # if you use the integration with OpenWISP Controller and/or OpenWISP Monitoring
+    TOPOLOGY_DEVICE_DEVICENODE_MODEL = 'sample_integration_device.DeviceNode'
 
 Substitute ``sample_network_topology`` with the name you chose in step 1.
 
