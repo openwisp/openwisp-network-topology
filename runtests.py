@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -14,7 +13,7 @@ if __name__ == '__main__':
     args.insert(1, 'test')
     if not os.environ.get('SAMPLE_APP', False):
         args.insert(2, 'openwisp_network_topology')
+        args.insert(3, 'openwisp_network_topology.integrations.device')
     else:
         args.insert(2, 'openwisp2')
-    # args.insert(3, '-v 3')
 execute_from_command_line(args)

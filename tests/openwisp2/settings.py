@@ -29,8 +29,14 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    # openwisp2 modules
+    # controller  (needed to test integration)
+    'openwisp_controller.pki',
+    'openwisp_controller.config',
+    'reversion',
+    'sortedm2m',
+    # network topology
     'openwisp_network_topology',
+    'openwisp_network_topology.integrations.device',
     'openwisp_users',
     # admin
     'django.contrib.admin',
@@ -139,6 +145,10 @@ ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 OPENWISP_ORGANIZATON_USER_ADMIN = True
 OPENWISP_ORGANIZATON_OWNER_ADMIN = True
 
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_BROKER_URL = 'memory://'
+
 if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
     LOGGING.update(
         {
@@ -154,13 +164,17 @@ if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
 
 if os.environ.get('SAMPLE_APP', False):
     INSTALLED_APPS.remove('openwisp_network_topology')
+    INSTALLED_APPS.remove('openwisp_network_topology.integrations.device')
     EXTENDED_APPS = ['openwisp_network_topology']
-    INSTALLED_APPS.append('openwisp2.sample_network_topology')
+    INSTALLED_APPS += [
+        'openwisp2.sample_network_topology',
+        'openwisp2.sample_integration_device',
+    ]
     TOPOLOGY_LINK_MODEL = 'sample_network_topology.Link'
     TOPOLOGY_NODE_MODEL = 'sample_network_topology.Node'
     TOPOLOGY_SNAPSHOT_MODEL = 'sample_network_topology.Snapshot'
     TOPOLOGY_TOPOLOGY_MODEL = 'sample_network_topology.Topology'
-
+    TOPOLOGY_DEVICE_DEVICENODE_MODEL = 'sample_integration_device.DeviceNode'
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:
