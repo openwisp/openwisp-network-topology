@@ -1,6 +1,8 @@
 import os
+import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TESTING = 'test' in sys.argv
 
 DEBUG = True
 
@@ -94,8 +96,8 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'filters': {
-        'require_debug_false': {'()': 'django.utils.log.RequireDebugFalse',},
-        'require_debug_true': {'()': 'django.utils.log.RequireDebugTrue',},
+        'require_debug_false': {'()': 'django.utils.log.RequireDebugFalse'},
+        'require_debug_true': {'()': 'django.utils.log.RequireDebugTrue'},
     },
     'formatters': {
         'simple': {'format': '[%(levelname)s] %(message)s'},
@@ -124,8 +126,8 @@ LOGGING = {
             'backupCount': 3,
         },
     },
-    'root': {'level': 'INFO', 'handlers': ['main_log', 'console', 'mail_admins'],},
-    'loggers': {'py.warnings': {'handlers': ['console'],}},
+    'root': {'level': 'INFO', 'handlers': ['main_log', 'console', 'mail_admins']},
+    'loggers': {'py.warnings': {'handlers': ['console']}},
 }
 
 TEST_RUNNER = 'openwisp_network_topology.tests.utils.LoggingDisabledTestRunner'
@@ -137,6 +139,18 @@ ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 OPENWISP_ORGANIZATON_USER_ADMIN = True
 OPENWISP_ORGANIZATON_OWNER_ADMIN = True
 
+if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
+    LOGGING.update(
+        {
+            'loggers': {
+                'django.db.backends': {
+                    'handlers': ['console'],
+                    'level': 'DEBUG',
+                    'propagate': False,
+                }
+            },
+        }
+    )
 
 if os.environ.get('SAMPLE_APP', False):
     INSTALLED_APPS.remove('openwisp_network_topology')
