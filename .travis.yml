@@ -12,6 +12,7 @@ env:
 branches:
   only:
     - master
+    - dev
 
 before_install:
   - pip install $DJANGO
