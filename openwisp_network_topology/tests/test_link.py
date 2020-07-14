@@ -124,8 +124,10 @@ class TestLink(CreateOrgMixin, CreateGraphObjectsMixin, TestCase):
         self.signal_was_called = False
         t = self.topology_model.objects.first()
         node1, node2 = self._get_nodes()
-        link = t._create_link(source=node1, target=node2, cost=1.0, status='up')
-        link.save()
+        with catch_signal(link_status_changed) as handler:
+            link = t._create_link(source=node1, target=node2, cost=1.0, status='up')
+            link.save()
+            handler.assert_not_called()
         with catch_signal(link_status_changed) as handler:
             link.status = 'down'
             link.save()
