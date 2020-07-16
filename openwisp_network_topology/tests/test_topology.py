@@ -364,13 +364,19 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         t.refresh_from_db()
         netjson = t.json(dict=True)
         for link in self.link_model.objects.all():
-            with self.subTest(f'status should not be saved in properties ({link})'):
-                self.assertNotIn('status', link.properties)
+            for attr in ['status', 'status_changed', 'created', 'modified']:
+                with self.subTest(f'{attr} should not be saved in properties ({link})'):
+                    self.assertNotIn(attr, link.properties)
         for link in netjson['links']:
-            with self.subTest(
-                f'status should be down ({link["source"]} - {link["target"]})'
-            ):
+            with self.subTest(f'status should be down ({link})'):
                 self.assertEqual(link['properties']['status'], 'down')
+            for attr in ['status_changed', 'created', 'modified']:
+                with self.subTest(f'{attr} should be present in properties ({link})'):
+                    self.assertIn(attr, link['properties'])
+        for node in netjson['nodes']:
+            for attr in ['created', 'modified']:
+                with self.subTest(f'{attr} should be present in properties ({node})'):
+                    self.assertIn(attr, node['properties'])
 
     def test_receive_status_existing_link(self):
         t = self._set_receive()
