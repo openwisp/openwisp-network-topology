@@ -133,4 +133,4 @@ class AbstractDeviceNode(UUIDModel):
             # triggers monitoring checks if OpenWISP Monitoring is enabled
             if 'openwisp_monitoring.device' in settings.INSTALLED_APPS:
                 run_checks = import_string(trigger_device_checks_path)
-                run_checks.delay(device_node.device.pk)
+                run_checks.delay(device_node.device.pk, recovery=link.status == 'up')

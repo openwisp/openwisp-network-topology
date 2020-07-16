@@ -21,7 +21,7 @@ before_install:
   - pip install -U https://github.com/openwisp/netdiff/tarball/dev
   # needed to test integrations
   - pip install -U https://github.com/openwisp/openwisp-controller/tarball/master
-  - pip install -U https://github.com/openwisp/openwisp-monitoring/tarball/master
+  - pip install -U https://github.com/openwisp/openwisp-monitoring/tarball/trigger-device-checks-improvement
   - pip install -U --no-deps https://github.com/openwisp/openwisp-notifications/tarball/master
 
 install:

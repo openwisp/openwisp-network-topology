@@ -241,7 +241,7 @@ class TestMonitoringIntegration(Base, TransactionTestCase):
         link = Link(
             source=node,
             target=node2,
-            status='down',
+            status='up',
             topology=topology,
             organization=topology.organization,
             cost=1,
@@ -261,7 +261,7 @@ class TestMonitoringIntegration(Base, TransactionTestCase):
                     ]
                 }
             ):
-                link.status = 'up'
+                link.status = 'down'
                 link.save()
             mocked_task.assert_called_once()
-            mocked_task.assert_called_with(device.pk)
+            mocked_task.assert_called_with(device.pk, recovery=False)
