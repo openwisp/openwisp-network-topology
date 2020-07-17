@@ -81,9 +81,13 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
             if attr in self.properties:
                 del self.properties[attr]
 
-    def json(self, dict=False, **kwargs):
+    def json(self, dict=False, original=False, **kwargs):
         """
-        returns a NetJSON NetworkGraph Link object
+        Returns a NetJSON NetworkGraph Link object.
+
+        If ``original`` is passed, the data will be returned
+        as it has been collected from the network (used when
+        doing the comparison).
         """
         netjson = OrderedDict(
             (
@@ -94,13 +98,14 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
             )
         )
         # properties contain status by default
-        properties = OrderedDict((('status', self.status),))
+        properties = OrderedDict()
         if self.properties:
             properties.update(self.properties)
-        properties['created'] = self.created
-        properties['modified'] = self.modified
-        properties['status_changed'] = self.status_changed
-
+        if not original:
+            properties['status'] = self.status
+            properties['status_changed'] = self.status_changed
+            properties['created'] = self.created
+            properties['modified'] = self.modified
         netjson['properties'] = properties
         if dict:
             return netjson

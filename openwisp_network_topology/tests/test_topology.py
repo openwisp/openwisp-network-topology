@@ -111,7 +111,7 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         responses.add(
             responses.GET,
             'http://127.0.0.1:9090',
-            body=t.json(),
+            body=t.json(original=True),
             content_type='application/json',
         )
         self.assertDictEqual(
@@ -518,3 +518,38 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         t.save()
         items = {'nodes': [{'id': 'bogus'}]}
         t._update_changed_items(items)
+
+    def test_receive_regression(self):
+        t = self._set_receive(parser='netdiff.OpenvpnParser', expiration_time=120)
+        t.save()
+        data = self._load('static/openvpn.txt')
+        pre_existing_nodes = Node.objects.count()
+        node1 = Node.objects.first()
+        node2 = Node.objects.last()
+        with freeze_time() as frozen_time:
+            t.receive(data)
+            self.assertEqual(t.node_set.count(), 4 + pre_existing_nodes)
+            self.assertEqual(t.link_set.count(), 3)
+            # create new link not included in the topology data
+            link = self._create_link(
+                source=node1, target=node2, status='up', topology=t, cost=1
+            )
+            self.assertEqual(link.status, 'up')
+            modified = link.modified
+            # after 61 seconds we receive new (empty) data
+            # we expect the link status to remain unchanged
+            # (since expiration_time has not passed yet)
+            # but we do not expect the link to be modified
+            frozen_time.tick(timedelta(seconds=61))
+            t.receive(data)
+            link.refresh_from_db()
+            self.assertEqual(link.status, 'up')
+            self.assertEqual(link.modified, modified)
+            # hen the topology data is received again later
+            # the expiration time is passed and we expect
+            # the link to be flagged as down and modified
+            frozen_time.tick(timedelta(seconds=61))
+            t.receive(data)
+            link.refresh_from_db()
+            self.assertEqual(link.status, 'down')
+            self.assertNotEqual(link.modified, modified)

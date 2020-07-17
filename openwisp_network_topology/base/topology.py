@@ -136,7 +136,7 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
             latest = data
         else:
             latest = self.get_topology_data(data)
-        current = NetJsonParser(self.json(dict=True, omit_down=True))
+        current = NetJsonParser(self.json(dict=True, omit_down=True, original=True))
         return diff(current, latest)
 
     def get_nodes_queryset(self):
@@ -145,7 +145,7 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
     def get_links_queryset(self):
         return self.link_set.select_related('source', 'target')
 
-    def json(self, dict=False, omit_down=False, **kwargs):
+    def json(self, dict=False, omit_down=False, original=False, **kwargs):
         """ returns a dict that represents a NetJSON NetworkGraph object """
         nodes = []
         links = []
@@ -155,9 +155,9 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
             links_queryset = links_queryset.filter(status='up')
         # populate graph
         for link in links_queryset:
-            links.append(link.json(dict=True))
+            links.append(link.json(dict=True, original=original))
         for node in self.get_nodes_queryset():
-            nodes.append(node.json(dict=True))
+            nodes.append(node.json(dict=True, original=original))
         netjson = OrderedDict(
             (
                 ('type', 'NetworkGraph'),

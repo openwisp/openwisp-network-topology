@@ -102,6 +102,12 @@ class TestLink(CreateOrgMixin, CreateGraphObjectsMixin, TestCase):
             self.assertNotIn('status', link.properties)
         with self.subTest('status should not be overridden'):
             self.assertEqual(netjson['properties']['status'], 'down')
+        with self.subTest('testing original=True'):
+            netjson = link.json(dict=True, original=True)
+            self.assertNotIn('status', netjson['properties'])
+            self.assertNotIn('status_changed', netjson['properties'])
+            self.assertNotIn('created', netjson['properties'])
+            self.assertNotIn('modified', netjson['properties'])
 
     def test_get_from_nodes(self):
         t = self.topology_model.objects.first()

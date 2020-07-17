@@ -96,6 +96,10 @@ class TestNode(CreateGraphObjectsMixin, CreateOrgMixin, TestCase):
             },
         )
         self.assertIsInstance(n.json(), str)
+        with self.subTest('testing original=True'):
+            netjson = n.json(dict=True, original=True)
+            self.assertNotIn('created', netjson['properties'])
+            self.assertNotIn('modified', netjson['properties'])
 
     def test_get_from_address(self):
         t = self.topology_model.objects.first()

@@ -1,5 +1,6 @@
 import json
 from collections import OrderedDict
+from copy import deepcopy
 from datetime import timedelta
 
 import swapper
@@ -73,9 +74,13 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
         """
         return self.name
 
-    def json(self, dict=False, **kwargs):
+    def json(self, dict=False, original=False, **kwargs):
         """
-        returns a NetJSON NetworkGraph Node object
+        Returns a NetJSON NetworkGraph Node object.
+
+        If ``original`` is passed, the data will be returned
+        as it has been collected from the network (used when
+        doing the comparison).
         """
         netjson = OrderedDict({'id': self.netjson_id})
         label = self.get_name()
@@ -84,9 +89,10 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
         for attr in ['local_addresses', 'properties']:
             value = getattr(self, attr)
             if value or attr == 'properties':
-                netjson[attr] = value
-        netjson['properties']['created'] = JSONEncoder().default(self.created)
-        netjson['properties']['modified'] = JSONEncoder().default(self.modified)
+                netjson[attr] = deepcopy(value)
+        if not original:
+            netjson['properties']['created'] = JSONEncoder().default(self.created)
+            netjson['properties']['modified'] = JSONEncoder().default(self.modified)
         if dict:
             return netjson
         return json.dumps(netjson, cls=JSONEncoder, **kwargs)
