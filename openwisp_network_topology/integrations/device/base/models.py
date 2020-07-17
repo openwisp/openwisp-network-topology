@@ -56,13 +56,15 @@ class AbstractDeviceNode(UUIDModel):
             return
 
         Device = load_model('config', 'Device')
-
-        try:
-            device = Device.objects.only('id', 'name').get(
+        device = (
+            Device.objects.only('id', 'name')
+            .filter(
                 organization_id=node.organization_id,
                 config__vpnclient__cert__common_name=common_name,
             )
-        except Device.DoesNotExist:
+            .first()
+        )
+        if not device:
             return
 
         device_node = cls(device=device, node=node)

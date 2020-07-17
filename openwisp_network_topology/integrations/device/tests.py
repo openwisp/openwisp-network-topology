@@ -71,6 +71,15 @@ class Base(
             default=True,
             organization=organization,
         )
+        vpn2 = self._create_vpn(name='test VPN2', ca=vpn.ca, organization=organization)
+        self._create_template(
+            name='VPN2',
+            type='vpn',
+            vpn=vpn2,
+            config=vpn.auto_client(),
+            default=True,
+            organization=organization,
+        )
         device = self._create_device(organization=organization)
         config = self._create_config(device=device)
         topology = self._create_topology(organization=organization, parser=parser)
