@@ -13,7 +13,7 @@ from openwisp_users.multitenancy import (
     MultitenantOrgFilter,
     MultitenantRelatedOrgFilter,
 )
-from openwisp_utils.admin import ReceiveUrlAdmin
+from openwisp_utils.admin import ReceiveUrlAdmin, UUIDAdmin
 
 from . import settings as app_settings
 from .contextmanagers import log_failure
@@ -61,7 +61,7 @@ class BaseAdmin(TimeStampedEditableAdmin):
 
 @admin.register(Topology)
 class TopologyAdmin(
-    MultitenantAdminMixin, BaseAdmin, ReceiveUrlAdmin, GraphVisualizerUrls
+    MultitenantAdminMixin, GraphVisualizerUrls, UUIDAdmin, ReceiveUrlAdmin, BaseAdmin
 ):
     model = Topology
     list_display = [
@@ -73,7 +73,14 @@ class TopologyAdmin(
         'modified',
         'organization',
     ]
-    readonly_fields = ['protocol', 'version', 'revision', 'metric', 'receive_url']
+    readonly_fields = [
+        'uuid',
+        'protocol',
+        'version',
+        'revision',
+        'metric',
+        'receive_url',
+    ]
     list_filter = [
         'parser',
         'strategy',
@@ -82,6 +89,7 @@ class TopologyAdmin(
     search_fields = ['label', 'id']
     actions = ['update_selected', 'unpublish_selected', 'publish_selected']
     fields = [
+        'uuid',
         'label',
         'organization',
         'parser',

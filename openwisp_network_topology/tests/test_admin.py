@@ -189,11 +189,14 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         response = self.client.get(path)
         self.assertNotContains(response, 'Links to other nodes')
 
-    def test_topology_visualize_button(self):
+    def test_topology_change_form(self):
         topology = self.topology_model.objects.first()
         path = reverse('{0}_topology_change'.format(self.prefix), args=[topology.pk])
         response = self.client.get(path)
         self.assertContains(response, 'View topology graph')
+        self.assertContains(
+            response, '<div class="readonly">{0}</div>'.format(topology.pk)
+        )
 
     def test_topology_visualize_view(self):
         t = self.topology_model.objects.first()
