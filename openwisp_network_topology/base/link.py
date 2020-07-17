@@ -65,7 +65,7 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
         self._initial_status = self.status
 
     def __str__(self):
-        return '{0} - {1}'.format(self.source.name, self.target.name)
+        return '{0} - {1}'.format(self.source.get_name(), self.target.get_name())
 
     def full_clean(self, *args, **kwargs):
         self.organization = self.topology.organization
@@ -144,3 +144,8 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
                 print_info('Deleting {0} expired links'.format(expired_links_length))
                 for link in expired_links:
                     link.delete()
+
+    @classmethod
+    def get_queryset(cls, qs):
+        """ admin list queryset """
+        return qs.select_related('organization', 'topology', 'source', 'target')

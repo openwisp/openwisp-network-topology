@@ -1,6 +1,9 @@
 import swapper
 
 from openwisp_network_topology.integrations.device.tests import (
+    TestAdmin as BaseTestAdmin,
+)
+from openwisp_network_topology.integrations.device.tests import (
     TestControllerIntegration as BaseTestControllerIntegration,
 )
 from openwisp_network_topology.integrations.device.tests import (
@@ -19,5 +22,11 @@ class TestMonitoringIntegration(BaseTestMonitoringIntegration):
     pass
 
 
+class TestAdmin(BaseTestAdmin):
+    module = 'openwisp2.sample_network_topology'
+    app_label = 'sample_network_topology'
+
+
 del BaseTestControllerIntegration
 del BaseTestMonitoringIntegration
+del BaseTestAdmin

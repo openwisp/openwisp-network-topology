@@ -2,8 +2,10 @@ from unittest import mock
 
 import django
 import swapper
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.test import TransactionTestCase
+from django.urls import reverse
 from django.utils.module_loading import import_string
 from openwisp_controller.config.tests.utils import (
     CreateConfigTemplateMixin,
@@ -216,7 +218,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
     def test_node_label_override(self):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
         node = self._init_test_node(topology, common_name=cert.common_name)
-        self.assertEqual(node.get_label(), device.name)
+        self.assertEqual(node.get_name(), device.name)
 
     def test_topology_json(self):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
@@ -265,3 +267,46 @@ class TestMonitoringIntegration(Base, TransactionTestCase):
                 link.save()
             mocked_task.assert_called_once()
             mocked_task.assert_called_with(device.pk, recovery=False)
+
+
+class TestAdmin(Base, TransactionTestCase):
+    module = 'openwisp_network_topology'
+    app_label = 'topology'
+    topology_model = Topology
+    link_model = Link
+    node_model = Node
+    user_model = get_user_model()
+    fixtures = ['test_users.json']
+    api_urls_path = 'api.urls'
+
+    @property
+    def prefix(self):
+        return 'admin:{0}'.format(self.app_label)
+
+    def setUp(self):
+        org = self._create_org()
+        t = self._create_topology(organization=org)
+        topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
+        node1 = self._init_test_node(topology, common_name=cert.common_name)
+        node2 = self._init_test_node(topology, addresses=['netjson_id2'], label='test2')
+        link = Link(
+            source=node1,
+            target=node2,
+            topology=topology,
+            organization=topology.organization,
+            cost=1,
+        )
+        link.full_clean()
+        link.save()
+        self._create_link(topology=t, source=node1, target=node2)
+        self.client.force_login(self.user_model.objects.get(username='admin'))
+
+    def test_node_change_list_queries(self):
+        path = reverse('{0}_node_changelist'.format(self.prefix))
+        with self.assertNumQueries(7):
+            self.client.get(path)
+
+    def test_link_change_list_queries(self):
+        path = reverse('{0}_link_changelist'.format(self.prefix))
+        with self.assertNumQueries(7):
+            self.client.get(path)

@@ -160,6 +160,20 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         self.assertNotContains(response, 'organization_id')
         self.assertContains(response, n.topology.organization.name)
 
+    def test_node_change_list_queries(self):
+        path = reverse('{0}_node_changelist'.format(self.prefix))
+        with self.assertNumQueries(7):
+            self.client.get(path)
+
+    def test_link_change_list_queries(self):
+        t = Topology.objects.first()
+        n1 = self._create_node(label='node1org1', topology=t)
+        n2 = self._create_node(label='node2org1', topology=t)
+        self._create_link(topology=t, source=n1, target=n2)
+        path = reverse('{0}_link_changelist'.format(self.prefix))
+        with self.assertNumQueries(7):
+            self.client.get(path)
+
     def test_link_change_form(self):
         t = Topology.objects.first()
         n1 = self._create_node(label='node1org1', topology=t)

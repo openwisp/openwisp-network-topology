@@ -66,19 +66,19 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
     def name(self):
         return self.label or self.netjson_id or ''
 
-    def get_label(self):
+    def get_name(self):
         """
         May be overridden/monkey patched to get the node name
         from other sources (e.g: device name in openwisp-controller)
         """
-        return self.label
+        return self.name
 
     def json(self, dict=False, **kwargs):
         """
         returns a NetJSON NetworkGraph Node object
         """
         netjson = OrderedDict({'id': self.netjson_id})
-        label = self.get_label()
+        label = self.get_name()
         if label:
             netjson['label'] = label
         for attr in ['local_addresses', 'properties']:
@@ -140,3 +140,8 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
                 print_info('Deleting {0} expired nodes'.format(expired_nodes_length))
                 for node in expired_nodes:
                     node.delete()
+
+    @classmethod
+    def get_queryset(cls, qs):
+        """ admin list queryset """
+        return qs.select_related('organization', 'topology')
