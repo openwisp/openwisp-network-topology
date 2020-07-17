@@ -1,3 +1,5 @@
+from importlib import import_module
+
 import swapper
 from django.apps import AppConfig
 from django.db import transaction
@@ -41,35 +43,4 @@ class OpenwispTopologyDeviceConfig(AppConfig):
         transaction.on_commit(lambda: trigger_device_updates.delay(link.pk))
 
     def override_node_label(self):
-        Node = swapper.load_model('topology', 'Node')
-        Topology = swapper.load_model('topology', 'Topology')
-
-        def get_label(self):
-            if hasattr(self, 'devicenode'):
-                return self.devicenode.device.name
-            return super(Node, self).get_label()
-
-        def get_nodes_queryset(self):
-            """
-            Overrides Topology.get_nodes_queryset
-            to avoid generating 2 additional queries for each node
-            when using the name of the device as the node label
-            """
-            return (
-                super(Topology, self)
-                .get_nodes_queryset()
-                .select_related('devicenode__device')
-                .only(
-                    'id',
-                    'topology_id',
-                    'label',
-                    'addresses',
-                    'properties',
-                    'created',
-                    'modified',
-                    'devicenode__device__name',
-                )
-            )
-
-        Node.get_label = get_label
-        Topology.get_nodes_queryset = get_nodes_queryset
+        import_module('openwisp_network_topology.integrations.device.overrides')

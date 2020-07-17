@@ -217,10 +217,12 @@ class TopologyAdmin(
         return TemplateResponse(request, 'admin/topology/visualize.html', context)
 
 
-class AutoOrgMixin(MultitenantAdminMixin):
+class NodeLinkMixin(MultitenantAdminMixin):
     """
     Hides organization in add form
-    Shows it readonly in change form
+    Shows organization readonly in change form
+    Adds get_queryset class method that enables
+    other extensions to override the admin queryset
     """
 
     readonly_fields = ['organization']
@@ -233,12 +235,15 @@ class AutoOrgMixin(MultitenantAdminMixin):
         fields_copy.remove('organization')
         return fields_copy
 
+    def get_queryset(self, request):
+        return self.model.get_queryset(super().get_queryset(request))
+
 
 @admin.register(Node)
-class NodeAdmin(AutoOrgMixin, BaseAdmin):
+class NodeAdmin(NodeLinkMixin, BaseAdmin):
     model = Node
     change_form_template = 'admin/topology/node/change_form.html'
-    list_display = ['name', 'organization', 'topology', 'addresses']
+    list_display = ['get_name', 'organization', 'topology', 'addresses']
     search_fields = ['addresses', 'label', 'properties']
     list_filter = [
         ('organization', MultitenantOrgFilter),
@@ -271,7 +276,7 @@ class NodeAdmin(AutoOrgMixin, BaseAdmin):
 
 
 @admin.register(Link)
-class LinkAdmin(AutoOrgMixin, BaseAdmin):
+class LinkAdmin(NodeLinkMixin, BaseAdmin):
     model = Link
     raw_id_fields = ['source', 'target']
     search_fields = [
