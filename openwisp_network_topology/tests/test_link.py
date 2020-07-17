@@ -135,3 +135,12 @@ class TestLink(CreateOrgMixin, CreateGraphObjectsMixin, TestCase):
             link=link, sender=self.link_model, signal=link_status_changed,
         )
         self.assertEqual(link.status, 'down')
+
+    def test_link_auto_org(self):
+        t = self.topology_model.objects.first()
+        node1, node2 = self._get_nodes()
+        link = self.link_model(
+            source=node1, target=node2, cost=1.0, cost_text='100mbit/s', topology=t
+        )
+        link.full_clean()
+        self.assertEqual(link.organization, t.organization)

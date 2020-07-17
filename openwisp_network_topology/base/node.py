@@ -40,7 +40,12 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
     def __str__(self):
         return self.name
 
+    def full_clean(self, *args, **kwargs):
+        self.organization = self.topology.organization
+        return super().full_clean(*args, **kwargs)
+
     def clean(self):
+
         if self.properties is None:
             self.properties = {}
 
