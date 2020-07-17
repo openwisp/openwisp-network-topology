@@ -1,9 +1,8 @@
 import logging
 import os
 
-from django.test.runner import DiscoverRunner
-
 from openwisp_users.models import Organization
+from openwisp_utils.tests import TimeLoggingTestRunner
 
 
 class CreateOrgMixin(object):
@@ -57,7 +56,7 @@ class CreateGraphObjectsMixin(object):
         return link
 
 
-class LoggingDisabledTestRunner(DiscoverRunner):
+class LoggingDisabledTestRunner(TimeLoggingTestRunner):
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
         # disable logging below CRITICAL while testing
         logging.disable(logging.CRITICAL)
