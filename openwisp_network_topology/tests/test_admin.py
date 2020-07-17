@@ -157,6 +157,18 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         path = reverse('{0}_node_change'.format(self.prefix), args=[n.pk])
         response = self.client.get(path)
         self.assertContains(response, 'Links to other nodes')
+        self.assertNotContains(response, 'organization_id')
+        self.assertContains(response, n.topology.organization.name)
+
+    def test_link_change_form(self):
+        t = Topology.objects.first()
+        n1 = self._create_node(label='node1org1', topology=t)
+        n2 = self._create_node(label='node2org1', topology=t)
+        link = self._create_link(topology=t, source=n1, target=n2)
+        path = reverse('{0}_link_change'.format(self.prefix), args=[link.pk])
+        response = self.client.get(path)
+        self.assertNotContains(response, 'organization_id')
+        self.assertContains(response, link.topology.organization.name)
 
     def test_node_add(self):
         path = reverse('{0}_node_add'.format(self.prefix))
@@ -281,13 +293,10 @@ class TestMultitenantAdmin(
         )
 
     def test_node_organization_fk_queryset(self):
-        data = self._create_multitenancy_test_env()
-        self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_node_add'),
-            visible=[data['org1'].name],
-            hidden=[data['org2'].name, data['inactive']],
-            select_widget=True,
-        )
+        self._create_multitenancy_test_env()
+        self._login(username='operator', password='tester')
+        response = self.client.get(reverse(f'admin:{self.app_label}_node_add'))
+        self.assertNotContains(response, 'organization_id')
 
     def test_link_queryset(self):
         data = self._create_multitenancy_test_env()
@@ -298,13 +307,10 @@ class TestMultitenantAdmin(
         )
 
     def test_link_organization_fk_queryset(self):
-        data = self._create_multitenancy_test_env()
-        self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_link_add'),
-            visible=[data['org1'].name],
-            hidden=[data['org2'].name, data['inactive']],
-            select_widget=True,
-        )
+        self._create_multitenancy_test_env()
+        self._login(username='operator', password='tester')
+        response = self.client.get(reverse(f'admin:{self.app_label}_link_add'))
+        self.assertNotContains(response, 'organization_id')
 
     def test_node_topology_fk_queryset(self):
         data = self._create_multitenancy_test_env()

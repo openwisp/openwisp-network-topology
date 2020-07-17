@@ -217,8 +217,25 @@ class TopologyAdmin(
         return TemplateResponse(request, 'admin/topology/visualize.html', context)
 
 
+class AutoOrgMixin(MultitenantAdminMixin):
+    """
+    Hides organization in add form
+    Shows it readonly in change form
+    """
+
+    readonly_fields = ['organization']
+
+    def get_fields(self, request, obj):
+        fields = super().get_fields(request, obj)
+        if obj:
+            return fields
+        fields_copy = list(fields)
+        fields_copy.remove('organization')
+        return fields_copy
+
+
 @admin.register(Node)
-class NodeAdmin(MultitenantAdminMixin, BaseAdmin):
+class NodeAdmin(AutoOrgMixin, BaseAdmin):
     model = Node
     change_form_template = 'admin/topology/node/change_form.html'
     list_display = ['name', 'organization', 'topology', 'addresses']
@@ -229,11 +246,11 @@ class NodeAdmin(MultitenantAdminMixin, BaseAdmin):
     ]
     multitenant_shared_relations = ('topology',)
     fields = [
-        'label',
+        'topology',
         'organization',
+        'label',
         'addresses',
         'properties',
-        'topology',
         'created',
         'modified',
     ]
@@ -254,7 +271,7 @@ class NodeAdmin(MultitenantAdminMixin, BaseAdmin):
 
 
 @admin.register(Link)
-class LinkAdmin(MultitenantAdminMixin, BaseAdmin):
+class LinkAdmin(AutoOrgMixin, BaseAdmin):
     model = Link
     raw_id_fields = ['source', 'target']
     search_fields = [
@@ -279,14 +296,14 @@ class LinkAdmin(MultitenantAdminMixin, BaseAdmin):
     ]
     multitenant_shared_relations = ('topology', 'source', 'target')
     fields = [
-        'organization',
-        'cost',
-        'cost_text',
-        'status',
-        'properties',
         'topology',
+        'organization',
+        'status',
         'source',
         'target',
+        'cost',
+        'cost_text',
+        'properties',
         'created',
         'modified',
     ]

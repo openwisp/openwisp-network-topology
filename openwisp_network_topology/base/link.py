@@ -67,6 +67,10 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
     def __str__(self):
         return '{0} - {1}'.format(self.source.name, self.target.name)
 
+    def full_clean(self, *args, **kwargs):
+        self.organization = self.topology.organization
+        return super().full_clean(*args, **kwargs)
+
     def clean(self):
         if self.source == self.target or self.source_id == self.target_id:
             raise ValidationError(_('source and target must not be the same'))

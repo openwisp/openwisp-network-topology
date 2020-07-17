@@ -125,3 +125,11 @@ class TestNode(CreateGraphObjectsMixin, CreateOrgMixin, TestCase):
         n2.save()
         self.assertEqual(self.node_model.count_address('Benz_Kalloni', t), 1)
         self.assertEqual(self.node_model.count_address('Kalloni', t), 1)
+
+    def test_node_auto_org(self):
+        t = self.topology_model.objects.first()
+        n = self.node_model(
+            label='TestNode', addresses=['192.168.0.1'], properties={}, topology=t
+        )
+        n.full_clean()
+        self.assertEqual(n.organization, t.organization)
