@@ -18,7 +18,6 @@ before_install:
   - pip install $DJANGO
   # TODO: remove when openwisp-utils with isort 5 is released
   - pip install -U https://github.com/openwisp/openwisp-utils/tarball/master#egg=openwisp_utils[qa]
-  - pip install -U https://github.com/openwisp/netdiff/tarball/dev
   # needed to test integrations
   - pip install -U https://github.com/openwisp/openwisp-controller/tarball/master
   - pip install -U https://github.com/openwisp/openwisp-monitoring/tarball/master
