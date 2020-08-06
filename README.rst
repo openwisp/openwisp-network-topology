@@ -562,10 +562,26 @@ ensuring also that ``openwisp_network_topology`` has been removed:
 
     INSTALLED_APPS = [
         # ... other apps ...
-        # 'openwisp_network_topology'  <-- comment out or delete this line
-        'sample_network_topology'
-        # optional, only if you need to extend the integration app
-        'sample_integration_device'
+        'openwisp_utils.admin_theme',
+        # all-auth
+        'django.contrib.sites',
+        'allauth',
+        'allauth.account',
+        'allauth.socialaccount',
+        # (optional) openwisp_controller - required only if you are using the integration app
+        'openwisp_controller.pki',
+        'openwisp_controller.config',
+        'reversion',
+        'sortedm2m',
+        # network topology
+        # 'sample_network_topology' <-- uncomment and replace with your app-name here
+        # (optional) required only if you need to extend the integration app
+        # 'sample_integration_device' <-- uncomment and replace with your integration-app-name here
+        'openwisp_users',
+        # admin
+        'django.contrib.admin',
+        # rest framework
+        'rest_framework',
     ]
 
 For more information about how to work with django projects and django apps,
