@@ -269,6 +269,7 @@ class TestMonitoringIntegration(Base, TransactionTestCase):
                         'openwisp_monitoring.device',
                         'openwisp_monitoring.check',
                         'openwisp_controller.connection',
+                        'openwisp_notifications',
                     ]
                 }
             ):
