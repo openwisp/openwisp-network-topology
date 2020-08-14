@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'openwisp_users.User'
-SITE_ID = '1'
+SITE_ID = 1
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
