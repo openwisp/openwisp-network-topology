@@ -1,7 +1,9 @@
 import json
+import logging
 
 import swapper
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from netdiff.exceptions import NetdiffException
 from rest_framework import generics
@@ -12,6 +14,7 @@ from ..utils import get_object_or_404
 from .parsers import TextParser
 from .serializers import NetworkGraphSerializer
 
+logger = logging.getLogger(__name__)
 Snapshot = swapper.load_model('topology', 'Snapshot')
 Topology = swapper.load_model('topology', 'Topology')
 
@@ -75,7 +78,18 @@ class ReceiveTopologyView(APIView):
                 'with message "%s"'
             ) % (topology.get_parser_display(), e.__class__.__name__, e)
             return Response({'detail': error}, status=400)
-        return Response({'detail': _('data received successfully')})
+        success_message = _('data received successfully')
+        deprecated_url = reverse('receive_topology_deprecated', args=[pk])
+        if request.path == deprecated_url:
+            expected_path = reverse('receive_topology', args=[pk])
+            expected_path = f'{expected_path}?key={key}'
+            warning = _(
+                'This URL is depercated and will be removed in '
+                f'future versions, use {expected_path}'
+            )
+            logger.warning(warning)
+            success_message = f'{success_message}. {warning}'
+        return Response({'detail': success_message})
 
 
 class NetworkGraphHistoryView(APIView):

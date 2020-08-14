@@ -130,16 +130,17 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         t.save()
         path = reverse('{0}_topology_change'.format(self.prefix), args=[t.pk])
         # No change in URL Test
+        receive_path = f'topology/{t.pk}/receive/'
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'field-receive_url')
-        self.assertContains(response, 'http://testserver/api/v1/receive')
+        self.assertContains(response, f'http://testserver/api/v1/{receive_path}')
         # Change URL Test
         TopologyAdmin.receive_url_baseurl = 'http://changedurlbase'
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'field-receive_url')
-        self.assertContains(response, 'http://changedurlbase/api/v1/receive')
+        self.assertContains(response, f'http://changedurlbase/api/v1/{receive_path}')
         # Change URLConf Test
         TopologyAdmin.receive_url_urlconf = '{}.{}'.format(
             self.module, self.api_urls_path
@@ -147,7 +148,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'field-receive_url')
-        self.assertContains(response, 'http://changedurlbase/receive')
+        self.assertContains(response, f'http://changedurlbase/{receive_path}')
         # Reset test options
         TopologyAdmin.receive_url_baseurl = None
         TopologyAdmin.receive_url_urlconf = None

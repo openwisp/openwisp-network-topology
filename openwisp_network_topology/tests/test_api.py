@@ -1,5 +1,6 @@
 import swapper
 from django.test import TestCase
+from django.urls import reverse
 
 from .utils import CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, UnpublishMixin
 
@@ -12,7 +13,7 @@ Topology = swapper.load_model('topology', 'Topology')
 class TestApi(
     CreateGraphObjectsMixin, CreateOrgMixin, UnpublishMixin, LoadMixin, TestCase
 ):
-    list_url = '/api/v1/topology/'
+    list_url = reverse('network_collection')
     topology_model = Topology
     node_model = Node
     link_model = Link
@@ -31,17 +32,19 @@ class TestApi(
     @property
     def detail_url(self):
         t = self.topology_model.objects.first()
-        return '/api/v1/topology/{0}/'.format(t.pk)
+        return reverse('network_graph', args=[t.pk])
 
     @property
     def receive_url(self):
         t = self.topology_model.objects.first()
-        return '/api/v1/receive/{0}/?key=test'.format(t.pk)
+        path = reverse('receive_topology', args=[t.pk])
+        return f'{path}?key=test'
 
     @property
     def snapshot_url(self):
         t = self.topology_model.objects.first()
-        return '/api/v1/topology/{0}/history/?date={1}'.format(t.pk, self.snapshot_date)
+        path = reverse('network_graph_history', args=[t.pk])
+        return f'{path}?date={self.snapshot_date}'
 
     def _set_receive(self):
         t = self.topology_model.objects.first()
@@ -82,6 +85,26 @@ class TestApi(
         response = self.client.post(self.receive_url, data, content_type='text/plain')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['detail'], 'data received successfully')
+        self.assertEqual(self.node_model.objects.count(), 2)
+        self.assertEqual(self.link_model.objects.count(), 1)
+
+    def test_receive_with_deprecated_url(self):
+        self._set_receive()
+        self.node_model.objects.all().delete()
+        data = self._load('static/netjson-1-link.json')
+        t = self.topology_model.objects.first()
+        path = reverse('receive_topology_deprecated', args=[t.pk])
+        path = f'{path}?key=test'
+        response = self.client.post(path, data=data, content_type='text/plain')
+        self.assertEqual(response.status_code, 200)
+        expected_path = reverse('receive_topology', args=[t.pk])
+        expected_path = f'{expected_path}?key=test'
+        message = (
+            'data received successfully. '
+            'This URL is depercated and will be removed in '
+            f'future versions, use {expected_path}'
+        )
+        self.assertEqual(response.data['detail'], message)
         self.assertEqual(self.node_model.objects.count(), 2)
         self.assertEqual(self.link_model.objects.count(), 1)
 
