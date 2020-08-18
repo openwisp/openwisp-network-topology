@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'openwisp_controller.config',
     'reversion',
     'sortedm2m',
+    'flat_json_widget',
     # network topology
     'openwisp_network_topology',
     'openwisp_network_topology.integrations.device',
