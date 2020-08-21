@@ -5,14 +5,16 @@ from django.db import migrations, models
 import django.db.models.deletion
 import uuid
 
+import swapper
+
 
 class Migration(migrations.Migration):
 
     initial = True
 
     dependencies = [
-        migrations.swappable_dependency(settings.TOPOLOGY_NODE_MODEL),
-        migrations.swappable_dependency(settings.CONFIG_DEVICE_MODEL),
+        swapper.dependency('topology', 'Node'),
+        swapper.dependency('config', 'Device'),
     ]
 
     operations = [
@@ -32,20 +34,20 @@ class Migration(migrations.Migration):
                     'device',
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to=settings.CONFIG_DEVICE_MODEL,
+                        to=swapper.get_model_name('config', 'Device'),
                     ),
                 ),
                 (
                     'node',
                     models.OneToOneField(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to=settings.TOPOLOGY_NODE_MODEL,
+                        to=swapper.get_model_name('topology', 'Node'),
                     ),
                 ),
             ],
             options={
                 'abstract': False,
-                'swappable': 'TOPOLOGY_DEVICE_DEVICENODE_MODEL',
+                'swappable': swapper.swappable_setting('topology_device', 'DeviceNode'),
                 'unique_together': {('node', 'device')},
             },
         ),
