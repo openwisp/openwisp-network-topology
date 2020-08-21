@@ -8,7 +8,6 @@ import uuid
 import django.core.validators
 import django.db.models.deletion
 import django.utils.timezone
-import openwisp_network_topology.utils
 import jsonfield.fields
 import model_utils.fields
 from django.db import migrations, models
@@ -82,7 +81,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={'abstract': False,},
+            options={'abstract': False},
         ),
         migrations.CreateModel(
             name='Node',
@@ -132,7 +131,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={'abstract': False,},
+            options={'abstract': False},
         ),
         migrations.CreateModel(
             name='Topology',
@@ -220,7 +219,12 @@ class Migration(migrations.Migration):
                     'expiration_time',
                     models.PositiveIntegerField(
                         default=0,
-                        help_text='"Expiration Time" in seconds: setting this to 0 will immediately mark missing links as down; a value higher than 0 will delay marking missing links as down until the "modified" field of a link is older than "Expiration Time"',
+                        help_text=(
+                            '"Expiration Time" in seconds: setting this to 0 will '
+                            'immediately mark missing links as down; a value higher '
+                            'than 0 will delay marking missing links as down until '
+                            'the "modified" field of a link is older than "Expiration Time"'
+                        ),
                         verbose_name='expiration time',
                     ),
                 ),
@@ -261,7 +265,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={'verbose_name_plural': 'topologies', 'abstract': False,},
+            options={'verbose_name_plural': 'topologies', 'abstract': False},
         ),
         migrations.AddField(
             model_name='node',

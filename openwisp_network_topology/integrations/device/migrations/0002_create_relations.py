@@ -1,6 +1,5 @@
-from django.db import migrations
-
 import swapper
+from django.db import migrations
 
 
 def create_relations_0001(apps, schema_editor, app='topology'):

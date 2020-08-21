@@ -62,6 +62,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={'abstract': False, 'verbose_name_plural': 'snapshots',},
+            options={'abstract': False, 'verbose_name_plural': 'snapshots'},
         ),
     ]

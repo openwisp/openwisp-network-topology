@@ -1,5 +1,5 @@
-from django.db import migrations
 import swapper
+from django.db import migrations
 
 
 def fix_link_properties(apps, schema_editor):
