@@ -3,6 +3,7 @@ import re
 import responses
 import swapper
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
 
@@ -280,6 +281,10 @@ class TestMultitenantAdmin(
 
     def test_topology_queryset(self):
         data = self._create_multitenancy_test_env()
+        perm = Permission.objects.get_by_natural_key(
+            'delete_topology', self.app_label, self.topology_model.__name__.lower()
+        )
+        data['operator'].user_permissions.remove(perm)
         self._test_multitenant_admin(
             url=reverse(f'admin:{self.app_label}_topology_changelist'),
             visible=[data['t1'].label, data['org1'].name],

@@ -114,9 +114,10 @@ class TopologyAdmin(
         move delete action to last position
         """
         actions = super().get_actions(request)
-        delete = actions['delete_selected']
-        del actions['delete_selected']
-        actions['delete_selected'] = delete
+        if 'delete_selected' in actions:
+            delete = actions['delete_selected']
+            del actions['delete_selected']
+            actions['delete_selected'] = delete
         return actions
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
