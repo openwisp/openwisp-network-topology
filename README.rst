@@ -447,6 +447,69 @@ of the url, this will enable you to point all the API urls to
 your openwisp-network-topology API server's domain,
 example value: ``https://mytopology.myapp.com``.
 
+Rest API
+--------
+
+Live documentation
+^^^^^^^^^^^^^^^^^^
+
+.. image:: docs/api-doc.png
+
+A general live API documentation (following the OpenAPI specification) at ``/api/v1/docs/``.
+
+Browsable web interface
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: docs/api-ui.png
+
+Additionally, opening any of the endpoints `listed below <#list-of-endpoints>`_
+directly in the browser will show the `browsable API interface of Django-REST-Framework
+<https://www.django-rest-framework.org/topics/browsable-api/>`_,
+which makes it even easier to find out the details of each endpoint.
+
+List of endpoints
+^^^^^^^^^^^^^^^^^
+
+Since the detailed explanation is contained in the `Live documentation <#live-documentation>`_
+and in the `Browsable web page <#browsable-web-interface>`_ of each point,
+here we'll provide just a list of the available endpoints,
+for further information please open the URL of the endpoint in your browser.
+
+List topologies
+###############
+
+.. code-block:: text
+
+    GET /api/v1/topology/
+
+Detail of a topology
+####################
+
+.. code-block:: text
+
+    GET /api/v1/topology/{id}/
+
+View topology history
+#####################
+
+This endpoint is used to go back in time to view previous topology snapshots.
+For it to work, snapshots need to be saved periodically as described in
+`save_snapshot <#save-snapshot>`_ section above.
+
+For example, we could use the endpoint to view the snapshot of a topology
+saved on ``2020-08-08`` as follows.
+
+.. code-block:: text
+
+    GET /api/v1/topology/{id}/history/?date=2020-08-08
+
+Send topology data
+##################
+
+.. code-block:: text
+
+    POST /api/v1/topology/{id}/receive/
+
 Overriding visualizer templates
 -------------------------------
 

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     # rest framework
     'rest_framework',
+    'drf_yasg',
     'django_extensions',
     # 'debug_toolbar',
 ]

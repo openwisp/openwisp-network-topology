@@ -6,6 +6,8 @@ Verison 0.5.0 [unreleased]
 
 WIP
 
+- [API] Added `API docs <https://github.com/openwisp/openwisp-network-topology/#rest-api>`_
+
 Verison 0.4.0 [2020-06-28]
 --------------------------
 

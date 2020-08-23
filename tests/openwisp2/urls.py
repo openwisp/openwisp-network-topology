@@ -19,6 +19,7 @@ if os.environ.get('SAMPLE_APP', False):
 urlpatterns += [
     url(r'^', include('openwisp_network_topology.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^api/v1/', include('openwisp_utils.api.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
