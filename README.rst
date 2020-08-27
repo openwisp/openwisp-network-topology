@@ -447,6 +447,19 @@ of the url, this will enable you to point all the API urls to
 your openwisp-network-topology API server's domain,
 example value: ``https://mytopology.myapp.com``.
 
+OPENWISP_NETWORK_TOPOLOGY_API_AUTH_REQUIRED
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
++--------------+---------------+
+| **type**:    |   ``boolean`` |
++--------------+---------------+
+| **default**: |   ``True``    |
++--------------+---------------+
+
+When enabled, the API `endpoints <#list-of-endpoints>`_ will only allow authenticated users
+who have the necessary permissions to access the objects which
+belong to the organizations the user manages.
+
 Rest API
 --------
 

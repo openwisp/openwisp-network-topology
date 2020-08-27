@@ -5,6 +5,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from openwisp_users.api.urls import get_api_urls
+
 urlpatterns = []
 
 if os.environ.get('SAMPLE_APP', False):
@@ -20,6 +22,7 @@ urlpatterns += [
     url(r'^', include('openwisp_network_topology.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^api/v1/', include('openwisp_utils.api.urls')),
+    url(r'^api/v1/', include(get_api_urls())),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

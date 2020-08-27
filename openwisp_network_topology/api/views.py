@@ -7,9 +7,19 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from netdiff.exceptions import NetdiffException
 from rest_framework import generics
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from rest_framework.permissions import (
+    BasePermission,
+    DjangoModelPermissions,
+    IsAuthenticated,
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from openwisp_users.api.authentication import BearerAuthentication
+from openwisp_users.api.permissions import IsOrganizationManager
+
+from .. import settings as app_settings
 from ..utils import get_object_or_404
 from .parsers import TextParser
 from .serializers import NetworkGraphSerializer
@@ -19,7 +29,46 @@ Snapshot = swapper.load_model('topology', 'Snapshot')
 Topology = swapper.load_model('topology', 'Topology')
 
 
-class NetworkCollectionView(generics.ListAPIView):
+class HasGetMethodPermission(BasePermission):
+    def has_permission(self, request, view):
+        return self.check_permission(request)
+
+    def has_object_permission(self, request, view, obj):
+        return self.check_permission(request)
+
+    def check_permission(self, request):
+        user = request.user
+        app_label = Topology._meta.app_label.lower()
+        model = Topology._meta.object_name.lower()
+        change_perm = f'{app_label}.change_{model}'
+        view_perm = f'{app_label}.view_{model}'
+        if user.is_authenticated:
+            if user.is_superuser or request.method != 'GET':
+                return True
+            if request.method == 'GET' and (
+                user.has_permission(change_perm) or user.has_permission(view_perm)
+            ):
+                return True
+        return False
+
+
+class RequireAuthentication(APIView):
+
+    if app_settings.TOPOLOGY_API_AUTH_REQUIRED:
+        authentication_classes = [
+            SessionAuthentication,
+            BasicAuthentication,
+            BearerAuthentication,
+        ]
+        permission_classes = [
+            IsAuthenticated,
+            IsOrganizationManager,
+            DjangoModelPermissions,
+            HasGetMethodPermission,
+        ]
+
+
+class NetworkCollectionView(generics.ListAPIView, RequireAuthentication):
     """
     Data of all the topologies returned
     in NetJSON NetworkCollection format
@@ -28,8 +77,21 @@ class NetworkCollectionView(generics.ListAPIView):
     serializer_class = NetworkGraphSerializer
     queryset = Topology.objects.filter(published=True)
 
+    def list(self, request, *args, **kwargs):
+        self.check_permissions(request)
+        return super().list(request, *args, **kwargs)
 
-class NetworkGraphView(generics.RetrieveAPIView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        if user.is_superuser:
+            return queryset
+        if user.is_authenticated:
+            queryset = queryset.filter(organization__in=user.organizations_managed)
+        return queryset
+
+
+class NetworkGraphView(generics.RetrieveAPIView, RequireAuthentication):
     """
     Data of a specific topology returned
     in NetJSON NetworkGraph format
@@ -92,7 +154,7 @@ class ReceiveTopologyView(APIView):
         return Response({'detail': success_message})
 
 
-class NetworkGraphHistoryView(APIView):
+class NetworkGraphHistoryView(RequireAuthentication):
     """
     History of a specific topology returned
     in NetJSON NetworkGraph format
@@ -100,9 +162,11 @@ class NetworkGraphHistoryView(APIView):
 
     topology_model = Topology
     snapshot_model = Snapshot
+    queryset = topology_model.objects.all()  # Required for DjangoModelPermissions
 
     def get(self, request, pk, format=None):
         topology = get_object_or_404(self.topology_model, pk)
+        self.check_object_permissions(request, topology)
         date = request.query_params.get('date')
         options = dict(topology=topology, date=date)
         # missing date: 400

@@ -7,6 +7,9 @@ Verison 0.5.0 [unreleased]
 WIP
 
 - [API] Added `API docs <https://github.com/openwisp/openwisp-network-topology/#rest-api>`_
+- [change] **Backward incompatible**: API and visualizer views now require authentication by default.
+  This can be changed through the new `OPENWISP_NETWORK_TOPOLOGY_API_AUTH_REQUIRED <https://github.com/openwisp/openwisp-network-topology#openwisp-network-topology-api-auth-required>`_
+  setting
 
 Verison 0.4.0 [2020-06-28]
 --------------------------

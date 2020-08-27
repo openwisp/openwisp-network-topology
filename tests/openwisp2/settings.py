@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # rest framework
     'rest_framework',
     'drf_yasg',
+    'rest_framework.authtoken',
     'django_extensions',
     # 'debug_toolbar',
 ]
@@ -146,6 +147,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 
 OPENWISP_ORGANIZATON_USER_ADMIN = True
 OPENWISP_ORGANIZATON_OWNER_ADMIN = True
+OPENWISP_USERS_AUTH_API = True
 
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
