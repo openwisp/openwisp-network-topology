@@ -33,7 +33,39 @@ openwisp-network-topology
 .. image:: https://github.com/openwisp/openwisp-network-topology/raw/master/docs/demo_network_topology.gif
    :alt: Features Highlights
 
-Network Topology Collector and Visualizer for OpenWISP, available also as a standalone django-app or as a reusable and extensible base library on top of which you can build your own network topology solution.
+OpenWISP Network Topology is a network topology collector and visualizer
+web application and API, it allows to collect network topology data from different
+networking software (dynamic mesh routing protocols, OpenVPN), store it,
+visualize it, edit its details, it also provides hooks (a.k.a
+`Django signals <https://docs.djangoproject.com/en/3.1/topics/signals/>`_)
+to execute code when the status of a link changes.
+
+When used in conjunction with
+`openwisp-controller <https://github.com/openwisp/openwisp-controller>`_
+and
+`openwisp-monitoring <https://github.com/openwisp/openwisp-monitoring>`_,
+it
+`makes the monitoring system faster in detecting change to the network <#integration-with-openwisp-controller-and-openwisp-monitoring>`_.
+
+OpenWISP is not only an application designed for end users, but can also be
+used as a framework on which custom network automation solutions can be built
+on top of its building blocks.
+
+Other popular building blocks that are part of the OpenWISP ecosystem are:
+
+- `openwisp-controller <https://github.com/openwisp/controller>`_:
+  network and WiFi controller: provisioning, configuration management,
+  x509 PKI management and more; works on OpenWRT, but designed to work also on other systems.
+- `openwisp-monitoring <https://github.com/openwisp/openwisp-monitoring>`_:
+  provides device status monitoring, collection of metrics, charts, alerts,
+  possibility to define custom checks
+- `openwisp-firmware-upgrader <https://github.com/openwisp/openwisp-firmware-upgrader>`_:
+  automated firmware upgrades (single device or mass network upgrades)
+- `openwisp-radius <https://github.com/openwisp/openwisp-radius>`_:
+  based on FreeRADIUS, allows to implement network access authentication systems like
+  802.1x WPA2 Enterprise, captive portal authentication, Hotspot 2.0 (802.11u)
+- `openwisp-ipam <https://github.com/openwisp/openwisp-ipam>`_:
+  it allows to manage the IP address space of networks
 
 .. image:: https://raw.githubusercontent.com/openwisp/openwisp2-docs/master/assets/design/openwisp-logo-black.svg
   :target: http://openwisp.org
