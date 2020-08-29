@@ -2,6 +2,6 @@ coveralls
 responses
 freezegun
 openwisp-users~=0.4.0
-openwisp-utils[qa]~=0.5.1
+openwisp-utils[qa]~=0.6.0
 # TODO: replace with openwisp-notifications when released
 markdown
