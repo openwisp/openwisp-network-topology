@@ -41,9 +41,9 @@ visualize it, edit its details, it also provides hooks (a.k.a
 to execute code when the status of a link changes.
 
 When used in conjunction with
-`openwisp-controller <https://github.com/openwisp/openwisp-controller>`_
+`OpenWISP Controller <https://github.com/openwisp/openwisp-controller>`_
 and
-`openwisp-monitoring <https://github.com/openwisp/openwisp-monitoring>`_,
+`OpenWISP Monitoring <https://github.com/openwisp/openwisp-monitoring>`_,
 it
 `makes the monitoring system faster in detecting change to the network <#integration-with-openwisp-controller-and-openwisp-monitoring>`_.
 
