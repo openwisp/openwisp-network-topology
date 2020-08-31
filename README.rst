@@ -53,7 +53,7 @@ on top of its building blocks.
 
 Other popular building blocks that are part of the OpenWISP ecosystem are:
 
-- `openwisp-controller <https://github.com/openwisp/controller>`_:
+- `openwisp-controller <https://github.com/openwisp/openwisp-controller>`_:
   network and WiFi controller: provisioning, configuration management,
   x509 PKI management and more; works on OpenWRT, but designed to work also on other systems.
 - `openwisp-monitoring <https://github.com/openwisp/openwisp-monitoring>`_:
