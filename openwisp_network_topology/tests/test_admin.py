@@ -221,6 +221,47 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         self.assertEqual('warning', message.tags)
         self.assertIn('1 topology was ignored', message.message)
 
+    def _test_properties_field(self, model, obj):
+        with self.subTest('test old properties readonly'):
+            content = 'readonly_properties">'
+            r = self.client.get(reverse(f'{self.prefix}_{model}_add'))
+            self.assertEqual(r.status_code, 200)
+            self.assertContains(r, content)
+
+        with self.subTest('test old properties display in list'):
+            path = reverse(f'{self.prefix}_{model}_change', args=[obj.pk])
+            r = self.client.get(path)
+            self.assertEqual(r.status_code, 200)
+            content = '<p><strong>Gateway</strong>: False</p>'
+            self.assertContains(r, content)
+
+        with self.subTest('test user properties diplay in flat json widgets'):
+            r = self.client.get(reverse(f'{self.prefix}_{model}_add'))
+            self.assertEqual(r.status_code, 200)
+            self.assertContains(r, 'flat-json-user_properties')
+
+    def test_node_user_properties_field(self):
+        t = Topology.objects.first()
+        n = self._create_node(label='node1org1', topology=t)
+        n.properties = {
+            'gateway': False,
+        }
+        n.full_clean()
+        n.save()
+        self._test_properties_field('node', n)
+
+    def test_link_user_properties_field(self):
+        t = Topology.objects.first()
+        n1 = self._create_node(label='node1org1', topology=t)
+        n2 = self._create_node(label='node2org1', topology=t)
+        li = self._create_link(topology=t, source=n1, target=n2)
+        li.properties = {
+            'gateway': False,
+        }
+        li.full_clean()
+        li.save()
+        self._test_properties_field('link', li)
+
 
 class TestMultitenantAdmin(
     CreateGraphObjectsMixin, TestMultitenantAdminMixin, TestOrganizationMixin, TestCase

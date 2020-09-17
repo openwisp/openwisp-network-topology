@@ -27,6 +27,7 @@ def topology_get_nodes_queryset(self):
             'label',
             'addresses',
             'properties',
+            'user_properties',
             'created',
             'modified',
             'devicenode__device__name',

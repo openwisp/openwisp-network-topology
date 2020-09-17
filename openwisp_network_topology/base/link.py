@@ -48,6 +48,14 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
         load_kwargs={'object_pairs_hook': OrderedDict},
         dump_kwargs={'indent': 4, 'cls': JSONEncoder},
     )
+    user_properties = JSONField(
+        verbose_name=_('user defined properties'),
+        help_text=_('If you need to add additional data to this link use this field'),
+        default=dict,
+        blank=True,
+        load_kwargs={'object_pairs_hook': OrderedDict},
+        dump_kwargs={'indent': 4, 'cls': JSONEncoder},
+    )
     status_changed = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -102,6 +110,7 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
         if self.properties:
             properties.update(self.properties)
         if not original:
+            properties.update(self.user_properties)
             properties['status'] = self.status
             properties['status_changed'] = self.status_changed
             properties['created'] = self.created

@@ -150,3 +150,28 @@ class TestLink(CreateOrgMixin, CreateGraphObjectsMixin, TestCase):
         )
         link.full_clean()
         self.assertEqual(link.organization, t.organization)
+
+    def test_user_properties_in_json(self):
+        t = self.topology_model.objects.first()
+        node1, node2 = self._get_nodes()
+        link = self.link_model(
+            source=node1, target=node2, cost=1.0, cost_text='100mbit/s', topology=t
+        )
+        link.properties = {
+            'wired': True,
+        }
+        link.user_properties = {
+            'user_property': True,
+        }
+        link.full_clean()
+        link.save()
+
+        with self.subTest('view json when original is False'):
+            data = link.json(dict=True)
+            self.assertIn('wired', data['properties'])
+            self.assertIn('user_property', data['properties'])
+
+        with self.subTest('view json when original is True'):
+            data = link.json(dict=True, original=True)
+            self.assertIn('wired', data['properties'])
+            self.assertNotIn('user_property', data['properties'])

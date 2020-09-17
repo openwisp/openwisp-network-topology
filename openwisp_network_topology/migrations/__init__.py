@@ -2,8 +2,14 @@
 import swapper
 
 
-def migrate_addresses(apps, schema_editor, app='topology'):
-    Node = apps.get_model(app, 'Node')
+def get_model(apps, app_name, model):
+    model_name = swapper.get_model_name(app_name, model)
+    model_label = swapper.split(model_name)[0]
+    return apps.get_model(model_label, model)
+
+
+def migrate_addresses(apps, schema_editor):
+    Node = get_model(apps, 'topology', 'Node')
     for node in Node.objects.iterator():
         addresses = node.addresses_old.replace(' ', '')
         if addresses.startswith(';'):
@@ -13,10 +19,17 @@ def migrate_addresses(apps, schema_editor, app='topology'):
         node.save()
 
 
-def migrate_openvpn_ids_0012(apps, schema_editor, app='topology'):
-    Node = swapper.load_model('topology', 'Node')
+def migrate_openvpn_ids_0012(apps, schema_editor):
+    Node = get_model(apps, 'topology', 'Node')
     queryset = Node.objects.filter(topology__parser='netdiff.OpenvpnParser')
     for node in queryset.iterator():
         node.addresses[0] = node.label
         node.full_clean()
         node.save()
+
+
+def fix_link_properties(apps, schema_editor):
+    Link = get_model(apps, 'topology', 'Link')
+    for link in Link.objects.all():
+        link.full_clean()
+        link.save()

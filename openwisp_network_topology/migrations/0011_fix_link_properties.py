@@ -1,12 +1,6 @@
-import swapper
 from django.db import migrations
 
-
-def fix_link_properties(apps, schema_editor):
-    Link = swapper.load_model('topology', 'Link')
-    for link in Link.objects.all():
-        link.full_clean()
-        link.save()
+from . import fix_link_properties
 
 
 class Migration(migrations.Migration):
