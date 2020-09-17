@@ -241,6 +241,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
 class TestMonitoringIntegration(Base, TransactionTestCase):
     @mock.patch('openwisp_monitoring.monitoring.apps.MonitoringConfig.create_database')
     @mock.patch('openwisp_monitoring.device.utils.manage_short_retention_policy')
+    @mock.patch('openwisp_notifications.types.NOTIFICATION_TYPES', dict())
     def test_monitoring_integration(self, *args):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
         node = self._init_test_node(
