@@ -11,7 +11,7 @@ WIP
   This can be changed through the new `OPENWISP_NETWORK_TOPOLOGY_API_AUTH_REQUIRED <https://github.com/openwisp/openwisp-network-topology#openwisp-network-topology-api-auth-required>`_
   setting
 
-Verison 0.4.0 [2020-06-28]
+Version 0.4.0 [2020-06-28]
 --------------------------
 
 - [refactoring] Merged code of django-netjsongraph in openwisp-network-topology
@@ -22,19 +22,19 @@ Verison 0.4.0 [2020-06-28]
 - [feature] Upgrader script to upgrade from django-netjsongraph to openwisp-network-topology
 - [change] Requirement netdiff~=0.8.0
 
-Verison 0.3.2 [2020-06-02]
+Version 0.3.2 [2020-06-02]
 --------------------------
 
 - [add] Support for openwisp-utils~=0.5.0
 - [fix] swagger API fix for serializer
 
-Verison 0.3.1 [2020-02-26]
+Version 0.3.1 [2020-02-26]
 --------------------------
 
 - bumped min openwisp-utils 0.4.3
 - bumped django-netjsongraph 0.6.1
 
-Verison 0.3.0 [2020-02-06]
+Version 0.3.0 [2020-02-06]
 --------------------------
 
 - Dropped support python 3.5 and below
@@ -44,13 +44,13 @@ Verison 0.3.0 [2020-02-06]
 - Dropped support django-netjsongraph below 0.6.0
 - Added support for django 3.0
 
-Verison 0.2.2 [2020-01-13]
+Version 0.2.2 [2020-01-13]
 --------------------------
 
 - Updated dependencies
 - Upgraded implementation of node addresses (via django-netjsongraph 0.5.0)
 
-Verison 0.2.1 [2018-02-24]
+Version 0.2.1 [2018-02-24]
 --------------------------
 
 - `fe9077c <https://github.com/openwisp/openwisp-network-topology/commit/fe9077c>`_:
