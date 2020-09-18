@@ -297,9 +297,9 @@ by default the data is added to the first found organization, eg::
 ``create_device_nodes``
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-This management command is used to create initial ``DeviceNode`` relationship when the
-integration with `openwisp_controller <#integration-with-openwisp-controller-and-openwisp-monitoring>`_
-is installed in a pre-existing system with some devices in it.
+This management command can be used to create the initial ``DeviceNode`` relationships when the
+`integration with OpenWISP Controller <#integration-with-openwisp-controller-and-openwisp-monitoring>`_
+is enabled in a pre-existing system which already has some devices and topology objects in its database.
 
 .. code-block:: shell
 
