@@ -1,15 +1,35 @@
 Changelog
 =========
 
-Verison 0.5.0 [unreleased]
+Version 0.5.0 [2020-09-18]
 --------------------------
 
-WIP
+Features
+~~~~~~~~
 
-- [API] Added `API docs <https://github.com/openwisp/openwisp-network-topology/#rest-api>`_
-- [change] **Backward incompatible**: API and visualizer views now require authentication by default.
-  This can be changed through the new `OPENWISP_NETWORK_TOPOLOGY_API_AUTH_REQUIRED <https://github.com/openwisp/openwisp-network-topology#openwisp-network-topology-api-auth-required>`_
+- Added `integration with OpenWISP Controller and OpenWISP Monitoring <https://github.com/openwisp/openwisp-network-topology#integration-with-openwisp-controller-and-openwisp-monitoring>`_
+- API: added `swagger API docs <https://github.com/openwisp/openwisp-network-topology/#rest-api>`_
+- Admin: added UUID readonly field
+- Added user defined properties in Node and Link
+
+Changes
+~~~~~~~
+
+- **Backward incompatible**: API and visualizer views now require authentication by default.
+  This can be changed through the new
+  `OPENWISP_NETWORK_TOPOLOGY_API_AUTH_REQUIRED <https://github.com/openwisp/openwisp-network-topology#openwisp-network-topology-api-auth-required>`_
   setting
+- Upgraded openvpn nodes to netdiff 0.9
+- Automatically manage organization of Node and Link
+- Changed API URL: /api/v1/receive/{id}/ -> /api/v1//topology/{id}/receive/ (old URL kept for backward compatibility)
+
+Bugfixes
+~~~~~~~~
+
+- Fixed link status bug introduced in 0.4
+- Fixed exceptions during update of data
+- Do not save ``status_changed``, ``modified``, ``created`` in link properties
+- Fixed Topology admin for users who do not have delete permission
 
 Version 0.4.0 [2020-06-28]
 --------------------------
