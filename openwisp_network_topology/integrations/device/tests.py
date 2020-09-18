@@ -3,6 +3,7 @@ from unittest import mock
 import django
 import swapper
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
 from django.db import transaction
 from django.test import TransactionTestCase
 from django.urls import reverse
@@ -236,6 +237,15 @@ class TestControllerIntegration(Base, TransactionTestCase):
             with self.assertNumQueries(2):
                 json = topology.json(dict=True)
         self.assertEqual(json['nodes'][0]['label'], device.name)
+
+    def test_create_device_nodes_command(self):
+        topology, _, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
+        properties = {'common_name': cert.common_name}
+        n = self._create_node(topology=topology, properties=properties)
+        DeviceNode.objects.all().delete()
+        call_command('create_device_nodes')
+        qs = DeviceNode.objects.filter(node=n)
+        self.assertEqual(qs.count(), 1)
 
 
 class TestMonitoringIntegration(Base, TransactionTestCase):

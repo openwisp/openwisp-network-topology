@@ -294,6 +294,17 @@ by default the data is added to the first found organization, eg::
 
 **Note**: you can follow the `tutorial to migrate database from django-netjsongraph <https://github.com/openwisp/django-netjsongraph/blob/master/README.rst>`_.
 
+``create_device_nodes``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This management command is used to create initial ``DeviceNode`` relationship when the
+integration with `openwisp_controller <#integration-with-openwisp-controller-and-openwisp-monitoring>`_
+is installed in a pre-existing system with some devices in it.
+
+.. code-block:: shell
+
+    ./manage.py create_device_nodes
+
 Logging
 -------
 
@@ -373,6 +384,10 @@ In order to use this module simply add
         'openwisp_users',
         'rest_framework',
     ]
+
+If you are enabling this integration on a pre-existing system, use the
+`create_device_nodes <#create-device-nodes>`_ management command to create
+the relationship between devices and nodes.
 
 Settings
 --------
@@ -479,8 +494,8 @@ of the url, this will enable you to point all the API urls to
 your openwisp-network-topology API server's domain,
 example value: ``https://mytopology.myapp.com``.
 
-OPENWISP_NETWORK_TOPOLOGY_API_AUTH_REQUIRED
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``OPENWISP_NETWORK_TOPOLOGY_API_AUTH_REQUIRED``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +--------------+---------------+
 | **type**:    |   ``boolean`` |
