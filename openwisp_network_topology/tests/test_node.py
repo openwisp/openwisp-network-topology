@@ -137,3 +137,25 @@ class TestNode(CreateGraphObjectsMixin, CreateOrgMixin, TestCase):
         )
         n.full_clean()
         self.assertEqual(n.organization, t.organization)
+
+    def test_user_properties_in_json(self):
+        t = self.topology_model.objects.first()
+        n = t._create_node(
+            addresses=['192.168.0.1'], label='test node', properties=None
+        )
+        n.properties = {
+            'gateway': True,
+        }
+        n.user_properties = {'user_property': True}
+        n.full_clean()
+        n.save()
+
+        with self.subTest('view json with original False'):
+            data = n.json(dict=True)
+            self.assertIn('gateway', data['properties'])
+            self.assertIn('user_property', data['properties'])
+
+        with self.subTest('view json with original True'):
+            data = n.json(dict=True, original=True)
+            self.assertIn('gateway', data['properties'])
+            self.assertNotIn('user_property', data['properties'])

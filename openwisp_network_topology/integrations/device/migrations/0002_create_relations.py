@@ -1,15 +1,6 @@
-import swapper
 from django.db import migrations
 
-
-def create_relations_0001(apps, schema_editor, app='topology'):
-    Node = swapper.load_model('topology', 'Node')
-    DeviceNode = swapper.load_model('topology_device', 'DeviceNode')
-    queryset = Node.objects.select_related('topology').filter(
-        topology__parser='netdiff.OpenvpnParser'
-    )
-    for node in queryset.iterator():
-        DeviceNode.auto_create(node)
+from . import create_relations_0001
 
 
 class Migration(migrations.Migration):

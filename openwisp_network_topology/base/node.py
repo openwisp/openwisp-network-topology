@@ -7,6 +7,7 @@ import swapper
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 from jsonfield import JSONField
 from rest_framework.utils.encoders import JSONEncoder
 
@@ -29,6 +30,14 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
     # netjson ID and local_addresses
     addresses = JSONField(default=[], blank=True)
     properties = JSONField(
+        default=dict,
+        blank=True,
+        load_kwargs={'object_pairs_hook': OrderedDict},
+        dump_kwargs={'indent': 4, 'cls': JSONEncoder},
+    )
+    user_properties = JSONField(
+        verbose_name=_('user defined properties'),
+        help_text=_('If you need to add additional data to this node use this field'),
         default=dict,
         blank=True,
         load_kwargs={'object_pairs_hook': OrderedDict},
@@ -91,6 +100,7 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
             if value or attr == 'properties':
                 netjson[attr] = deepcopy(value)
         if not original:
+            netjson['properties'].update(deepcopy(self.user_properties))
             netjson['properties']['created'] = JSONEncoder().default(self.created)
             netjson['properties']['modified'] = JSONEncoder().default(self.modified)
         if dict:
