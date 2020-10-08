@@ -488,7 +488,7 @@ another module, example, ``myapp.urls``.
 | **default**: |   ``None``    |
 +--------------+---------------+
 
-If you have a seperate instanse of openwisp-network-topology on a
+If you have a seperate instance of openwisp-network-topology on a
 different domain, you can use this option to change the base
 of the url, this will enable you to point all the API urls to
 your openwisp-network-topology API server's domain,
