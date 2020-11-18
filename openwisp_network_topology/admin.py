@@ -5,7 +5,6 @@ from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.db.models import Q
 from django.template.response import TemplateResponse
-from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -46,19 +45,19 @@ class BaseAdmin(TimeStampedEditableAdmin):
     class Media:
         css = {
             'all': [
-                static('netjsongraph/css/src/netjsongraph.css'),
-                static('netjsongraph/css/lib/jquery-ui.min.css'),
-                static('netjsongraph/css/style.css'),
-                static('netjsongraph/css/admin.css'),
+                'netjsongraph/css/src/netjsongraph.css',
+                'netjsongraph/css/lib/jquery-ui.min.css',
+                'netjsongraph/css/style.css',
+                'netjsongraph/css/admin.css',
             ]
         }
         js = [
-            static('netjsongraph/js/lib/d3.min.js'),
-            static('netjsongraph/js/lib/jquery-ui.min.js'),
-            static('netjsongraph/js/src/netjsongraph.js'),
-            static('netjsongraph/js/strategy-switcher.js'),
-            static('netjsongraph/js/topology-history.js'),
-            static('netjsongraph/js/visualize.js'),
+            'netjsongraph/js/lib/d3.min.js',
+            'netjsongraph/js/lib/jquery-ui.min.js',
+            'netjsongraph/js/src/netjsongraph.js',
+            'netjsongraph/js/strategy-switcher.js',
+            'netjsongraph/js/topology-history.js',
+            'netjsongraph/js/visualize.js',
         ]
 
 
