@@ -24,7 +24,7 @@ class OpenwispTopologyDeviceConfig(AppConfig):
         Link = swapper.load_model('topology', 'Link')
 
         post_save.connect(
-            self.create_device_rel, sender=Node, dispatch_uid='node_to_device_rel',
+            self.create_device_rel, sender=Node, dispatch_uid='node_to_device_rel'
         )
         link_status_changed.connect(
             self.link_status_changed_receiver,

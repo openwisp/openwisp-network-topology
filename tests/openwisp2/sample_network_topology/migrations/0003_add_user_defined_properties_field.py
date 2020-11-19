@@ -9,9 +9,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sample_network_topology', '0002_json_properties'),
-    ]
+    dependencies = [('sample_network_topology', '0002_json_properties')]
 
     operations = [
         migrations.AddField(

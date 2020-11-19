@@ -15,10 +15,10 @@ trigger_device_checks_path = 'openwisp_monitoring.device.tasks.trigger_device_ch
 
 class AbstractDeviceNode(UUIDModel):
     node = models.OneToOneField(
-        get_model_name('topology', 'Node'), on_delete=models.CASCADE,
+        get_model_name('topology', 'Node'), on_delete=models.CASCADE
     )
     device = models.ForeignKey(
-        get_model_name('config', 'Device'), on_delete=models.CASCADE,
+        get_model_name('config', 'Device'), on_delete=models.CASCADE
     )
 
     # relations will be auto-created only for these parsers

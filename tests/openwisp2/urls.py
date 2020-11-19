@@ -14,9 +14,7 @@ if os.environ.get('SAMPLE_APP', False):
 
     from .sample_network_topology.visualizer import views
 
-    urlpatterns += [
-        url(r'^topology/', include(get_visualizer_urls(views))),
-    ]
+    urlpatterns += [url(r'^topology/', include(get_visualizer_urls(views)))]
 
 urlpatterns += [
     url(r'^', include('openwisp_network_topology.urls')),

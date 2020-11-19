@@ -143,9 +143,7 @@ class TestNode(CreateGraphObjectsMixin, CreateOrgMixin, TestCase):
         n = t._create_node(
             addresses=['192.168.0.1'], label='test node', properties=None
         )
-        n.properties = {
-            'gateway': True,
-        }
+        n.properties = {'gateway': True}
         n.user_properties = {'user_property': True}
         n.full_clean()
         n.save()

@@ -5,9 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('topology', '0002_snapshot'),
-    ]
+    dependencies = [('topology', '0002_snapshot')]
 
     operations = [
         migrations.AddField(

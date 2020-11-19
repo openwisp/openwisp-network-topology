@@ -9,9 +9,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('topology', '0009_remove_old_addresses'),
-    ]
+    dependencies = [('topology', '0009_remove_old_addresses')]
 
     operations = [
         migrations.AlterField(

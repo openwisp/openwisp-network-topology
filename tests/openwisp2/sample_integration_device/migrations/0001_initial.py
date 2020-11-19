@@ -46,5 +46,5 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={'abstract': False, 'unique_together': {('node', 'device')}},
-        ),
+        )
     ]

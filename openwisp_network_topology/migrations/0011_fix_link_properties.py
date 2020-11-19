@@ -4,9 +4,7 @@ from . import fix_link_properties
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('topology', '0010_properties_json'),
-    ]
+    dependencies = [('topology', '0010_properties_json')]
 
     operations = [
         migrations.RunPython(
