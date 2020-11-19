@@ -9,9 +9,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('topology', '0012_update_openvpn_netjson_ids'),
-    ]
+    dependencies = [('topology', '0012_update_openvpn_netjson_ids')]
 
     operations = [
         migrations.AddField(

@@ -19,9 +19,7 @@ def reformat_address_backward(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('topology', '0005_default_operator_permission'),
-    ]
+    dependencies = [('topology', '0005_default_operator_permission')]
 
     operations = [
         migrations.RunPython(reformat_address_forward, reformat_address_backward)

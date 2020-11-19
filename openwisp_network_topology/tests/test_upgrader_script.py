@@ -20,9 +20,7 @@ class TestUpgradeFromDjangoNetjsongraph(TestCase):
             os.path.dirname(__file__), 'static', 'upgrader_script'
         )
         call_command(
-            'upgrade_from_django_netjsongraph',
-            backup=static_path,
-            stdout=commandOutput,
+            'upgrade_from_django_netjsongraph', backup=static_path, stdout=commandOutput
         )
         self.assertIn('Migration Process Complete!', commandOutput.getvalue())
         os.remove(os.path.join(static_path, 'group_loaded.json'))

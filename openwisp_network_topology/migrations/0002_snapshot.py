@@ -11,9 +11,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('topology', '0001_initial'),
-    ]
+    dependencies = [('topology', '0001_initial')]
 
     operations = [
         migrations.CreateModel(
@@ -63,5 +61,5 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={'abstract': False, 'verbose_name_plural': 'snapshots'},
-        ),
+        )
     ]

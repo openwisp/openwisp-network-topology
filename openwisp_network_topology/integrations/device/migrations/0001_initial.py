@@ -49,5 +49,5 @@ class Migration(migrations.Migration):
                 'swappable': swapper.swappable_setting('topology_device', 'DeviceNode'),
                 'unique_together': {('node', 'device')},
             },
-        ),
+        )
     ]

@@ -243,9 +243,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
     def test_node_user_properties_field(self):
         t = Topology.objects.first()
         n = self._create_node(label='node1org1', topology=t)
-        n.properties = {
-            'gateway': False,
-        }
+        n.properties = {'gateway': False}
         n.full_clean()
         n.save()
         self._test_properties_field('node', n)
@@ -255,9 +253,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         n1 = self._create_node(label='node1org1', topology=t)
         n2 = self._create_node(label='node2org1', topology=t)
         li = self._create_link(topology=t, source=n1, target=n2)
-        li.properties = {
-            'gateway': False,
-        }
+        li.properties = {'gateway': False}
         li.full_clean()
         li.save()
         self._test_properties_field('link', li)

@@ -6,13 +6,11 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('topology', '0006_reformat_addresses'),
-    ]
+    dependencies = [('topology', '0006_reformat_addresses')]
 
     operations = [
         migrations.RenameField(
-            model_name='node', old_name='addresses', new_name='addresses_old',
+            model_name='node', old_name='addresses', new_name='addresses_old'
         ),
         migrations.AddField(
             model_name='node',

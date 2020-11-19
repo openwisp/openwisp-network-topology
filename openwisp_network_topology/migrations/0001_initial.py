@@ -19,9 +19,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('openwisp_users', '0001_initial'),
-    ]
+    dependencies = [('openwisp_users', '0001_initial')]
 
     operations = [
         migrations.CreateModel(

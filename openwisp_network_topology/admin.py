@@ -32,10 +32,7 @@ class TimeStampedEditableAdmin(ModelAdmin):
     """
 
     def __init__(self, *args, **kwargs):
-        self.readonly_fields += (
-            'created',
-            'modified',
-        )
+        self.readonly_fields += ('created', 'modified')
         super().__init__(*args, **kwargs)
 
 
@@ -83,11 +80,7 @@ class TopologyAdmin(
         'metric',
         'receive_url',
     ]
-    list_filter = [
-        'parser',
-        'strategy',
-        ('organization', MultitenantOrgFilter),
-    ]
+    list_filter = ['parser', 'strategy', ('organization', MultitenantOrgFilter)]
     search_fields = ['label', 'id']
     actions = ['update_selected', 'unpublish_selected', 'publish_selected']
     fields = [
@@ -153,7 +146,7 @@ class TopologyAdmin(
                 r'^visualize/(?P<pk>[^/]+)/$',
                 self.admin_site.admin_view(self.visualize_view),
                 name='{0}_visualize'.format(url_prefix),
-            ),
+            )
         ] + super().get_urls()
 
     def _message(self, request, rows, suffix, level=messages.SUCCESS):
@@ -230,9 +223,7 @@ class TopologyAdmin(
 
 class UserPropertiesForm(forms.ModelForm):
     class Meta:
-        widgets = {
-            'user_properties': FlatJsonWidget,
-        }
+        widgets = {'user_properties': FlatJsonWidget}
 
 
 class NodeLinkMixin(MultitenantAdminMixin):

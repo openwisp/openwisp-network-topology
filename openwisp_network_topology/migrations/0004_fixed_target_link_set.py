@@ -6,9 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('topology', '0003_link_status_and_openvpn_parser'),
-    ]
+    dependencies = [('topology', '0003_link_status_and_openvpn_parser')]
 
     operations = [
         migrations.AlterField(
@@ -19,5 +17,5 @@ class Migration(migrations.Migration):
                 related_name='target_link_set',
                 to='topology.Node',
             ),
-        ),
+        )
     ]

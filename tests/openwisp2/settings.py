@@ -98,7 +98,7 @@ TEMPLATES = [
                 'openwisp_utils.admin_theme.context_processor.menu_items',
             ],
         },
-    },
+    }
 ]
 
 LOGGING = {
@@ -162,7 +162,7 @@ if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
                     'level': 'DEBUG',
                     'propagate': False,
                 }
-            },
+            }
         }
     )
 

@@ -9,9 +9,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sample_network_topology', '0001_initial'),
-    ]
+    dependencies = [('sample_network_topology', '0001_initial')]
 
     operations = [
         migrations.AlterField(

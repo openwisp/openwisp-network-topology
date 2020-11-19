@@ -138,7 +138,7 @@ class TestLink(CreateOrgMixin, CreateGraphObjectsMixin, TestCase):
             link.status = 'down'
             link.save()
         handler.assert_called_once_with(
-            link=link, sender=self.link_model, signal=link_status_changed,
+            link=link, sender=self.link_model, signal=link_status_changed
         )
         self.assertEqual(link.status, 'down')
 
@@ -157,12 +157,8 @@ class TestLink(CreateOrgMixin, CreateGraphObjectsMixin, TestCase):
         link = self.link_model(
             source=node1, target=node2, cost=1.0, cost_text='100mbit/s', topology=t
         )
-        link.properties = {
-            'wired': True,
-        }
-        link.user_properties = {
-            'user_property': True,
-        }
+        link.properties = {'wired': True}
+        link.user_properties = {'user_property': True}
         link.full_clean()
         link.save()
 
