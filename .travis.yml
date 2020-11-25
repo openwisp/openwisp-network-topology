@@ -17,14 +17,12 @@ branches:
 
 before_install:
   - pip install $DJANGO
-  # needed to test integrations
-  - pip install -U https://github.com/openwisp/openwisp-controller/tarball/master
-  - pip install -U https://github.com/openwisp/openwisp-monitoring/tarball/master
-  - pip install -U --no-deps https://github.com/openwisp/openwisp-notifications/tarball/master
 
 install:
   - python setup.py -q develop
   - pip install -r requirements-test.txt
+  # needed to test integrations
+  - pip install -U https://github.com/openwisp/openwisp-monitoring/tarball/master
 
 script:
   - ./run-qa-checks
