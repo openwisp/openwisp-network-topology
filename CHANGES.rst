@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 0.5.1 [2020-11-25]
+--------------------------
+
+- [fix] Removed static() call from media assets
+- [change] Increased `openwisp-users <https://github.com/openwisp/openwisp-users#openwisp-users>`__ version from 0.2.x to 0.5.x
+  (which brings many interesting improvements to multi-tenancy,
+  `see the change log of openwisp-users <https://github.com/openwisp/openwisp-users/blob/master/CHANGES.rst#version-050-2020-11-18>`_
+  for more information)
+- Increased `openwisp-utils <https://github.com/openwisp/openwisp-utils#openwisp-utils>`__ version to 0.7.x
+
 Version 0.5.0 [2020-09-18]
 --------------------------
 
