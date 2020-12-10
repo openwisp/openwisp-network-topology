@@ -84,12 +84,12 @@ class TopologyAdmin(
     search_fields = ['label', 'id']
     actions = ['update_selected', 'unpublish_selected', 'publish_selected']
     fields = [
-        'uuid',
         'label',
         'organization',
         'parser',
         'strategy',
         'url',
+        'uuid',
         'key',
         'expiration_time',
         'receive_url',
