@@ -49,3 +49,7 @@ input[type=text].readonly {
     bottom: 60px;
     right: 5px;
 }
+
+.submit-row .visualizelink { background: #778898 }
+.submit-row .visualizelink:hover,
+.submit-row .visualizelink:focus { background: #576a7c }
