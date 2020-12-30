@@ -1,4 +1,4 @@
-openwisp-users~=0.5.0
+openwisp-users~=0.5.1
 openwisp-utils[rest]~=0.7.0
 swapper~=1.1
 django>=2.2,<3.2
