@@ -267,12 +267,6 @@ class TestMultitenantAdmin(
     node_model = Node
     link_model = Link
 
-    operator_permission_filters = [
-        {'codename__endswith': 'topology'},
-        {'codename__endswith': 'node'},
-        {'codename__endswith': 'link'},
-    ]
-
     def _create_multitenancy_test_env(self):
         org1 = self._create_org(name='test1org')
         org2 = self._create_org(name='test2org')
