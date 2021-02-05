@@ -10,11 +10,10 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.utils.timezone import now
 
-from openwisp_users.models import Organization
-
 from .. import settings as app_settings
 from .utils import CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin
 
+Organization = swapper.load_model('openwisp_users', 'Organization')
 Link = swapper.load_model('topology', 'Link')
 Node = swapper.load_model('topology', 'Node')
 Snapshot = swapper.load_model('topology', 'Snapshot')

@@ -1,8 +1,11 @@
 import logging
 import os
 
-from openwisp_users.models import Organization
+import swapper
+
 from openwisp_utils.tests import TimeLoggingTestRunner
+
+Organization = swapper.load_model('openwisp_users', 'Organization')
 
 
 class CreateOrgMixin(object):
