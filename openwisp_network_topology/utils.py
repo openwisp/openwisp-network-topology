@@ -45,11 +45,6 @@ def get_api_urls(views_module):
             name='network_graph_history',
         ),
         url(
-            r'^receive/(?P<pk>[^/\?]+)/$',
-            views_module.receive_topology,
-            name='receive_topology_deprecated',
-        ),
-        url(
             r'^topology/(?P<pk>[^/\?]+)/receive/$',
             views_module.receive_topology,
             name='receive_topology',

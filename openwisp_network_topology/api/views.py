@@ -141,16 +141,6 @@ class ReceiveTopologyView(APIView):
             ) % (topology.get_parser_display(), e.__class__.__name__, e)
             return Response({'detail': error}, status=400)
         success_message = _('data received successfully')
-        deprecated_url = reverse('receive_topology_deprecated', args=[pk])
-        if request.path == deprecated_url:
-            expected_path = reverse('receive_topology', args=[pk])
-            expected_path = f'{expected_path}?key={key}'
-            warning = _(
-                'This URL is depercated and will be removed in '
-                f'future versions, use {expected_path}'
-            )
-            logger.warning(warning)
-            success_message = f'{success_message}. {warning}'
         return Response({'detail': success_message})
 
 

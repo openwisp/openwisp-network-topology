@@ -105,26 +105,6 @@ class TestApi(
         self.assertEqual(self.node_model.objects.count(), 2)
         self.assertEqual(self.link_model.objects.count(), 1)
 
-    def test_receive_with_deprecated_url(self):
-        self._set_receive()
-        self.node_model.objects.all().delete()
-        data = self._load('static/netjson-1-link.json')
-        t = self.topology_model.objects.first()
-        path = reverse('receive_topology_deprecated', args=[t.pk])
-        path = f'{path}?key=test'
-        response = self.client.post(path, data=data, content_type='text/plain')
-        self.assertEqual(response.status_code, 200)
-        expected_path = reverse('receive_topology', args=[t.pk])
-        expected_path = f'{expected_path}?key=test'
-        message = (
-            'data received successfully. '
-            'This URL is depercated and will be removed in '
-            f'future versions, use {expected_path}'
-        )
-        self.assertEqual(response.data['detail'], message)
-        self.assertEqual(self.node_model.objects.count(), 2)
-        self.assertEqual(self.link_model.objects.count(), 1)
-
     def test_receive_404(self):
         # topology is set to FETCH strategy
         response = self.client.post(self.receive_url, content_type='text/plain')
