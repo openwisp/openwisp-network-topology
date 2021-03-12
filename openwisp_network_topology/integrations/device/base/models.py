@@ -57,7 +57,7 @@ class AbstractDeviceNode(UUIDModel):
 
         Device = load_model('config', 'Device')
         device = (
-            Device.objects.only('id', 'name')
+            Device.objects.only('id', 'name', 'last_ip', 'management_ip')
             .filter(
                 organization_id=node.organization_id,
                 config__vpnclient__cert__common_name=common_name,

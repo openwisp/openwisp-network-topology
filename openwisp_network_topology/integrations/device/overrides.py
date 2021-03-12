@@ -30,7 +30,10 @@ def topology_get_nodes_queryset(self):
             'user_properties',
             'created',
             'modified',
+            'devicenode__device__id',
             'devicenode__device__name',
+            'devicenode__device__last_ip',
+            'devicenode__device__management_ip',
         )
     )
 
@@ -51,7 +54,11 @@ def node_get_queryset(cls, qs):
             'organization__is_active',
             'label',
             'addresses',
+            'devicenode__device__id',
             'devicenode__device__name',
+            'devicenode__device__name',
+            'devicenode__device__last_ip',
+            'devicenode__device__management_ip',
         )
     )
 
@@ -75,10 +82,16 @@ def link_get_queryset(cls, qs):
             'cost_text',
             'source__addresses',
             'source__label',
+            'source__devicenode__device__id',
             'source__devicenode__device__name',
+            'source__devicenode__device__last_ip',
+            'source__devicenode__device__management_ip',
             'target__addresses',
             'target__label',
+            'target__devicenode__device__id',
             'target__devicenode__device__name',
+            'target__devicenode__device__last_ip',
+            'target__devicenode__device__management_ip',
         )
     )
 

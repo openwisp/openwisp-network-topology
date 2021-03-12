@@ -1,4 +1,5 @@
-openwisp-users~=0.5.1
+# TODO set the next point release of openwisp-users when ready
+openwisp-users @ https://github.com/openwisp/openwisp-users/tarball/master
 openwisp-utils[rest]~=0.7.0
 swapper~=1.1
 django>=2.2,<3.2
