@@ -3,7 +3,6 @@ import logging
 
 import swapper
 from django.core.exceptions import ValidationError
-from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from netdiff.exceptions import NetdiffException
 from rest_framework import generics
