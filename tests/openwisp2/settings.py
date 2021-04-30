@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'openwisp_network_topology',
     'openwisp_network_topology.integrations.device',
     'openwisp_users',
+    'openwisp_notifications',
     # admin
     'django.contrib.admin',
     # rest framework
