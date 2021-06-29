@@ -4,5 +4,7 @@ freezegun
 # TODO: change this when next point version of openwisp-utils is released
 openwisp-utils[qa] @ https://github.com/openwisp/openwisp-utils/tarball/master
 openwisp-controller~=0.8
+# TODO: change this when next point version of openwisp-users is released
+openwisp-users @ https://github.com/openwisp/openwisp-users/tarball/master
 # Needed to test integrations
 openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/master
