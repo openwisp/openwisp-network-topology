@@ -7,16 +7,12 @@ from django.utils.translation import ugettext_lazy as _
 from netdiff.exceptions import NetdiffException
 from rest_framework import generics
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
-from rest_framework.permissions import (
-    BasePermission,
-    DjangoModelPermissions,
-    IsAuthenticated,
-)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from openwisp_users.api.authentication import BearerAuthentication
-from openwisp_users.api.permissions import IsOrganizationManager
+from openwisp_users.api.permissions import DjangoModelPermissions, IsOrganizationManager
 
 from .. import settings as app_settings
 from ..utils import get_object_or_404
@@ -26,29 +22,6 @@ from .serializers import NetworkGraphSerializer
 logger = logging.getLogger(__name__)
 Snapshot = swapper.load_model('topology', 'Snapshot')
 Topology = swapper.load_model('topology', 'Topology')
-
-
-class HasGetMethodPermission(BasePermission):
-    def has_permission(self, request, view):
-        return self.check_permission(request)
-
-    def has_object_permission(self, request, view, obj):
-        return self.check_permission(request)
-
-    def check_permission(self, request):
-        user = request.user
-        app_label = Topology._meta.app_label.lower()
-        model = Topology._meta.object_name.lower()
-        change_perm = f'{app_label}.change_{model}'
-        view_perm = f'{app_label}.view_{model}'
-        if user.is_authenticated:
-            if user.is_superuser or request.method != 'GET':
-                return True
-            if request.method == 'GET' and (
-                user.has_permission(change_perm) or user.has_permission(view_perm)
-            ):
-                return True
-        return False
 
 
 class RequireAuthentication(APIView):
@@ -63,7 +36,6 @@ class RequireAuthentication(APIView):
             IsAuthenticated,
             IsOrganizationManager,
             DjangoModelPermissions,
-            HasGetMethodPermission,
         ]
 
 
