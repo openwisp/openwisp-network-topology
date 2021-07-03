@@ -7,6 +7,7 @@ from django.urls import reverse
 from rest_framework.views import APIView
 
 from openwisp_users.tests.utils import TestOrganizationMixin
+from openwisp_utils.tests import AssertNumQueriesSubTestMixin
 
 from .utils import CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, UnpublishMixin
 
@@ -18,6 +19,7 @@ OrganizationUser = swapper.load_model('openwisp_users', 'OrganizationUser')
 
 
 class TestApi(
+    AssertNumQueriesSubTestMixin,
     CreateGraphObjectsMixin,
     CreateOrgMixin,
     UnpublishMixin,
@@ -216,6 +218,58 @@ class TestApi(
             r.data['detail'], 'You do not have permission to perform this action.'
         )
         self.assertEqual(len(r.data), 1)
+
+    def test_modelpermission_class_with_change_perm(self):
+        t = self.topology_model.objects.first()
+        user = self._create_user(username='list-user', email='list@email.com')
+        self._create_org_user(user=user, organization=t.organization, is_admin=True)
+        change_perm = Permission.objects.filter(codename='change_topology')
+        user.user_permissions.add(*change_perm)
+        self.client.force_login(user)
+        with self.subTest('List url'):
+            url = self.list_url
+            with self.assertNumQueries(7):
+                response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+        with self.subTest('Detail url'):
+            url = self.detail_url
+            with self.assertNumQueries(8):
+                response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+    def test_modelpermission_class_with_view_perm(self):
+        t = self.topology_model.objects.first()
+        user = self._create_user(username='list-user', email='list@email.com')
+        self._create_org_user(user=user, organization=t.organization, is_admin=True)
+        view_perm = Permission.objects.filter(codename='view_topology')
+        user.user_permissions.add(*view_perm)
+        self.client.force_login(user)
+        with self.subTest('List url'):
+            url = self.list_url
+            with self.assertNumQueries(7):
+                response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+        with self.subTest('Detail url'):
+            url = self.detail_url
+            with self.assertNumQueries(8):
+                response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+    def test_modelpermission_class_with_no_perm(self):
+        t = self.topology_model.objects.first()
+        user = self._create_user(username='list-user', email='list@email.com')
+        self._create_org_user(user=user, organization=t.organization, is_admin=True)
+        self.client.force_login(user)
+        with self.subTest('List url'):
+            url = self.list_url
+            with self.assertNumQueries(4):
+                response = self.client.get(url)
+            self.assertEqual(response.status_code, 403)
+        with self.subTest('Detail url'):
+            url = self.detail_url
+            with self.assertNumQueries(4):
+                response = self.client.get(url)
+            self.assertEqual(response.status_code, 403)
 
     def test_list_with_auth_enabled(self):
         user = self._create_user(username='list-user', email='list@email.com')
