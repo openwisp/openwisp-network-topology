@@ -5,23 +5,26 @@ import swapper
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from netdiff.exceptions import NetdiffException
-from rest_framework import generics
+from rest_framework import generics, pagination
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from openwisp_users.api.authentication import BearerAuthentication
+from openwisp_users.api.mixins import FilterByOrganizationManaged
 from openwisp_users.api.permissions import DjangoModelPermissions, IsOrganizationManager
 
 from .. import settings as app_settings
 from ..utils import get_object_or_404
 from .parsers import TextParser
-from .serializers import NetworkGraphSerializer
+from .serializers import LinkSerializer, NetworkGraphSerializer, NodeSerializer
 
 logger = logging.getLogger(__name__)
 Snapshot = swapper.load_model('topology', 'Snapshot')
 Topology = swapper.load_model('topology', 'Topology')
+Node = swapper.load_model('topology', 'Node')
+Link = swapper.load_model('topology', 'Link')
 
 
 class RequireAuthentication(APIView):
@@ -146,7 +149,47 @@ class NetworkGraphHistoryView(RequireAuthentication):
             return Response({'detail': _('invalid date supplied')}, status=403)
 
 
+class ProtectedAPIMixin(FilterByOrganizationManaged):
+    authentication_classes = [BearerAuthentication, SessionAuthentication]
+    permission_classes = [
+        IsAuthenticated,
+        DjangoModelPermissions,
+    ]
+
+
+class ListViewPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class NodeListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
+    queryset = Node.objects.order_by('-created')
+    serializer_class = NodeSerializer
+    pagination_class = ListViewPagination
+
+
+class NodeDetailView(ProtectedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Node.objects.all()
+    serializer_class = NodeSerializer
+
+
+class LinkListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
+    queryset = Link.objects.order_by('-created')
+    serializer_class = LinkSerializer
+    pagination_class = ListViewPagination
+
+
+class LinkDetailView(ProtectedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Link.objects.all()
+    serializer_class = LinkSerializer
+
+
 network_collection = NetworkCollectionView.as_view()
 network_graph = NetworkGraphView.as_view()
 network_graph_history = NetworkGraphHistoryView.as_view()
 receive_topology = ReceiveTopologyView.as_view()
+node_list = NodeListCreateView.as_view()
+node_detail = NodeDetailView.as_view()
+link_list = LinkListCreateView.as_view()
+link_detail = LinkDetailView.as_view()

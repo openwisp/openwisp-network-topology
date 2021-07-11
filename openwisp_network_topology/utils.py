@@ -52,6 +52,10 @@ def get_api_urls(views_module):
             views_module.receive_topology,
             name='receive_topology',
         ),
+        path('node/', views_module.node_list, name='node_list'),
+        path('node/<str:pk>', views_module.node_detail, name='node_detail'),
+        path('link/', views_module.link_list, name='link_list'),
+        path('link/<str:pk>', views_module.link_detail, name='link_detail'),
     ]
     return urls
 
