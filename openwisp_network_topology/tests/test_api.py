@@ -353,3 +353,39 @@ class TestApi(
         user = self._create_admin(username='superapi', email='superapi@email.com')
         self.client.force_login(user)
         self._successful_api_tests()
+
+    def test_node_list_api(self):
+        pass
+
+    def test_node_create_api(self):
+        pass
+
+    def test_node_detail_api(self):
+        pass
+
+    def test_node_put_api(self):
+        pass
+
+    def test_node_patch_api(self):
+        pass
+
+    def test_node_delete_api(self):
+        pass
+
+    def test_link_list_api(self):
+        pass
+
+    def test_link_create_api(self):
+        pass
+
+    def test_link_detail_api(self):
+        pass
+
+    def test_link_put_api(self):
+        pass
+
+    def test_link_patch_api(self):
+        pass
+
+    def test_link_delete_api(self):
+        pass
