@@ -572,6 +572,90 @@ Send topology data
 
     POST /api/v1/topology/{id}/receive/
 
+List links
+##########
+
+.. code-block:: text
+
+    GET /api/v1/link/
+
+Create link
+###########
+
+.. code-block:: text
+
+    POST /api/v1/link/
+
+Get link detail
+###############
+
+.. code-block:: text
+
+    GET /api/v1/link/{id}/
+
+Change link detail
+##################
+
+.. code-block:: text
+
+    PUT /api/v1/link/{id}/
+
+Patch link detail
+#################
+
+.. code-block:: text
+
+    PATCH /api/v1/link/{id}/
+
+Delete link
+###########
+
+.. code-block:: text
+
+    DELETE /api/v1/link/{id}/
+
+List nodes
+##########
+
+.. code-block:: text
+
+    GET /api/v1/node/
+
+Create node
+###########
+
+.. code-block:: text
+
+    POST /api/v1/node/
+
+Get node detail
+###############
+
+.. code-block:: text
+
+    GET /api/v1/node/{id}/
+
+Change node detail
+##################
+
+.. code-block:: text
+
+    PUT /api/v1/node/{id}/
+
+Patch node detail
+#################
+
+.. code-block:: text
+
+    PATCH /api/v1/node/{id}/
+
+Delete node
+###########
+
+.. code-block:: text
+
+    DELETE /api/v1/node/{id}/
+
 Overriding visualizer templates
 -------------------------------
 
