@@ -4,6 +4,7 @@ import swapper
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
+from openwisp_controller.tests.utils import TestAdminMixin
 from rest_framework.views import APIView
 
 from openwisp_users.tests.utils import TestOrganizationMixin
@@ -352,7 +353,23 @@ class TestApi(
         self.client.force_login(user)
         self._successful_api_tests()
 
+
+class TestModelsApi(
+    AssertNumQueriesSubTestMixin, TestAdminMixin, TestOrganizationMixin, TestCase,
+):
+    def setUp(self):
+        super().setUp()
+        self._login()
+
     def test_node_list_api(self):
+        path = reverse('node_list')
+        self.assertEqual(Node.objects.count(), 0)
+        with self.assertNumQueries(3):
+            response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 0)
+
+    def test_node_list_filter_api(self):
         pass
 
     def test_node_create_api(self):
@@ -371,6 +388,9 @@ class TestApi(
         pass
 
     def test_link_list_api(self):
+        pass
+
+    def test_link_filter_api(self):
         pass
 
     def test_link_create_api(self):
