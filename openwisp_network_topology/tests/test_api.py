@@ -356,9 +356,17 @@ class TestApi(
         self._successful_api_tests()
 
 
-class TestModelsApi(
-    AssertNumQueriesSubTestMixin, TestAdminMixin, TestOrganizationMixin, TestCase,
+class TestNodeLinkApi(
+    AssertNumQueriesSubTestMixin,
+    CreateGraphObjectsMixin,
+    TestAdminMixin,
+    TestOrganizationMixin,
+    TestCase,
 ):
+    topology_model = Topology
+    node_model = Node
+    link_model = Link
+
     def setUp(self):
         super().setUp()
         self._login()
@@ -372,40 +380,177 @@ class TestModelsApi(
         self.assertEqual(response.data['count'], 0)
 
     def test_node_list_filter_api(self):
-        pass
+        path = reverse('node_list')
+        org1 = self._create_org(name='org1')
+        t1 = self._create_topology(organization=self._get_org())
+        t2 = self._create_topology(organization=org1)
+        self._create_node(
+            label='node1',
+            addresses=['192.168.0.1'],
+            topology=t1,
+            organization=self._get_org(),
+        )
+        self._create_node(
+            label='node2', addresses=['192.168.0.2'], topology=t2, organization=org1
+        )
+        view_perm = Permission.objects.filter(codename='view_node')
+        user = self._get_user()
+        user.user_permissions.add(*view_perm)
+        OrganizationUser.objects.create(user=user, organization=org1, is_admin=True)
+        self.client.force_login(user)
+        with self.assertNumQueries(6):
+            response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(Node.objects.count(), 2)
 
     def test_node_create_api(self):
-        pass
+        path = reverse('node_list')
+        t1 = self._create_topology(organization=self._get_org())
+        data = {
+            'topology': t1.pk,
+            'label': 'test-node',
+            'addresses': ['192.168.0.1'],
+            'properties': {},
+            'user_properties': {},
+        }
+        with self.assertNumQueries(8):
+            response = self.client.post(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['topology'], t1.pk)
+        self.assertEqual(response.data['label'], 'test-node')
+        self.assertEqual(response.data['addresses'], ['192.168.0.1'])
 
     def test_node_detail_api(self):
-        pass
+        t1 = self._create_topology(organization=self._get_org())
+        node1 = self._create_node(label='node1', addresses=['192.168.0.1'], topology=t1)
+        path = reverse('node_detail', args=(node1.pk,))
+        with self.assertNumQueries(3):
+            response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['id'], str(node1.pk))
+        self.assertEqual(response.data['topology'], t1.pk)
+        self.assertEqual(response.data['label'], 'node1')
 
     def test_node_put_api(self):
-        pass
+        t1 = self._create_topology(organization=self._get_org())
+        node1 = self._create_node(label='node1', addresses=['192.168.0.1'], topology=t1)
+        data = {
+            'topology': t1.pk,
+            'label': 'change-node',
+            'addresses': ['192.168.0.1', '192.168.0.2'],
+            'properties': {},
+            'user_properties': {},
+        }
+        path = reverse('node_detail', args=(node1.pk,))
+        with self.assertNumQueries(9):
+            response = self.client.put(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['label'], 'change-node')
+        self.assertEqual(response.data['addresses'], ['192.168.0.1', '192.168.0.2'])
 
     def test_node_patch_api(self):
-        pass
+        t1 = self._create_topology(organization=self._get_org())
+        node1 = self._create_node(label='node1', addresses=['192.168.0.1'], topology=t1)
+        path = reverse('node_detail', args=(node1.pk,))
+        data = {'label': 'change-node'}
+        with self.assertNumQueries(8):
+            response = self.client.patch(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['label'], 'change-node')
 
     def test_node_delete_api(self):
-        pass
+        t1 = self._create_topology(organization=self._get_org())
+        node1 = self._create_node(label='node1', addresses=['192.168.0.1'], topology=t1)
+        path = reverse('node_detail', args=(node1.pk,))
+        with self.assertNumQueries(6):
+            response = self.client.delete(path)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Node.objects.count(), 0)
 
     def test_link_list_api(self):
-        pass
-
-    def test_link_filter_api(self):
-        pass
+        path = reverse('link_list')
+        with self.assertNumQueries(3):
+            response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 0)
 
     def test_link_create_api(self):
-        pass
+        path = reverse('link_list')
+        t = self._create_topology(organization=self._get_org())
+        n1 = self._create_node(label='node1', topology=t)
+        n2 = self._create_node(label='node2', topology=t)
+        data = {
+            'topology': t.pk,
+            'source': n1.pk,
+            'target': n2.pk,
+            'cost': 1.0,
+            'properties': {},
+            'user_properties': {},
+        }
+        with self.assertNumQueries(12):
+            response = self.client.post(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['topology'], t.pk)
+        self.assertEqual(response.data['status'], 'up')
+        self.assertEqual(response.data['source'], n1.pk)
+        self.assertEqual(response.data['target'], n2.pk)
 
     def test_link_detail_api(self):
-        pass
+        t = self._create_topology(organization=self._get_org())
+        n1 = self._create_node(label='node1', topology=t)
+        n2 = self._create_node(label='node2', topology=t)
+        l1 = self._create_link(topology=t, source=n1, target=n2)
+        path = reverse('link_detail', args=(l1.pk,))
+        with self.assertNumQueries(3):
+            response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['id'], str(l1.pk))
+        self.assertEqual(response.data['topology'], t.pk)
+        self.assertEqual(response.data['source'], n1.pk)
+        self.assertEqual(response.data['target'], n2.pk)
 
     def test_link_put_api(self):
-        pass
+        t = self._create_topology(organization=self._get_org())
+        n1 = self._create_node(label='node1', topology=t)
+        n2 = self._create_node(label='node2', topology=t)
+        l1 = self._create_link(topology=t, source=n1, target=n2)
+        path = reverse('link_detail', args=(l1.pk,))
+        data = {
+            'topology': t.pk,
+            'source': n1.pk,
+            'target': n2.pk,
+            'cost': 21.0,
+            'properties': {},
+            'user_properties': {'user': 'tester'},
+        }
+        with self.assertNumQueries(15):
+            response = self.client.put(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['cost'], 21.0)
+        self.assertEqual(response.data['properties'], {})
+        self.assertEqual(response.data['user_properties'], {'user': 'tester'})
 
     def test_link_patch_api(self):
-        pass
+        t = self._create_topology(organization=self._get_org())
+        n1 = self._create_node(label='node1', topology=t)
+        n2 = self._create_node(label='node2', topology=t)
+        l1 = self._create_link(topology=t, source=n1, target=n2)
+        path = reverse('link_detail', args=(l1.pk,))
+        data = {'cost': 50.0}
+        with self.assertNumQueries(12):
+            response = self.client.patch(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['cost'], 50.0)
 
     def test_link_delete_api(self):
-        pass
+        t = self._create_topology(organization=self._get_org())
+        n1 = self._create_node(label='node1', topology=t)
+        n2 = self._create_node(label='node2', topology=t)
+        l1 = self._create_link(topology=t, source=n1, target=n2)
+        self.assertEqual(Link.objects.count(), 1)
+        path = reverse('link_detail', args=(l1.pk,))
+        with self.assertNumQueries(4):
+            response = self.client.delete(path)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Link.objects.count(), 0)
