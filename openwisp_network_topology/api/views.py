@@ -42,14 +42,21 @@ class RequireAuthentication(APIView):
         ]
 
 
-class NetworkCollectionView(generics.ListAPIView, RequireAuthentication):
+class ListViewPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class NetworkCollectionView(generics.ListCreateAPIView, RequireAuthentication):
     """
     Data of all the topologies returned
     in NetJSON NetworkCollection format
     """
 
     serializer_class = NetworkGraphSerializer
-    queryset = Topology.objects.filter(published=True)
+    queryset = Topology.objects.filter(published=True).order_by('-created')
+    pagination_class = ListViewPagination
 
     def list(self, request, *args, **kwargs):
         self.check_permissions(request)
@@ -155,12 +162,6 @@ class ProtectedAPIMixin(FilterByOrganizationManaged):
         IsAuthenticated,
         DjangoModelPermissions,
     ]
-
-
-class ListViewPagination(pagination.PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 100
 
 
 class NodeListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):

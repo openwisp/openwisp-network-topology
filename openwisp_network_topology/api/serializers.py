@@ -29,7 +29,7 @@ class NetworkCollectionSerializer(serializers.ListSerializer):
         )
 
 
-class NetworkGraphSerializer(serializers.ModelSerializer):
+class NetworkGraphSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
     """
     NetJSON NetworkGraph
     """
@@ -39,8 +39,27 @@ class NetworkGraphSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = swapper.load_model('topology', 'Topology')
-        fields = '__all__'
+        fields = (
+            'label',
+            'organization',
+            'parser',
+            'strategy',
+            'key',
+            'expiration_time',
+            'url',
+            'published',
+            'protocol',
+            'version',
+            'revision',
+            'metric',
+        )
         list_serializer_class = NetworkCollectionSerializer
+        extra_kwargs = {
+            'protocol': {'read_only': True},
+            'version': {'read_only': True},
+            'revision': {'read_only': True},
+            'metric': {'read_only': True},
+        }
 
 
 class NodeSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
