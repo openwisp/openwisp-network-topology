@@ -1,8 +1,11 @@
+from unittest.mock import patch
+
 import swapper
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
 from openwisp_controller.tests.utils import TestAdminMixin
+from rest_framework.views import APIView
 
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.tests import AssertNumQueriesSubTestMixin
@@ -78,8 +81,8 @@ class TestApi(
 
     def test_list(self):
         response = self.client.get(self.list_url)
-        self.assertEqual(response.data['results']['type'], 'NetworkCollection')
-        self.assertEqual(len(response.data['results']['collection']), 1)
+        self.assertEqual(response.data['type'], 'NetworkCollection')
+        self.assertEqual(len(response.data['collection']), 1)
 
     def test_detail(self):
         response = self.client.get(self.detail_url)
@@ -88,7 +91,7 @@ class TestApi(
     def test_list_unpublished(self):
         self._unpublish()
         response = self.client.get(self.list_url)
-        self.assertEqual(len(response.data['results']['collection']), 0)
+        self.assertEqual(len(response.data['collection']), 0)
 
     def test_detail_unpublished(self):
         self._unpublish()
@@ -194,8 +197,8 @@ class TestApi(
         r = self.client.get(url)
         if not has_detail:
             self.assertEqual(r.status_code, 200)
-            self.assertEqual(r.data['results']['type'], 'NetworkCollection')
-            self.assertEqual(len(r.data['results']['collection']), 0)
+            self.assertEqual(r.data['type'], 'NetworkCollection')
+            self.assertEqual(len(r.data['collection']), 0)
             self.assertNotEqual(Topology.objects.all().count(), 0)
         else:
             detail = (
@@ -226,7 +229,7 @@ class TestApi(
         self.client.force_login(user)
         with self.subTest('List url'):
             url = self.list_url
-            with self.assertNumQueries(8):
+            with self.assertNumQueries(7):
                 response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
         with self.subTest('Detail url'):
@@ -244,7 +247,7 @@ class TestApi(
         self.client.force_login(user)
         with self.subTest('List url'):
             url = self.list_url
-            with self.assertNumQueries(8):
+            with self.assertNumQueries(7):
                 response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
         with self.subTest('Detail url'):
@@ -306,8 +309,8 @@ class TestApi(
         with self.subTest('test list'):
             r = self.client.get(self.list_url)
             self.assertEqual(r.status_code, 200)
-            self.assertEqual(r.data['results']['type'], 'NetworkCollection')
-            self.assertEqual(len(r.data['results']['collection']), 1)
+            self.assertEqual(r.data['type'], 'NetworkCollection')
+            self.assertEqual(len(r.data['collection']), 1)
 
         with self.subTest('test detail'):
             response = self.client.get(self.detail_url)
@@ -330,7 +333,22 @@ class TestApi(
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data['type'], 'NetworkGraph')
 
+    @patch.object(APIView, 'get_permissions', return_value=[])
+    @patch.object(APIView, 'get_authenticators', return_value=[])
+    def test_api_with_auth_disabled(self, perm_mocked, auth_mocked):
+        user = self._get_user(username='tester')
+        self.client.logout()
+        self._successful_api_tests()
+        self.client.force_login(user)
+
     def test_superuser_with_api_auth_enabled(self):
+        user = self._create_admin(username='superapi', email='superapi@email.com')
+        self.client.force_login(user)
+        self._successful_api_tests()
+
+    @patch.object(APIView, 'get_permissions', return_value=[])
+    @patch.object(APIView, 'get_authenticators', return_value=[])
+    def test_superuser_with_api_auth_disabled(self, perm_mocked, auth_mocked):
         user = self._create_admin(username='superapi', email='superapi@email.com')
         self.client.force_login(user)
         self._successful_api_tests()

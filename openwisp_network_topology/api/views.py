@@ -48,15 +48,14 @@ class ListViewPagination(pagination.PageNumberPagination):
     max_page_size = 100
 
 
-class NetworkCollectionView(generics.ListCreateAPIView, RequireAuthentication):
+class NetworkCollectionView(generics.ListAPIView, RequireAuthentication):
     """
     Data of all the topologies returned
     in NetJSON NetworkCollection format
     """
 
     serializer_class = NetworkGraphSerializer
-    queryset = Topology.objects.filter(published=True).order_by('-created')
-    pagination_class = ListViewPagination
+    queryset = Topology.objects.filter(published=True)
 
     def list(self, request, *args, **kwargs):
         self.check_permissions(request)
@@ -85,10 +84,8 @@ class NetworkGraphView(generics.RetrieveAPIView, RequireAuthentication):
 class ReceiveTopologyView(APIView):
     """
     This views allow nodes to send topology data using the RECEIVE strategy.
-
     Required query string parameters:
         * key
-
     Allowed content-types:
         * text/plain
     """
