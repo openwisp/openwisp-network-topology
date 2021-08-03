@@ -48,7 +48,7 @@ class ListViewPagination(pagination.PageNumberPagination):
     max_page_size = 100
 
 
-class NetworkCollectionView(generics.ListAPIView, RequireAuthentication):
+class NetworkCollectionView(generics.ListCreateAPIView, RequireAuthentication):
     """
     Data of all the topologies returned
     in NetJSON NetworkCollection format
