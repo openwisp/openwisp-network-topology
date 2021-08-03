@@ -563,7 +563,7 @@ class TestTopologyNodeLinkApi(
             'url': 'http://127.0.0.1:9090',
             'published': True,
         }
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(6):
             response = self.client.post(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['label'], 'test-fetch-topology')
@@ -580,7 +580,7 @@ class TestTopologyNodeLinkApi(
             'expiration_time': 360,
             'published': True,
         }
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(6):
             response = self.client.post(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['label'], 'test-receive-topology')
