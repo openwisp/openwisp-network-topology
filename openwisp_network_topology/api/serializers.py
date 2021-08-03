@@ -30,12 +30,21 @@ class NetworkCollectionSerializer(serializers.ListSerializer):
         )
 
 
+class TopologySerializer(ValidatedModelSerializer):
+    class Meta:
+        model = Topology
+        fields = '__all__'
+
+
 class NetworkGraphSerializer(ValidatedModelSerializer):
     """
     NetJSON NetworkGraph
     """
 
     def to_representation(self, obj):
+        if self.context['request'].method == 'POST':
+            serializer = TopologySerializer(self.instance)
+            return serializer.data
         return obj.json(dict=True)
 
     class Meta:

@@ -4,7 +4,7 @@ from openwisp_network_topology.tests.test_admin import (
 )
 from openwisp_network_topology.tests.test_api import TestApi as BaseTestApi
 from openwisp_network_topology.tests.test_api import (
-    TestNodeLinkApi as BaseTestNodeLinkApi,
+    TestTopologyNodeLinkApi as BaseTestTopologyNodeLinkApi,
 )
 from openwisp_network_topology.tests.test_link import TestLink as BaseTestLink
 from openwisp_network_topology.tests.test_node import TestNode as BaseTestNode
@@ -71,7 +71,7 @@ class TestUsersIntegration(BaseTestUsersIntegration):
     pass
 
 
-class TestNodeLinkApi(BaseTestNodeLinkApi):
+class TestNodeLinkApi(BaseTestTopologyNodeLinkApi):
     pass
 
 
@@ -86,4 +86,4 @@ del BaseTestUtils
 del BaseTestVisualizer
 del BaseTestUpgradeFromDjangoNetjsongraph
 del BaseTestUsersIntegration
-del TestNodeLinkApi
+del BaseTestTopologyNodeLinkApi
