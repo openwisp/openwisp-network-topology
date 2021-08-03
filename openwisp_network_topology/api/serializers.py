@@ -9,6 +9,7 @@ from openwisp_utils.api.serializers import ValidatedModelSerializer
 
 Node = swapper.load_model('topology', 'Node')
 Link = swapper.load_model('topology', 'Link')
+Topology = swapper.load_model('topology', 'Topology')
 
 
 class NetworkCollectionSerializer(serializers.ListSerializer):
@@ -29,7 +30,7 @@ class NetworkCollectionSerializer(serializers.ListSerializer):
         )
 
 
-class NetworkGraphSerializer(serializers.ModelSerializer):
+class NetworkGraphSerializer(ValidatedModelSerializer):
     """
     NetJSON NetworkGraph
     """
@@ -38,9 +39,19 @@ class NetworkGraphSerializer(serializers.ModelSerializer):
         return obj.json(dict=True)
 
     class Meta:
-        model = swapper.load_model('topology', 'Topology')
-        fields = '__all__'
+        model = Topology
+        fields = (
+            'label',
+            'organization',
+            'parser',
+            'strategy',
+            'key',
+            'expiration_time',
+            'url',
+            'published',
+        )
         list_serializer_class = NetworkCollectionSerializer
+        extra_kwargs = {'published': {'initial': True}}
 
 
 class NodeSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):

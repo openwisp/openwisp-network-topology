@@ -356,7 +356,7 @@ class TestApi(
         self._successful_api_tests()
 
 
-class TestNodeLinkApi(
+class TestTopologyNodeLinkApi(
     AssertNumQueriesSubTestMixin,
     CreateGraphObjectsMixin,
     TestAdminMixin,
@@ -554,3 +554,54 @@ class TestNodeLinkApi(
             response = self.client.delete(path)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Link.objects.count(), 0)
+
+    def test_fetch_topology_create_api(self):
+        path = reverse('network_collection')
+        data = {
+            'label': 'test-fetch-topology',
+            'organization': self._get_org().pk,
+            'parser': 'netdiff.OlsrParser',
+            'strategy': 'fetch',
+            'url': 'http://127.0.0.1:9090',
+            'published': True,
+        }
+        with self.assertNumQueries(8):
+            response = self.client.post(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['label'], 'test-fetch-topology')
+        self.assertEqual(response.data['parser'], 'netdiff.OlsrParser')
+
+    def test_receive_topology_create_api(self):
+        path = reverse('network_collection')
+        data = {
+            'label': 'test-receive-topology',
+            'organization': self._get_org().pk,
+            'parser': 'netdiff.OlsrParser',
+            'strategy': 'receive',
+            'key': 'A3DJ62jhd49',
+            'expiration_time': 360,
+            'published': True,
+        }
+        with self.assertNumQueries(8):
+            response = self.client.post(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['label'], 'test-receive-topology')
+        self.assertEqual(response.data['parser'], 'netdiff.OlsrParser')
+
+    def test_topology_receive_no_key_create_api(self):
+        path = reverse('network_collection')
+        data = {
+            'label': 'test-receive-topology',
+            'organization': self._get_org().pk,
+            'parser': 'netdiff.OlsrParser',
+            'strategy': 'receive',
+            'key': '',
+            'expiration_time': 360,
+            'published': True,
+        }
+        with self.assertNumQueries(5):
+            response = self.client.post(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            'a key must be specified when using RECEIVE strateg', str(response.content)
+        )
