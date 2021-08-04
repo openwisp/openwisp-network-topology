@@ -36,26 +36,30 @@ def get_api_urls(views_module):
     used by third party apps to reduce boilerplate
     """
     urls = [
-        path('topology/', views_module.network_collection, name='network_collection'),
         path(
-            'topology/<uuid:pk>/',
+            'topology/topology/',
+            views_module.network_collection,
+            name='network_collection',
+        ),
+        path(
+            'topology/topology/<str:pk>/',
             views_module.network_graph,
             name='network_graph',
         ),
         path(
-            'topology/<uuid:pk>/history/',
+            'topology/topology/<str:pk>/history/',
             views_module.network_graph_history,
             name='network_graph_history',
         ),
         path(
-            'topology/<uuid:pk>/receive/',
+            'topology/topology/<str:pk>/receive/',
             views_module.receive_topology,
             name='receive_topology',
         ),
-        path('node/', views_module.node_list, name='node_list'),
-        path('node/<str:pk>/', views_module.node_detail, name='node_detail'),
-        path('link/', views_module.link_list, name='link_list'),
-        path('link/<str:pk>/', views_module.link_detail, name='link_detail'),
+        path('topology/node/', views_module.node_list, name='node_list'),
+        path('topology/node/<str:pk>/', views_module.node_detail, name='node_detail'),
+        path('topology/link/', views_module.link_list, name='link_list'),
+        path('topology/link/<str:pk>/', views_module.link_detail, name='link_detail'),
     ]
     return urls
 

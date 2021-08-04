@@ -133,7 +133,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         t.save()
         path = reverse('{0}_topology_change'.format(self.prefix), args=[t.pk])
         # No change in URL Test
-        receive_path = f'topology/{t.pk}/receive/'
+        receive_path = f'topology/topology/{t.pk}/receive/'
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'field-receive_url')
