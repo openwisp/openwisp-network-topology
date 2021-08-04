@@ -86,27 +86,6 @@ body.frontend {
     background-color: #2b2b2b
 }
 
-#menu {
-    list-style: none outside;
-}
-
-#menu li {
-    margin-bottom: 10px;
-}
-
-#menu li a {
-    display: inline-block;
-    background: #000;
-    color: #fff;
-    text-decoration: none;
-    padding: 5px 15px;
-    margin-right: 5px;
-}
-
-#menu li a:hover {
-    background: rgba(0, 0, 0, 0.7)
-}
-
 .down {
     stroke: #c92517;
     stroke-dasharray: 10, 5

@@ -1,7 +1,8 @@
-import swapper
 from django.apps import AppConfig
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from swapper import get_model_name
+
+from openwisp_utils.admin_theme.menu import register_menu_group
 
 from .settings import SIGNALS
 
@@ -14,13 +15,33 @@ class OpenwispNetworkTopologyConfig(AppConfig):
     def ready(self, *args, **kwargs):
         if SIGNALS:  # pragma: nocover
             __import__(SIGNALS)
-        self.add_default_menu_items()
+        self.register_menu_groups()
 
-    def add_default_menu_items(self):
-        menu_setting = 'OPENWISP_DEFAULT_ADMIN_MENU_ITEMS'
-        items = [{'model': swapper.get_model_name('topology', 'Topology')}]
-        if not hasattr(settings, menu_setting):
-            setattr(settings, menu_setting, items)
-        else:
-            current_menu = getattr(settings, menu_setting)
-            current_menu += items
+    def register_menu_groups(self):
+        register_menu_group(
+            position=110,
+            config={
+                'label': 'Network Topology',
+                'items': {
+                    1: {
+                        'label': _('Topologies'),
+                        'model': get_model_name('topology', 'Topology'),
+                        'name': 'changelist',
+                        'icon': 'ow-topology',
+                    },
+                    2: {
+                        'label': _('Nodes'),
+                        'model': get_model_name('topology', 'Node'),
+                        'name': 'changelist',
+                        'icon': 'ow-node',
+                    },
+                    3: {
+                        'label': _('Links'),
+                        'model': get_model_name('topology', 'Link'),
+                        'name': 'changelist',
+                        'icon': 'ow-link',
+                    },
+                },
+                'icon': 'ow-network-topology',
+            },
+        )

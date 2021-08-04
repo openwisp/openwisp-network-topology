@@ -258,6 +258,23 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         li.save()
         self._test_properties_field('link', li)
 
+    def test_admin_menu_groups(self):
+        # Test menu group (openwisp-utils menu group) for Topology and Link
+        # and Node
+        self.client.force_login(self.user_model.objects.get(username='admin'))
+        response = self.client.get(reverse('admin:index'))
+        models = ['topology', 'node', 'link']
+        for model in models:
+            with self.subTest('test admin group for {model} model'):
+                url = reverse(f'admin:{self.app_label}_{model}_changelist')
+                self.assertContains(response, f'<a class="mg-link" href="{url}">')
+        with self.subTest('test networking topology group is registered'):
+            self.assertContains(
+                response,
+                '<div class="mg-dropdown-label">Network Topology </div>',
+                html=True,
+            )
+
 
 class TestMultitenantAdmin(
     CreateGraphObjectsMixin, TestMultitenantAdminMixin, TestOrganizationMixin, TestCase
