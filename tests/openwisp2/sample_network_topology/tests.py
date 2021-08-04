@@ -14,11 +14,13 @@ from openwisp_network_topology.tests.test_topology import (
 from openwisp_network_topology.tests.test_upgrader_script import (
     TestUpgradeFromDjangoNetjsongraph as BaseTestUpgradeFromDjangoNetjsongraph,
 )
+from openwisp_network_topology.tests.test_users_integration import (
+    TestUsersIntegration as BaseTestUsersIntegration,
+)
 from openwisp_network_topology.tests.test_utils import TestUtils as BaseTestUtils
 from openwisp_network_topology.tests.test_visualizer import (
     TestVisualizer as BaseTestVisualizer,
 )
-from openwisp_users.tests.test_admin import TestBasicUsersIntegration
 
 
 class TestAdmin(BaseTestAdmin):
@@ -62,7 +64,7 @@ class TestUpgradeFromDjangoNetjsongraph(BaseTestUpgradeFromDjangoNetjsongraph):
     pass
 
 
-class TestUsersIntegration(TestBasicUsersIntegration):
+class TestUsersIntegration(BaseTestUsersIntegration):
     pass
 
 
@@ -76,4 +78,4 @@ del BaseTestTopology
 del BaseTestUtils
 del BaseTestVisualizer
 del BaseTestUpgradeFromDjangoNetjsongraph
-del TestBasicUsersIntegration
+del BaseTestUsersIntegration

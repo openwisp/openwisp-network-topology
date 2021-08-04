@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     # controller  (needed to test integration)
     'openwisp_controller.pki',
     'openwisp_controller.config',
+    'openwisp_controller.connection',
+    'openwisp_notifications',
     'reversion',
     'sortedm2m',
     'flat_json_widget',
@@ -39,7 +41,6 @@ INSTALLED_APPS = [
     'openwisp_network_topology',
     'openwisp_network_topology.integrations.device',
     'openwisp_users',
-    'openwisp_notifications',
     # admin
     'django.contrib.admin',
     # rest framework

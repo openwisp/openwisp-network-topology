@@ -17,6 +17,8 @@ from openwisp_network_topology.tests.utils import (
     CreateGraphObjectsMixin,
     CreateOrgMixin,
 )
+from openwisp_utils.admin_theme.dashboard import DASHBOARD_CHARTS, DASHBOARD_TEMPLATES
+from openwisp_utils.admin_theme.menu import MENU
 
 from .base.models import logger as models_logger
 from .base.models import trigger_device_checks_path
@@ -270,6 +272,9 @@ class TestMonitoringIntegration(Base, TransactionTestCase):
         )
         link.full_clean()
         link.save()
+        DASHBOARD_CHARTS.clear()
+        DASHBOARD_TEMPLATES.clear()
+        MENU.clear()
         # needed for monitoring
         trigger_device_checks = import_string(trigger_device_checks_path)
         with mock.patch.object(trigger_device_checks, 'delay') as mocked_task:
