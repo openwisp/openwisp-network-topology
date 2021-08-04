@@ -66,7 +66,7 @@ def check_auth_perm(request):
     view_perm = f'{app_label}.view_{model}'
     if not user.is_authenticated:
         return HttpResponseForbidden(_('Authentication credentials were not provided.'))
-    if not (user.has_permission(change_perm) or user.has_permission(view_perm)):
+    if not (user.has_perm(change_perm) or user.has_perm(view_perm)):
         return HttpResponseForbidden(
             _('You do not have permission to perform this action.')
         )
