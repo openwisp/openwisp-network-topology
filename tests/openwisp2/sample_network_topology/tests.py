@@ -71,7 +71,7 @@ class TestUsersIntegration(BaseTestUsersIntegration):
     pass
 
 
-class TestNodeLinkApi(BaseTestTopologyNodeLinkApi):
+class TestTopologyNodeLinkApi(BaseTestTopologyNodeLinkApi):
     pass
 
 
