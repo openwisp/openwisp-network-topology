@@ -461,7 +461,7 @@ class TestTopologyNodeLinkApi(
         t1 = self._create_topology(organization=self._get_org())
         node1 = self._create_node(label='node1', addresses=['192.168.0.1'], topology=t1)
         path = reverse('node_detail', args=(node1.pk,))
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(9):
             response = self.client.delete(path)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Node.objects.count(), 0)
@@ -548,7 +548,7 @@ class TestTopologyNodeLinkApi(
         l1 = self._create_link(topology=t, source=n1, target=n2)
         self.assertEqual(Link.objects.count(), 1)
         path = reverse('link_detail', args=(l1.pk,))
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             response = self.client.delete(path)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Link.objects.count(), 0)
