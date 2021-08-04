@@ -158,6 +158,7 @@ Add ``openwisp_network_topology`` and its dependencies to ``INSTALLED_APPS``:
     INSTALLED_APPS = [
         # other apps
         'openwisp_network_topology',
+        'openwisp_users.accounts',
         'allauth',
         'allauth.account',
         'openwisp_users',
@@ -379,6 +380,7 @@ In order to use this module simply add
         # other apps (eg: openwisp-controller, openwisp-monitoring)
         'openwisp_network_topology',
         'openwisp_network_topology.integrations.device',
+        'openwisp_users.accounts',
         'allauth',
         'allauth.account',
         'openwisp_users',
@@ -688,6 +690,7 @@ ensuring also that ``openwisp_network_topology`` has been removed:
         'openwisp_utils.admin_theme',
         # all-auth
         'django.contrib.sites',
+        'openwisp_users.accounts',
         'allauth',
         'allauth.account',
         'allauth.socialaccount',
