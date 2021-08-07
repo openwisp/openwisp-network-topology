@@ -234,7 +234,7 @@ class TestApi(
             self.assertEqual(response.status_code, 200)
         with self.subTest('Detail url'):
             url = self.detail_url
-            with self.assertNumQueries(8):
+            with self.assertNumQueries(7):
                 response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
@@ -252,7 +252,7 @@ class TestApi(
             self.assertEqual(response.status_code, 200)
         with self.subTest('Detail url'):
             url = self.detail_url
-            with self.assertNumQueries(8):
+            with self.assertNumQueries(7):
                 response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
@@ -368,6 +368,12 @@ class TestTopologyNodeLinkApi(
     def setUp(self):
         super().setUp()
         self._login()
+
+    @property
+    def detail_url(self):
+        org = self._get_org()
+        t = self._create_topology(organization=org)
+        return reverse('network_graph', args=[t.pk])
 
     def test_node_list_api(self):
         path = reverse('node_list')
@@ -603,3 +609,113 @@ class TestTopologyNodeLinkApi(
         self.assertIn(
             'a key must be specified when using RECEIVE strateg', str(response.content)
         )
+
+    def test_get_topology_detail_api(self):
+        with self.assertNumQueries(13):
+            response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_put_topology_detail_api(self):
+        org1 = self._get_org()
+        topo = self._create_topology(organization=org1)
+        self.assertEqual(topo.label, 'TestNetwork')
+        path = reverse('network_graph', args=[topo.pk])
+        data = {
+            'label': 'ChangeTestNetwork',
+            'organization': org1.pk,
+            'parser': 'netdiff.OlsrParser',
+        }
+        with self.assertNumQueries(8):
+            response = self.client.put(path, data, content_type='application/json')
+        topo.refresh_from_db()
+        self.assertEqual(topo.label, 'ChangeTestNetwork')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['label'], 'ChangeTestNetwork')
+        self.assertEqual(response.data['type'], 'NetworkGraph')
+
+    def test_change_strategy_fetch_api_400(self):
+        org1 = self._get_org()
+        path = self.detail_url
+        data = {
+            'label': 'ChangeTestNetwork',
+            'organization': org1.pk,
+            'parser': 'netdiff.OlsrParser',
+            'strategy': 'fetch',
+            'url': '',
+        }
+        with self.assertNumQueries(4):
+            response = self.client.put(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            'an url must be specified when using FETCH strategy', str(response.content)
+        )
+
+    def test_change_strategy_receive_api_400(self):
+        org1 = self._get_org()
+        path = self.detail_url
+        data = {
+            'label': 'ChangeTestNetwork',
+            'organization': org1.pk,
+            'parser': 'netdiff.OlsrParser',
+            'strategy': 'receive',
+            'key': '',
+        }
+        with self.assertNumQueries(4):
+            response = self.client.put(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            'a key must be specified when using RECEIVE strategy', str(response.content)
+        )
+
+    def test_change_strategy_fetch_api_200(self):
+        org1 = self._get_org()
+        topo = self._create_topology(organization=org1, strategy='receive')
+        path = reverse('network_graph', args=[topo.pk])
+        self.assertEqual(topo.strategy, 'receive')
+        data = {
+            'label': 'ChangeTestNetwork',
+            'organization': org1.pk,
+            'parser': 'netdiff.OlsrParser',
+            'strategy': 'fetch',
+            'url': 'http://127.0.0.1:9090',
+        }
+        with self.assertNumQueries(8):
+            response = self.client.put(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['strategy'], 'fetch')
+        topo.refresh_from_db()
+        self.assertEqual(topo.strategy, 'fetch')
+
+    def test_change_strategy_receive_api_200(self):
+        org1 = self._get_org()
+        topo = self._create_topology(organization=org1, strategy='fetch')
+        path = reverse('network_graph', args=[topo.pk])
+        self.assertEqual(topo.strategy, 'fetch')
+        data = {
+            'label': 'ChangeTestNetwork',
+            'organization': org1.pk,
+            'parser': 'netdiff.OlsrParser',
+            'strategy': 'receive',
+            'key': 12345,
+        }
+        with self.assertNumQueries(8):
+            response = self.client.put(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['strategy'], 'receive')
+        topo.refresh_from_db()
+        self.assertEqual(topo.strategy, 'receive')
+
+    def test_patch_topology_detail_api(self):
+        path = self.detail_url
+        data = {
+            'label': 'ChangeTestNetwork',
+        }
+        with self.assertNumQueries(7):
+            response = self.client.patch(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['label'], 'ChangeTestNetwork')
+
+    def test_delete_topology_api(self):
+        with self.assertNumQueries(17):
+            response = self.client.delete(self.detail_url)
+        self.assertEqual(response.status_code, 204)

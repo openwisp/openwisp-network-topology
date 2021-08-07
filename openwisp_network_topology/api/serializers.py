@@ -65,16 +65,11 @@ class NetworkGraphSerializer(ValidatedModelSerializer):
         extra_kwargs = {'published': {'initial': True}}
 
 
-def get_representation_data(obj, dict=False, omit_down=False, **kwargs):
+def get_representation_data(obj, dict=False, **kwargs):
     """ returns a dict that represents a NetJSON NetworkGraph object """
     nodes = []
     links = []
-    links_queryset = obj.get_links_queryset()
-    # needed to detect links coming back online
-    if omit_down:
-        links_queryset = links_queryset.filter(status='up')
-    # populate graph
-    for link in links_queryset:
+    for link in obj.get_links_queryset():
         links.append(link.json(dict=True, original=False))
     for node in obj.get_nodes_queryset():
         nodes.append(node.json(dict=True, original=False))

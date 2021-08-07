@@ -542,14 +542,42 @@ List topologies
 
 .. code-block:: text
 
-    GET /api/v1/topology/
+    GET /api/v1/topology/topology/
+
+Create topology
+###############
+
+.. code-block:: text
+
+    POST /api/v1/topology/topology/
 
 Detail of a topology
 ####################
 
 .. code-block:: text
 
-    GET /api/v1/topology/{id}/
+    GET /api/v1/topology/topology/{id}/
+
+Change topolgy detail
+#####################
+
+.. code-block:: text
+
+    PUT /api/v1/topology/topology/{id}/
+
+Patch topology detail
+#####################
+
+.. code-block:: text
+
+    PATCH /api/v1/topology/topology/{id}/
+
+Delete topology
+###############
+
+.. code-block:: text
+
+    DELETE /api/v1/topology/topology/{id}/
 
 View topology history
 #####################
@@ -563,98 +591,98 @@ saved on ``2020-08-08`` as follows.
 
 .. code-block:: text
 
-    GET /api/v1/topology/{id}/history/?date=2020-08-08
+    GET /api/v1/topology/topology/{id}/history/?date=2020-08-08
 
 Send topology data
 ##################
 
 .. code-block:: text
 
-    POST /api/v1/topology/{id}/receive/
+    POST /api/v1/topology/topology/{id}/receive/
 
 List links
 ##########
 
 .. code-block:: text
 
-    GET /api/v1/link/
+    GET /api/v1/topology/link/
 
 Create link
 ###########
 
 .. code-block:: text
 
-    POST /api/v1/link/
+    POST /api/v1/topology/link/
 
 Get link detail
 ###############
 
 .. code-block:: text
 
-    GET /api/v1/link/{id}/
+    GET /api/v1/topology/link/{id}/
 
 Change link detail
 ##################
 
 .. code-block:: text
 
-    PUT /api/v1/link/{id}/
+    PUT /api/v1/topology/link/{id}/
 
 Patch link detail
 #################
 
 .. code-block:: text
 
-    PATCH /api/v1/link/{id}/
+    PATCH /api/v1/topology/link/{id}/
 
 Delete link
 ###########
 
 .. code-block:: text
 
-    DELETE /api/v1/link/{id}/
+    DELETE /api/v1/topology/link/{id}/
 
 List nodes
 ##########
 
 .. code-block:: text
 
-    GET /api/v1/node/
+    GET /api/v1/topology/node/
 
 Create node
 ###########
 
 .. code-block:: text
 
-    POST /api/v1/node/
+    POST /api/v1/topology/node/
 
 Get node detail
 ###############
 
 .. code-block:: text
 
-    GET /api/v1/node/{id}/
+    GET /api/v1/topology/node/{id}/
 
 Change node detail
 ##################
 
 .. code-block:: text
 
-    PUT /api/v1/node/{id}/
+    PUT /api/v1/topology/node/{id}/
 
 Patch node detail
 #################
 
 .. code-block:: text
 
-    PATCH /api/v1/node/{id}/
+    PATCH /api/v1/topology/node/{id}/
 
 Delete node
 ###########
 
 .. code-block:: text
 
-    DELETE /api/v1/node/{id}/
+    DELETE /api/v1/topology/node/{id}/
 
 Overriding visualizer templates
 -------------------------------
