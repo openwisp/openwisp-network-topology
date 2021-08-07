@@ -127,6 +127,20 @@ class NetworkGraphUpdateSerializer(ValidatedModelSerializer):
             'published',
         )
 
+    def validate_strategy(self, value):
+        if value == 'receive' and not self.initial_data.get('key'):
+            raise serializers.ValidationError(
+                _('a key must be specified when using RECEIVE strategy')
+            )
+        return value
+
+    def validate_url(self, value):
+        if not value and self.initial_data.get('strategy') == 'fetch':
+            raise serializers.ValidationError(
+                _('an url must be specified when using FETCH strategy')
+            )
+        return value
+
 
 class NodeSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
     addresses = serializers.JSONField(initial=[])
