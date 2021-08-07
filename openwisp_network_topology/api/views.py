@@ -85,7 +85,7 @@ class NetworkGraphView(
     """
 
     serializer_class = NetworkGraphUpdateSerializer
-    queryset = Topology.objects.all()
+    queryset = Topology.objects.select_related('organization')
 
 
 class ReceiveTopologyView(APIView):
