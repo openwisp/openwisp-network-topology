@@ -18,7 +18,12 @@ from openwisp_users.api.permissions import DjangoModelPermissions, IsOrganizatio
 from .. import settings as app_settings
 from ..utils import get_object_or_404
 from .parsers import TextParser
-from .serializers import LinkSerializer, NetworkGraphSerializer, NodeSerializer
+from .serializers import (
+    LinkSerializer,
+    NetworkGraphSerializer,
+    NetworkGraphUpdateSerializer,
+    NodeSerializer,
+)
 
 logger = logging.getLogger(__name__)
 Snapshot = swapper.load_model('topology', 'Snapshot')
@@ -71,14 +76,16 @@ class NetworkCollectionView(generics.ListCreateAPIView, RequireAuthentication):
         return queryset
 
 
-class NetworkGraphView(generics.RetrieveAPIView, RequireAuthentication):
+class NetworkGraphView(
+    generics.RetrieveUpdateDestroyAPIView, RequireAuthentication,
+):
     """
     Data of a specific topology returned
     in NetJSON NetworkGraph format
     """
 
-    serializer_class = NetworkGraphSerializer
-    queryset = Topology.objects.filter(published=True)
+    serializer_class = NetworkGraphUpdateSerializer
+    queryset = Topology.objects.all()
 
 
 class ReceiveTopologyView(APIView):

@@ -96,7 +96,7 @@ class TestApi(
     def test_detail_unpublished(self):
         self._unpublish()
         response = self.client.get(self.detail_url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
 
     def test_receive(self):
         self._set_receive()
