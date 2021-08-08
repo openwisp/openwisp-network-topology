@@ -611,8 +611,7 @@ class TestTopologyNodeLinkApi(
         )
 
     def test_get_topology_detail_api(self):
-        with self.assertNumQueries(13):
-            response = self.client.get(self.detail_url)
+        response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
 
     def test_put_topology_detail_api(self):
@@ -716,6 +715,5 @@ class TestTopologyNodeLinkApi(
         self.assertEqual(response.data['label'], 'ChangeTestNetwork')
 
     def test_delete_topology_api(self):
-        with self.assertNumQueries(17):
-            response = self.client.delete(self.detail_url)
+        response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, 204)
