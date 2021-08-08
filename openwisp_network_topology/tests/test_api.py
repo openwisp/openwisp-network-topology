@@ -447,7 +447,7 @@ class TestTopologyNodeLinkApi(
             'user_properties': {},
         }
         path = reverse('node_detail', args=(node1.pk,))
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(8):
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['label'], 'change-node')
@@ -458,7 +458,7 @@ class TestTopologyNodeLinkApi(
         node1 = self._create_node(label='node1', addresses=['192.168.0.1'], topology=t1)
         path = reverse('node_detail', args=(node1.pk,))
         data = {'label': 'change-node'}
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(7):
             response = self.client.patch(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['label'], 'change-node')
@@ -528,7 +528,7 @@ class TestTopologyNodeLinkApi(
             'properties': {},
             'user_properties': {'user': 'tester'},
         }
-        with self.assertNumQueries(15):
+        with self.assertNumQueries(12):
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['cost'], 21.0)
@@ -542,7 +542,7 @@ class TestTopologyNodeLinkApi(
         l1 = self._create_link(topology=t, source=n1, target=n2)
         path = reverse('link_detail', args=(l1.pk,))
         data = {'cost': 50.0}
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(9):
             response = self.client.patch(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['cost'], 50.0)
