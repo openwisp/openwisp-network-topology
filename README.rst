@@ -577,7 +577,7 @@ Delete topology
 
 .. code-block:: text
 
-    DELETE /api/v1/topology/topology/{id}/
+    DELETE /api/v1/topology/topology/{id}
 
 View topology history
 #####################
