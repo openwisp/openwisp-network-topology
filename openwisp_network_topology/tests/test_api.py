@@ -292,7 +292,14 @@ class TestApi(
             self._test_api_with_not_permitted_user(user, self.detail_url)
 
         with self.subTest('test api with not a member user'):
-            self._test_api_with_not_a_manager_user(user, self.detail_url)
+            org1 = self._create_org(name='org1')
+            t1 = self._create_topology(organization=org1)
+            url = reverse('network_graph', args=(t1.pk,))
+            user = self._create_user(username='org-member', email='orgmem@ber.com')
+            self.client.force_login(user)
+            with self.assertNumQueries(5):
+                response = self.client.get(url)
+            self.assertEqual(response.status_code, 403)
 
     def test_snapshot_with_auth_enabled(self):
         user = self._create_user(username='snapshot-user', email='snapshot@email.com')
@@ -306,16 +313,6 @@ class TestApi(
             self._test_api_with_not_a_manager_user(user, self.snapshot_url)
 
     def _successful_api_tests(self):
-        with self.subTest('test list'):
-            r = self.client.get(self.list_url)
-            self.assertEqual(r.status_code, 200)
-            self.assertEqual(r.data['type'], 'NetworkCollection')
-            self.assertEqual(len(r.data['collection']), 1)
-
-        with self.subTest('test detail'):
-            response = self.client.get(self.detail_url)
-            self.assertEqual(response.data['type'], 'NetworkGraph')
-
         with self.subTest('test receive'):
             self._set_receive()
             self.node_model.objects.all().delete()

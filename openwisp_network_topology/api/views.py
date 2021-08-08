@@ -53,7 +53,9 @@ class ListViewPagination(pagination.PageNumberPagination):
     max_page_size = 100
 
 
-class NetworkCollectionView(generics.ListCreateAPIView, RequireAuthentication):
+class NetworkCollectionView(
+    RequireAuthentication, FilterByOrganizationManaged, generics.ListCreateAPIView,
+):
     """
     Data of all the topologies returned
     in NetJSON NetworkCollection format
@@ -66,18 +68,11 @@ class NetworkCollectionView(generics.ListCreateAPIView, RequireAuthentication):
         self.check_permissions(request)
         return super().list(request, *args, **kwargs)
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        user = self.request.user
-        if user.is_superuser:
-            return queryset
-        if user.is_authenticated:
-            queryset = queryset.filter(organization__in=user.organizations_managed)
-        return queryset
-
 
 class NetworkGraphView(
-    generics.RetrieveUpdateDestroyAPIView, RequireAuthentication,
+    RequireAuthentication,
+    FilterByOrganizationManaged,
+    generics.RetrieveUpdateDestroyAPIView,
 ):
     """
     Data of a specific topology returned

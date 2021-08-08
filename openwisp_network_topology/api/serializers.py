@@ -36,7 +36,7 @@ class TopologySerializer(ValidatedModelSerializer):
         fields = '__all__'
 
 
-class NetworkGraphSerializer(ValidatedModelSerializer):
+class NetworkGraphSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
     """
     NetJSON NetworkGraph
     """
@@ -98,7 +98,9 @@ def get_representation_data(obj):
     return netjson
 
 
-class NetworkGraphUpdateSerializer(ValidatedModelSerializer):
+class NetworkGraphUpdateSerializer(
+    FilterSerializerByOrgManaged, ValidatedModelSerializer
+):
     def to_representation(self, obj):
         topo_data = get_representation_data(obj)
         if obj.strategy == 'receive':
