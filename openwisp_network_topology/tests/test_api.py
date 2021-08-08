@@ -610,6 +610,22 @@ class TestTopologyNodeLinkApi(
             response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
 
+    def test_get_topology_detail_with_link_api(self):
+        org1 = self._get_org()
+        topo = self._create_topology(organization=org1)
+        node1 = self._create_node(
+            label='node1', addresses=['192.168.0.1'], topology=topo, organization=org1
+        )
+        node2 = self._create_node(
+            label='node2', addresses=['192.168.0.2'], topology=topo, organization=org1
+        )
+        self._create_link(topology=topo, source=node1, target=node2)
+        path = reverse('network_graph', args=(topo.pk,))
+        with self.assertNumQueries(5):
+            response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(response.data['links'], [])
+
     def test_put_topology_detail_api(self):
         org1 = self._get_org()
         topo = self._create_topology(organization=org1)

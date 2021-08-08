@@ -1,10 +1,8 @@
-import json
 from collections import OrderedDict
 
 import swapper
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-from rest_framework.utils.encoders import JSONEncoder
 
 from openwisp_users.api.mixins import FilterSerializerByOrgManaged
 from openwisp_utils.api.serializers import ValidatedModelSerializer
@@ -65,8 +63,11 @@ class NetworkGraphSerializer(ValidatedModelSerializer):
         extra_kwargs = {'published': {'initial': True}}
 
 
-def get_representation_data(obj, dict=False, **kwargs):
-    """ returns a dict that represents a NetJSON NetworkGraph object """
+def get_representation_data(obj):
+    """
+    Returns a dict that represents
+    a NetJSON NetworkGraph object.
+    """
     nodes = []
     links = []
     for link in obj.get_links_queryset():
@@ -94,14 +95,12 @@ def get_representation_data(obj, dict=False, **kwargs):
             ('links', links),
         )
     )
-    if dict:
-        return netjson
-    return json.dumps(netjson, cls=JSONEncoder, **kwargs)
+    return netjson
 
 
 class NetworkGraphUpdateSerializer(ValidatedModelSerializer):
     def to_representation(self, obj):
-        topo_data = get_representation_data(obj, dict=True)
+        topo_data = get_representation_data(obj)
         if obj.strategy == 'receive':
             del topo_data['url']
         if obj.strategy == 'fetch':
