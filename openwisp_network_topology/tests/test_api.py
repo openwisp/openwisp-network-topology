@@ -369,12 +369,6 @@ class TestTopologyNodeLinkApi(
         super().setUp()
         self._login()
 
-    @property
-    def detail_url(self):
-        org = self._get_org()
-        t = self._create_topology(organization=org)
-        return reverse('network_graph', args=[t.pk])
-
     def test_node_list_api(self):
         path = reverse('node_list')
         self.assertEqual(Node.objects.count(), 0)
@@ -467,8 +461,7 @@ class TestTopologyNodeLinkApi(
         t1 = self._create_topology(organization=self._get_org())
         node1 = self._create_node(label='node1', addresses=['192.168.0.1'], topology=t1)
         path = reverse('node_detail', args=(node1.pk,))
-        with self.assertNumQueries(9):
-            response = self.client.delete(path)
+        response = self.client.delete(path)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Node.objects.count(), 0)
 
@@ -554,8 +547,7 @@ class TestTopologyNodeLinkApi(
         l1 = self._create_link(topology=t, source=n1, target=n2)
         self.assertEqual(Link.objects.count(), 1)
         path = reverse('link_detail', args=(l1.pk,))
-        with self.assertNumQueries(6):
-            response = self.client.delete(path)
+        response = self.client.delete(path)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Link.objects.count(), 0)
 
@@ -611,7 +603,11 @@ class TestTopologyNodeLinkApi(
         )
 
     def test_get_topology_detail_api(self):
-        response = self.client.get(self.detail_url)
+        org1 = self._get_org()
+        topo = self._create_topology(organization=org1)
+        path = reverse('network_graph', args=(topo.pk,))
+        with self.assertNumQueries(5):
+            response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
 
     def test_put_topology_detail_api(self):
@@ -634,7 +630,8 @@ class TestTopologyNodeLinkApi(
 
     def test_change_strategy_fetch_api_400(self):
         org1 = self._get_org()
-        path = self.detail_url
+        topo = self._create_topology(organization=org1)
+        path = reverse('network_graph', args=(topo.pk,))
         data = {
             'label': 'ChangeTestNetwork',
             'organization': org1.pk,
@@ -651,7 +648,8 @@ class TestTopologyNodeLinkApi(
 
     def test_change_strategy_receive_api_400(self):
         org1 = self._get_org()
-        path = self.detail_url
+        topo = self._create_topology(organization=org1)
+        path = reverse('network_graph', args=(topo.pk,))
         data = {
             'label': 'ChangeTestNetwork',
             'organization': org1.pk,
@@ -705,7 +703,9 @@ class TestTopologyNodeLinkApi(
         self.assertEqual(topo.strategy, 'receive')
 
     def test_patch_topology_detail_api(self):
-        path = self.detail_url
+        org1 = self._get_org()
+        topo = self._create_topology(organization=org1)
+        path = reverse('network_graph', args=(topo.pk,))
         data = {
             'label': 'ChangeTestNetwork',
         }
@@ -715,5 +715,8 @@ class TestTopologyNodeLinkApi(
         self.assertEqual(response.data['label'], 'ChangeTestNetwork')
 
     def test_delete_topology_api(self):
-        response = self.client.delete(self.detail_url)
+        org1 = self._create_org(name='org1')
+        topo = self._create_topology(label='topology1', organization=org1)
+        path = reverse('network_graph', args=(topo.pk,))
+        response = self.client.delete(path)
         self.assertEqual(response.status_code, 204)
