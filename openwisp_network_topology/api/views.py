@@ -58,7 +58,7 @@ class NetworkCollectionView(
 ):
     """
     Data of all the topologies returned
-    in NetJSON NetworkCollection format
+    in NetJSON NetworkCollection format.
     """
 
     serializer_class = NetworkGraphSerializer
@@ -68,6 +68,13 @@ class NetworkCollectionView(
         self.check_permissions(request)
         return super().list(request, *args, **kwargs)
 
+    def get_success_headers(self, data):
+        """
+        Remove `LOCATION` option from the
+        header when URL field is present.
+        """
+        return {}
+
 
 class NetworkGraphView(
     RequireAuthentication,
@@ -76,7 +83,7 @@ class NetworkGraphView(
 ):
     """
     Data of a specific topology returned
-    in NetJSON NetworkGraph format
+    in NetJSON NetworkGraph format.
     """
 
     serializer_class = NetworkGraphUpdateSerializer
@@ -127,7 +134,7 @@ class ReceiveTopologyView(APIView):
 class NetworkGraphHistoryView(RequireAuthentication):
     """
     History of a specific topology returned
-    in NetJSON NetworkGraph format
+    in NetJSON NetworkGraph format.
     """
 
     topology_model = Topology
