@@ -30,39 +30,6 @@ class NetworkCollectionSerializer(serializers.ListSerializer):
         )
 
 
-class TopologySerializer(ValidatedModelSerializer):
-    class Meta:
-        model = Topology
-        fields = '__all__'
-
-
-class NetworkGraphSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
-    """
-    NetJSON NetworkGraph
-    """
-
-    def to_representation(self, obj):
-        if self.context['request'].method == 'POST':
-            serializer = TopologySerializer(self.instance)
-            return serializer.data
-        return obj.json(dict=True)
-
-    class Meta:
-        model = Topology
-        fields = (
-            'label',
-            'organization',
-            'parser',
-            'strategy',
-            'key',
-            'expiration_time',
-            'url',
-            'published',
-        )
-        list_serializer_class = NetworkCollectionSerializer
-        extra_kwargs = {'published': {'initial': True}}
-
-
 def get_representation_data(obj):
     """
     Returns a dict that represents
@@ -98,10 +65,12 @@ def get_representation_data(obj):
     return netjson
 
 
-class NetworkGraphUpdateSerializer(
-    FilterSerializerByOrgManaged, ValidatedModelSerializer
-):
+class NetworkGraphRepresentation(object):
     def to_representation(self, obj):
+        """
+        Overriding the default represenation
+        of Topology object.
+        """
         topo_data = get_representation_data(obj)
         if obj.strategy == 'receive':
             del topo_data['url']
@@ -110,6 +79,43 @@ class NetworkGraphUpdateSerializer(
             del topo_data['expiration_time']
         return topo_data
 
+
+class TopologySerializer(NetworkGraphRepresentation, ValidatedModelSerializer):
+    class Meta:
+        model = Topology
+        fields = '__all__'
+
+
+class NetworkGraphSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
+    """
+    NetJSON NetworkGraph.
+    """
+
+    def to_representation(self, obj):
+        if self.context['request'].method == 'POST':
+            serializer = TopologySerializer(self.instance)
+            return serializer.data
+        return obj.json(dict=True)
+
+    class Meta:
+        model = Topology
+        fields = (
+            'label',
+            'organization',
+            'parser',
+            'strategy',
+            'key',
+            'expiration_time',
+            'url',
+            'published',
+        )
+        list_serializer_class = NetworkCollectionSerializer
+        extra_kwargs = {'published': {'initial': True}}
+
+
+class NetworkGraphUpdateSerializer(
+    NetworkGraphRepresentation, FilterSerializerByOrgManaged, ValidatedModelSerializer
+):
     class Meta:
         model = Topology
         fields = (
