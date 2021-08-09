@@ -92,7 +92,7 @@ class TestApi(
     def test_list_unpublished(self):
         self._unpublish()
         response = self.client.get(self.list_url)
-        self.assertEqual(len(response.data['collection']), 0)
+        self.assertEqual(len(response.data['collection']), 1)
 
     def test_detail_unpublished(self):
         self._unpublish()

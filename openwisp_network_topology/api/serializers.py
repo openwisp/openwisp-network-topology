@@ -86,7 +86,11 @@ class TopologySerializer(NetworkGraphRepresentation, ValidatedModelSerializer):
         fields = '__all__'
 
 
-class NetworkGraphSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
+class BaseSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
+    pass
+
+
+class NetworkGraphSerializer(BaseSerializer):
     """
     NetJSON NetworkGraph.
     """
@@ -113,9 +117,7 @@ class NetworkGraphSerializer(FilterSerializerByOrgManaged, ValidatedModelSeriali
         extra_kwargs = {'published': {'initial': True}}
 
 
-class NetworkGraphUpdateSerializer(
-    NetworkGraphRepresentation, FilterSerializerByOrgManaged, ValidatedModelSerializer
-):
+class NetworkGraphUpdateSerializer(NetworkGraphRepresentation, BaseSerializer):
     class Meta:
         model = Topology
         fields = (
@@ -144,9 +146,18 @@ class NetworkGraphUpdateSerializer(
         return value
 
 
-class NodeSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
-    addresses = serializers.JSONField(initial=[])
+class BaseNodeLinkSerializer(BaseSerializer):
     properties = serializers.JSONField(initial={})
+
+    def validate(self, data):
+        instance = self.instance or self.Meta.model(**data)
+        instance.full_clean()
+        data['organization'] = instance.organization
+        return data
+
+
+class NodeSerializer(BaseNodeLinkSerializer):
+    addresses = serializers.JSONField(initial=[])
     user_properties = serializers.JSONField(initial={})
 
     class Meta:
@@ -154,6 +165,7 @@ class NodeSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
         fields = (
             'id',
             'topology',
+            'organization',
             'label',
             'addresses',
             'properties',
@@ -161,17 +173,10 @@ class NodeSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
             'created',
             'modified',
         )
-        read_only_fields = ('created', 'modified')
-
-    def validate(self, data):
-        instance = self.instance or self.Meta.model(**data)
-        instance.full_clean()
-        data['organization'] = data.get('organization', instance.organization)
-        return data
+        read_only_fields = ('organization', 'created', 'modified')
 
 
-class LinkSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
-    properties = serializers.JSONField(initial={})
+class LinkSerializer(BaseNodeLinkSerializer):
     user_properties = serializers.JSONField(
         initial={},
         help_text=_('If you need to add additional data to this link use this field'),
@@ -182,6 +187,7 @@ class LinkSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
         fields = (
             'id',
             'topology',
+            'organization',
             'status',
             'source',
             'target',
@@ -192,10 +198,4 @@ class LinkSerializer(FilterSerializerByOrgManaged, ValidatedModelSerializer):
             'created',
             'modified',
         )
-        read_only_fields = ('created', 'modified')
-
-    def validate(self, data):
-        instance = self.instance or self.Meta.model(**data)
-        instance.full_clean()
-        data['organization'] = data.get('organization', instance.organization)
-        return data
+        read_only_fields = ('organization', 'created', 'modified')

@@ -62,7 +62,7 @@ class NetworkCollectionView(
     """
 
     serializer_class = NetworkGraphSerializer
-    queryset = Topology.objects.filter(published=True)
+    queryset = Topology.objects.select_related('organization')
 
     def list(self, request, *args, **kwargs):
         self.check_permissions(request)
