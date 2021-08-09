@@ -16,6 +16,7 @@ Link = swapper.load_model('topology', 'Link')
 Node = swapper.load_model('topology', 'Node')
 Snapshot = swapper.load_model('topology', 'Snapshot')
 Topology = swapper.load_model('topology', 'Topology')
+Organization = swapper.load_model('openwisp_users', 'Organization')
 OrganizationUser = swapper.load_model('openwisp_users', 'OrganizationUser')
 
 
@@ -733,3 +734,61 @@ class TestTopologyNodeLinkApi(
         path = reverse('network_graph', args=(topo.pk,))
         response = self.client.delete(path)
         self.assertEqual(response.status_code, 204)
+
+    def test_topology_filter_by_org_api(self):
+        org1 = self._create_org(name='org1')
+        org2 = self._create_org(name='org2')
+        topo1 = self._create_topology(label='topo1', organization=org1)
+        topo2 = self._create_topology(label='topo2', organization=org2)
+        user1 = self._create_user(username='test-filter', email='test@filter.com')
+        self._create_org_user(user=user1, organization=org1, is_admin=True)
+        view_perm = Permission.objects.filter(codename='view_topology')
+        user1.user_permissions.add(*view_perm)
+        self.client.force_login(user1)
+        with self.subTest('test network collection view'):
+            path = reverse('network_collection')
+            with self.assertNumQueries(7):
+                response = self.client.get(path)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(str(topo1.id), str(response.content))
+            self.assertNotIn(str(topo2.id), str(response.content))
+
+        with self.subTest('test network graph view'):
+            # Get the topology graph view of member org 200
+            path = reverse('network_graph', args=(topo1.pk,))
+            with self.assertNumQueries(7):
+                response = self.client.get(path)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['id'], str(topo1.id))
+
+            # Get the topology graph view of different org 404
+            path = reverse('network_graph', args=(topo2.pk,))
+            with self.assertNumQueries(5):
+                response = self.client.get(path)
+            self.assertEqual(response.status_code, 404)
+
+    def test_topology_filter_fields_by_org_api(self):
+        org1 = self._get_org()
+        user1 = self._create_user(username='test-filter', email='test@filter.com')
+        self._create_org_user(user=user1, organization=org1, is_admin=True)
+        topo_perm = Permission.objects.filter(codename__endswith='topology')
+        user1.user_permissions.add(*topo_perm)
+        self.client.force_login(user1)
+        with self.subTest('test network collection view'):
+            path = reverse('network_collection')
+            with self.assertNumQueries(6):
+                response = self.client.get(path, {'format': 'api'})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(Organization.objects.count(), 2)
+            self.assertContains(response, 'test org</option>')
+            self.assertNotContains(response, 'default</option>')
+
+        with self.subTest('test network graph view'):
+            topo1 = self._create_topology(label='topo1', organization=org1)
+            path = reverse('network_graph', args=(topo1.pk,))
+            with self.assertNumQueries(14):
+                response = self.client.get(path, {'format': 'api'})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(Organization.objects.count(), 2)
+            self.assertContains(response, 'test org</option>')
+            self.assertNotContains(response, 'default</option>')
