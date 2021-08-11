@@ -21,7 +21,6 @@ body.frontend {
     top: 10px;
     right: 10px;
     width: auto;
-    z-index: 10000;
 }
 
 .njg-metadata {
