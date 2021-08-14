@@ -582,6 +582,17 @@ class TestTopologyNodeLinkApi(
         self.assertEqual(response.data['label'], 'test-receive-topology')
         self.assertEqual(response.data['parser'], 'netdiff.OlsrParser')
 
+    def test_topology_detail_receive_url_api(self):
+        org1 = self._get_org()
+        topo = self._create_topology(organization=org1)
+        path = reverse('network_graph', args=(topo.pk,))
+        r_path = reverse('receive_topology', args=[topo.pk])
+        receive_url = '{0}?key={1}'.format(r_path, topo.key)
+        with self.assertNumQueries(5):
+            response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['receive_url'], receive_url)
+
     def test_topology_receive_no_key_create_api(self):
         path = reverse('network_collection')
         data = {

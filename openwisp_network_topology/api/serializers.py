@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 import swapper
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -30,6 +31,12 @@ class NetworkCollectionSerializer(serializers.ListSerializer):
         )
 
 
+def get_receive_url(pk, key):
+    path = reverse('receive_topology', args=[pk])
+    url = '{0}?key={1}'.format(path, key)
+    return url
+
+
 def get_representation_data(obj):
     """
     Returns a dict that represents
@@ -55,6 +62,7 @@ def get_representation_data(obj):
             ('url', obj.url),
             ('key', obj.key),
             ('expiration_time', obj.expiration_time),
+            ('receive_url', get_receive_url(obj.pk, obj.key)),
             ('published', obj.published),
             ('created', obj.created),
             ('modified', obj.modified),
@@ -72,11 +80,6 @@ class NetworkGraphRepresentation(object):
         of Topology object.
         """
         topo_data = get_representation_data(obj)
-        if obj.strategy == 'receive':
-            del topo_data['url']
-        if obj.strategy == 'fetch':
-            del topo_data['key']
-            del topo_data['expiration_time']
         return topo_data
 
 
