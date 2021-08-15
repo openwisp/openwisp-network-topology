@@ -587,7 +587,7 @@ class TestTopologyNodeLinkApi(
         topo = self._create_topology(organization=org1)
         path = reverse('network_graph', args=(topo.pk,))
         r_path = reverse('receive_topology', args=[topo.pk])
-        receive_url = '{0}?key={1}'.format(r_path, topo.key)
+        receive_url = 'http://testserver{0}?key={1}'.format(r_path, topo.key)
         with self.assertNumQueries(5):
             response = self.client.get(path)
         self.assertEqual(response.status_code, 200)

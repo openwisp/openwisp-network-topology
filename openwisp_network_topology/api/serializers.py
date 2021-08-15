@@ -80,6 +80,9 @@ class NetworkGraphRepresentation(object):
         of Topology object.
         """
         topo_data = get_representation_data(obj)
+        topo_data['receive_url'] = self.context['request'].build_absolute_uri(
+            topo_data['receive_url']
+        )
         return topo_data
 
 
@@ -100,7 +103,9 @@ class NetworkGraphSerializer(BaseSerializer):
 
     def to_representation(self, obj):
         if self.context['request'].method == 'POST':
-            serializer = TopologySerializer(self.instance)
+            serializer = TopologySerializer(
+                self.instance, context={'request': self.context['request']}
+            )
             return serializer.data
         return obj.json(dict=True)
 
