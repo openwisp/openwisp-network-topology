@@ -163,6 +163,20 @@ class BaseNodeLinkSerializer(BaseSerializer):
         data['organization'] = instance.organization
         return data
 
+    def validate_properties(self, value):
+        if type(value) is not dict:
+            raise serializers.ValidationError(
+                _('Value must be valid JSON or key, valued pair.')
+            )
+        return value
+
+    def validate_user_properties(self, value):
+        if type(value) is not dict:
+            raise serializers.ValidationError(
+                _('Value must be valid JSON or key, valued pair.')
+            )
+        return value
+
 
 class NodeSerializer(BaseNodeLinkSerializer):
     addresses = serializers.JSONField(initial=[])

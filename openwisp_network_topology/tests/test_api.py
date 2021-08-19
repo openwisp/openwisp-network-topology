@@ -491,6 +491,31 @@ class TestTopologyNodeLinkApi(
         self.assertEqual(response.data['source'], n1.pk)
         self.assertEqual(response.data['target'], n2.pk)
 
+    def test_link_create_with_wrong_value_format_api(self):
+        path = reverse('link_list')
+        t = self._create_topology(organization=self._get_org())
+        n1 = self._create_node(label='node1', topology=t)
+        n2 = self._create_node(label='node2', topology=t)
+        data = {
+            'topology': t.pk,
+            'source': n1.pk,
+            'target': n2.pk,
+            'cost': 1.0,
+            'properties': 0,
+            'user_properties': 122343,
+        }
+        with self.assertNumQueries(5):
+            response = self.client.post(path, data, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data['properties'][0].title(),
+            'Value Must Be Valid Json Or Key, Valued Pair.',
+        )
+        self.assertEqual(
+            response.data['user_properties'][0].title(),
+            'Value Must Be Valid Json Or Key, Valued Pair.',
+        )
+
     def test_link_detail_api(self):
         t = self._create_topology(organization=self._get_org())
         n1 = self._create_node(label='node1', topology=t)
