@@ -693,7 +693,7 @@ class TestTopologyNodeLinkApi(
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(
-            'an url must be specified when using FETCH strategy', str(response.content)
+            'An url must be specified when using FETCH strategy', str(response.content)
         )
 
     def test_change_strategy_receive_api_400(self):
@@ -711,7 +711,7 @@ class TestTopologyNodeLinkApi(
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(
-            'a key must be specified when using RECEIVE strategy', str(response.content)
+            'A key must be specified when using RECEIVE strategy', str(response.content)
         )
 
     def test_change_strategy_fetch_api_200(self):

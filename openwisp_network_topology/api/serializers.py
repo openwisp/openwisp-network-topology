@@ -79,11 +79,11 @@ class NetworkGraphRepresentation(object):
         Overriding the default represenation
         of Topology object.
         """
-        topo_data = get_representation_data(obj)
-        topo_data['receive_url'] = self.context['request'].build_absolute_uri(
-            topo_data['receive_url']
+        topology_data = get_representation_data(obj)
+        topology_data['receive_url'] = self.context['request'].build_absolute_uri(
+            topology_data['receive_url']
         )
-        return topo_data
+        return topology_data
 
 
 class TopologySerializer(NetworkGraphRepresentation, ValidatedModelSerializer):
@@ -142,14 +142,14 @@ class NetworkGraphUpdateSerializer(NetworkGraphRepresentation, BaseSerializer):
     def validate_strategy(self, value):
         if value == 'receive' and not self.initial_data.get('key'):
             raise serializers.ValidationError(
-                _('a key must be specified when using RECEIVE strategy')
+                _('A key must be specified when using RECEIVE strategy')
             )
         return value
 
     def validate_url(self, value):
         if not value and self.initial_data.get('strategy') == 'fetch':
             raise serializers.ValidationError(
-                _('an url must be specified when using FETCH strategy')
+                _('An url must be specified when using FETCH strategy')
             )
         return value
 
