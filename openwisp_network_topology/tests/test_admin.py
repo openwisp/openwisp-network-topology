@@ -265,10 +265,10 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         response = self.client.get(reverse('admin:index'))
         models = ['topology', 'node', 'link']
         for model in models:
-            with self.subTest('test admin group for {model} model'):
+            with self.subTest('test menu group link for {model} model'):
                 url = reverse(f'admin:{self.app_label}_{model}_changelist')
-                self.assertContains(response, f'<a class="mg-link" href="{url}">')
-        with self.subTest('test networking topology group is registered'):
+                self.assertContains(response, f'class="mg-link" href="{url}"')
+        with self.subTest('test "networking topology" group is registered'):
             self.assertContains(
                 response,
                 '<div class="mg-dropdown-label">Network Topology </div>',
