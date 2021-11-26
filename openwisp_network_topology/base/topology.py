@@ -129,7 +129,7 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
         return latest
 
     def diff(self, data=None):
-        """ shortcut to netdiff.diff """
+        """shortcut to netdiff.diff"""
         # if we get an instance of ``self.parser_class`` it means
         # ``self.get_topology_data`` has already been executed by ``receive``
         if isinstance(data, self.parser_class):
@@ -146,7 +146,7 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
         return self.link_set.select_related('source', 'target')
 
     def json(self, dict=False, omit_down=False, original=False, **kwargs):
-        """ returns a dict that represents a NetJSON NetworkGraph object """
+        """returns a dict that represents a NetJSON NetworkGraph object"""
         nodes = []
         links = []
         links_queryset = self.get_links_queryset()
