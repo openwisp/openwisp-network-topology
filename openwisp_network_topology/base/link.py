@@ -161,5 +161,5 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
 
     @classmethod
     def get_queryset(cls, qs):
-        """ admin list queryset """
+        """admin list queryset"""
         return qs.select_related('organization', 'topology', 'source', 'target')
