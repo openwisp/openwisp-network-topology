@@ -1,6 +1,5 @@
 # TODO set the next point release of openwisp-users when ready
 openwisp-users @ https://github.com/openwisp/openwisp-users/tarball/master
-swapper~=1.1.0
 django>=2.2,<3.2
 netdiff~=0.9.0
 jsonfield>=3.1.0,<4.0.0

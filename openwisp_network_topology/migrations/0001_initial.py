@@ -10,7 +10,9 @@ import django.db.models.deletion
 import django.utils.timezone
 import jsonfield.fields
 import model_utils.fields
+from django.conf import settings
 from django.db import migrations, models
+from swapper import dependency, get_model_name, split
 
 import openwisp_utils
 
@@ -19,7 +21,9 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [('openwisp_users', '0001_initial')]
+    dependencies = [
+        dependency(*split(settings.AUTH_USER_MODEL), version='0004_default_groups'),
+    ]
 
     operations = [
         migrations.CreateModel(
@@ -74,7 +78,7 @@ class Migration(migrations.Migration):
                     'organization',
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='openwisp_users.Organization',
+                        to=get_model_name('openwisp_users', 'Organization'),
                         verbose_name='organization',
                     ),
                 ),
@@ -124,7 +128,7 @@ class Migration(migrations.Migration):
                     'organization',
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='openwisp_users.Organization',
+                        to=get_model_name('openwisp_users', 'Organization'),
                         verbose_name='organization',
                     ),
                 ),
@@ -258,7 +262,7 @@ class Migration(migrations.Migration):
                     'organization',
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='openwisp_users.Organization',
+                        to=get_model_name('openwisp_users', 'Organization'),
                         verbose_name='organization',
                     ),
                 ),

@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.models import Permission
 from django.db import migrations
+from swapper import dependency, split
 
 
 def create_default_permissions(apps, schema_editor):
@@ -48,7 +50,7 @@ def assign_permissions_to_groups(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('openwisp_users', '0004_default_groups'),
+        dependency(*split(settings.AUTH_USER_MODEL), version='0004_default_groups'),
         ('topology', '0004_fixed_target_link_set'),
     ]
     operations = [

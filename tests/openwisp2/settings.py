@@ -76,7 +76,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'openwisp2.urls'
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
