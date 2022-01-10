@@ -1,6 +1,5 @@
-coveralls
-responses
-freezegun
+responses~=0.16.0
+freezegun~=1.1.0
 # Needed to test integrations
 openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/master
 openwisp-utils[qa] @ https://github.com/openwisp/openwisp-utils/tarball/master

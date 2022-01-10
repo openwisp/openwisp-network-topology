@@ -1,13 +1,12 @@
 import swapper
 from django import forms
-from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.db.models import Q
 from django.template.response import TemplateResponse
-from django.urls import reverse
+from django.urls import re_path, reverse
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from flat_json_widget.widgets import FlatJsonWidget
 
 from openwisp_users.multitenancy import (
@@ -142,7 +141,7 @@ class TopologyAdmin(
         options = getattr(self.model, '_meta')
         url_prefix = '{0}_{1}'.format(options.app_label, options.model_name)
         return [
-            url(
+            re_path(
                 r'^visualize/(?P<pk>[^/]+)/$',
                 self.admin_site.admin_view(self.visualize_view),
                 name='{0}_visualize'.format(url_prefix),
