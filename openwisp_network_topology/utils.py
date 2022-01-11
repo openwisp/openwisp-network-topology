@@ -1,12 +1,15 @@
 import sys
 
-from django.conf.urls import url
 from django.core.exceptions import ValidationError
 from django.dispatch import Signal
 from django.http import Http404
 from django.shortcuts import get_object_or_404 as get_obj_or_404
+from django.urls import path, re_path
 
-link_status_changed = Signal(providing_args=["link"])
+link_status_changed = Signal()
+link_status_changed.__doc__ = """
+Providing arguments: ['link']
+"""
 
 
 def print_info(message):  # pragma no cover
@@ -33,19 +36,19 @@ def get_api_urls(views_module):
     used by third party apps to reduce boilerplate
     """
     urls = [
-        url(r'^topology/$', views_module.network_collection, name='network_collection'),
-        url(
-            r'^topology/(?P<pk>[^/]+)/$',
+        path('topology/', views_module.network_collection, name='network_collection'),
+        path(
+            'topology/<uuid:pk>/',
             views_module.network_graph,
             name='network_graph',
         ),
-        url(
-            r'^topology/(?P<pk>[^/]+)/history/$',
+        path(
+            'topology/<uuid:pk>/history/',
             views_module.network_graph_history,
             name='network_graph_history',
         ),
-        url(
-            r'^topology/(?P<pk>[^/\?]+)/receive/$',
+        path(
+            'topology/<uuid:pk>/receive/',
             views_module.receive_topology,
             name='receive_topology',
         ),
@@ -58,8 +61,8 @@ def get_visualizer_urls(views_module):
     used by third party apps to reduce boilerplate
     """
     urls = [
-        url(r'^$', views_module.topology_list, name='topology_list'),
-        url(
+        path('', views_module.topology_list, name='topology_list'),
+        re_path(
             r'^topology/(?P<pk>[^/]+)/$',
             views_module.topology_detail,
             name='topology_detail',

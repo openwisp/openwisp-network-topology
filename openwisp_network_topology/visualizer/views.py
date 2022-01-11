@@ -1,7 +1,7 @@
 import swapper
 from django.http import HttpResponseForbidden
 from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from ..settings import TOPOLOGY_API_AUTH_REQUIRED, VISUALIZER_CSS

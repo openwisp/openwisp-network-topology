@@ -1,9 +1,9 @@
 import os
 
 from django.conf import settings
-from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.urls import include, path
 
 from openwisp_users.api.urls import get_api_urls
 
@@ -14,15 +14,15 @@ if os.environ.get('SAMPLE_APP', False):
 
     from .sample_network_topology.visualizer import views
 
-    urlpatterns += [url(r'^topology/', include(get_visualizer_urls(views)))]
+    urlpatterns += [path('topology/', include(get_visualizer_urls(views)))]
 
 urlpatterns += [
-    url(r'^', include('openwisp_network_topology.urls')),
+    path('', include('openwisp_network_topology.urls')),
     # needed to test integrations
-    url(r'^', include('openwisp_controller.urls')),
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/v1/', include('openwisp_utils.api.urls')),
-    url(r'^api/v1/', include(get_api_urls())),
+    path('', include('openwisp_controller.urls')),
+    path('admin/', admin.site.urls),
+    path('api/v1/', include('openwisp_utils.api.urls')),
+    path('api/v1/', include(get_api_urls())),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
@@ -31,4 +31,4 @@ urlpatterns += staticfiles_urlpatterns()
 if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
 
-    urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls))]
+    urlpatterns += [path('__debug__/', include(debug_toolbar.urls))]

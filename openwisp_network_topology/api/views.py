@@ -3,7 +3,7 @@ import logging
 
 import swapper
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from netdiff.exceptions import NetdiffException
 from rest_framework import generics
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication

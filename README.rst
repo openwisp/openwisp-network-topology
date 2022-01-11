@@ -10,9 +10,9 @@ openwisp-network-topology
    :target: https://coveralls.io/github/openwisp/openwisp-network-topology
    :alt: Test Coverage
 
-.. image:: https://requires.io/github/openwisp/openwisp-network-topology/requirements.svg?branch=master
-   :target: https://requires.io/github/openwisp/openwisp-network-topology/requirements/?branch=master
-   :alt: Requirements Status
+.. image:: https://img.shields.io/librariesio/github/openwisp/openwisp-network-topology
+   :target: https://libraries.io/github/openwisp/openwisp-network-topology#repository_dependencies
+   :alt: Dependency monitoring
 
 .. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
    :target: https://gitter.im/openwisp/general
@@ -173,8 +173,8 @@ Add the URLs to your main ``urls.py``:
 
     urlpatterns = [
         # ... other urls in your project ...
-        url(r'^', include('openwisp_network_topology.urls')),
-        url(r'admin/', admin.site.urls),
+        path('', include('openwisp_network_topology.urls')),
+        path('admin/', admin.site.urls),
     ]
 
 Then run:
@@ -910,9 +910,9 @@ Please read and replicate according to your project needs:
     urlpatterns = [
         # If you've extended visualizer views (discussed below).
         # Add visualizer views in urls.py
-        # url(r'^topology/', include(get_visualizer_urls(views))),
-        url(r'^', include('openwisp_network_topology.urls')),
-        url(r'^admin/', admin.site.urls),
+        # path('topology/', include(get_visualizer_urls(views))),
+        path('', include('openwisp_network_topology.urls')),
+        path('admin/', admin.site.urls),
     ]
 
 For more information about URL configuration in django, please refer to the
