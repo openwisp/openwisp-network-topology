@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'openwisp_controller.config',
     'openwisp_controller.connection',
     'openwisp_notifications',
+    'openwisp_ipam',
     'reversion',
     'sortedm2m',
     'flat_json_widget',
