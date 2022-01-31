@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from netdiff import NetJsonParser, diff
 from rest_framework.utils.encoders import JSONEncoder
 
-from openwisp_users.mixins import OrgMixin
+from openwisp_users.mixins import ShareableOrgMixin
 from openwisp_utils.base import KeyField, TimeStampedEditableModel
 
 from ..contextmanagers import log_failure
@@ -22,7 +22,7 @@ from ..utils import print_info
 STRATEGIES = (('fetch', _('FETCH')), ('receive', _('RECEIVE')))
 
 
-class AbstractTopology(OrgMixin, TimeStampedEditableModel):
+class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
 
     label = models.CharField(_('label'), max_length=64)
     parser = models.CharField(

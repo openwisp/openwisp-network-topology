@@ -13,14 +13,14 @@ from model_utils import Choices
 from model_utils.fields import StatusField
 from rest_framework.utils.encoders import JSONEncoder
 
-from openwisp_users.mixins import OrgMixin
+from openwisp_users.mixins import ShareableOrgMixin
 from openwisp_utils.base import TimeStampedEditableModel
 
 from .. import settings as app_settings
 from ..utils import link_status_changed, print_info
 
 
-class AbstractLink(OrgMixin, TimeStampedEditableModel):
+class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
     """
     NetJSON NetworkGraph Link Object implementation
     """
@@ -76,7 +76,7 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
         return '{0} - {1}'.format(self.source.get_name(), self.target.get_name())
 
     def full_clean(self, *args, **kwargs):
-        self.organization = self.topology.organization
+        self.validate_organization()
         self.validate_topology()
         return super().full_clean(*args, **kwargs)
 
@@ -98,6 +98,18 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
             errors['target'] = _('Target node and link should have same topology.')
         if errors:
             raise ValidationError(errors)
+
+    def validate_organization(self):
+        if self.source.organization_id == self.target.organization_id:
+            self.organization_id = self.source.organization_id
+        elif self.topology.organization_id is None:
+            # Link is shared between two organizations.
+            self.organization = None
+        else:
+            # Link cannot be shared if topology is not shared.
+            raise ValidationError(
+                _('source and target nodes should belong to same organization.')
+            )
 
     def json(self, dict=False, original=False, **kwargs):
         """

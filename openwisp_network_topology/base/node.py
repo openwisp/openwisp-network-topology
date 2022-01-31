@@ -11,14 +11,14 @@ from django.utils.translation import gettext_lazy as _
 from jsonfield import JSONField
 from rest_framework.utils.encoders import JSONEncoder
 
-from openwisp_users.mixins import OrgMixin
+from openwisp_users.mixins import ShareableOrgMixin
 from openwisp_utils.base import TimeStampedEditableModel
 
 from .. import settings as app_settings
 from ..utils import print_info
 
 
-class AbstractNode(OrgMixin, TimeStampedEditableModel):
+class AbstractNode(ShareableOrgMixin, TimeStampedEditableModel):
     """
     NetJSON NetworkGraph Node Object implementation
     """
@@ -51,11 +51,10 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
         return self.name
 
     def full_clean(self, *args, **kwargs):
-        self.organization = self.topology.organization
+        self.organization_id = self.get_organization_id()
         return super().full_clean(*args, **kwargs)
 
     def clean(self):
-
         if self.properties is None:
             self.properties = {}
 
@@ -82,6 +81,17 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
         from other sources (e.g: device name in openwisp-controller)
         """
         return self.name
+
+    def get_organization_id(self):
+        """
+        May be overridden/monkey patched to get the node organization
+        from other sources (e.g: device organization_id in openwisp-controller)
+        """
+        # If topology is not shared, node will get the organization
+        # of the topology.
+        if self.topology.organization_id is None:
+            return self.organization_id
+        return self.topology.organization_id
 
     def json(self, dict=False, original=False, **kwargs):
         """

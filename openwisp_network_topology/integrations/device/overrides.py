@@ -11,6 +11,12 @@ def get_name(self):
     return super(Node, self).get_name()
 
 
+def node_get_organization_id(self):
+    if hasattr(self, 'devicenode'):
+        return self.devicenode.device.organization_id
+    return super(Node, self).get_organization_id()
+
+
 def topology_get_nodes_queryset(self):
     """
     Overrides Topology.get_nodes_queryset
@@ -97,6 +103,7 @@ def link_get_queryset(cls, qs):
 
 
 Node.get_name = get_name
+Node.get_organization = node_get_organization_id
 Node.get_queryset = node_get_queryset
 Link.get_queryset = link_get_queryset
 Topology.get_nodes_queryset = topology_get_nodes_queryset
