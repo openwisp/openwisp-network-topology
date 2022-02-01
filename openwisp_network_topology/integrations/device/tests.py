@@ -14,10 +14,8 @@ from openwisp_controller.config.tests.utils import (
     TestVpnX509Mixin,
 )
 
-from openwisp_network_topology.tests.utils import (
-    CreateGraphObjectsMixin,
-    CreateOrgMixin,
-)
+from openwisp_network_topology.tests.utils import CreateGraphObjectsMixin
+from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.admin_theme.dashboard import DASHBOARD_CHARTS, DASHBOARD_TEMPLATES
 from openwisp_utils.admin_theme.menu import MENU
 
@@ -36,19 +34,21 @@ Cert = swapper.load_model('pki', 'Cert')
 
 
 class Base(
-    TestVpnX509Mixin, CreateConfigTemplateMixin, CreateGraphObjectsMixin, CreateOrgMixin
+    TestVpnX509Mixin,
+    CreateConfigTemplateMixin,
+    CreateGraphObjectsMixin,
+    TestOrganizationMixin,
 ):
     topology_model = Topology
     node_model = Node
 
-    def _get_org(self):
-        org = Organization.objects.first()
-        if not org:
-            return Organization.objects.create(name='default', slug='default')
-        return org
-
     def _init_test_node(
-        sel, topology, addresses=None, label='test', common_name=None, create=True
+        self,
+        topology,
+        addresses=None,
+        label='test',
+        common_name=None,
+        create=True,
     ):
         if not addresses:
             addresses = ['netjson_id']
@@ -249,6 +249,53 @@ class TestControllerIntegration(Base, TransactionTestCase):
         call_command('create_device_nodes')
         qs = DeviceNode.objects.filter(node=n)
         self.assertEqual(qs.count(), 1)
+
+    def test_shared_topology_org_devices(self):
+        org1 = self._create_org(name='org1')
+        org2 = self._create_org(name='org2')
+        shared_topology = self._create_topology(
+            organization=None, parser='netdiff.OpenvpnParser'
+        )
+        shared_vpn = self._create_vpn(name='test VPN', organization=None)
+        self._create_template(
+            name='VPN',
+            type='vpn',
+            vpn=shared_vpn,
+            config=shared_vpn.auto_client(),
+            default=True,
+            organization=None,
+        )
+        org1_device = self._create_device(organization=org1)
+        self._create_config(device=org1_device)
+        org1_cert_common_name = (
+            org1_device.config.vpnclient_set.first().cert.common_name
+        )
+        org2_device = self._create_device(organization=org2)
+        self._create_config(device=org2_device)
+        org2_cert_common_name = (
+            org2_device.config.vpnclient_set.first().cert.common_name
+        )
+
+        openvpn_status = (
+            'OpenVPN CLIENT LIST\n'
+            'Updated,Sun Oct  8 19:46:06 2017\n'
+            'Common Name,Real Address,Bytes Received,Bytes Sent,Connected Since\n'
+            f'{org1_cert_common_name},87.7.9.213:56857,417209,6046898,Sun Oct  8 08:39:11 2017\n'
+            f'{org2_cert_common_name},2.226.154.66:52091,6020304,444463,Sun Oct  8 08:39:10 2017\n'
+            'ROUTING TABLE\n'
+            'Virtual Address,Common Name,Real Address,Last Ref\n'
+            f'9e:c2:f2:55:f4:33,{org1_cert_common_name},87.7.9.213:56857,Sun Oct  8 19:45:37 2017\n'
+            f'46:8a:69:e7:46:24,{org2_cert_common_name},2.226.154.66:52091,Sun Oct  8 19:45:37 2017\n'
+            'GLOBAL STATS\n'
+            'Max bcast/mcast queue length,6\n'
+            'END'
+        )
+        shared_topology.receive(openvpn_status)
+        self.assertEqual(DeviceNode.objects.count(), 2)
+        org1_node = DeviceNode.objects.get(device=org1_device).node
+        org2_node = DeviceNode.objects.get(device=org2_device).node
+        self.assertEqual(org1_node.organization, org1)
+        self.assertEqual(org2_node.organization, org2)
 
 
 class TestMonitoringIntegration(Base, TransactionTestCase):

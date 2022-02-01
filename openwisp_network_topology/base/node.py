@@ -4,6 +4,7 @@ from copy import deepcopy
 from datetime import timedelta
 
 import swapper
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -87,11 +88,20 @@ class AbstractNode(ShareableOrgMixin, TimeStampedEditableModel):
         May be overridden/monkey patched to get the node organization
         from other sources (e.g: device organization_id in openwisp-controller)
         """
-        # If topology is not shared, node will get the organization
-        # of the topology.
-        if self.topology.organization_id is None:
+        # Node will get organization of topology if it is unspecified.
+        if self.organization_id is None:
+            return self.topology.organization_id
+        else:
+            # Non-shared node can belong to shared topology. But,
+            # a shared node cannot belong to non-shared topology.
+            if (
+                self.topology.organization_id is not None
+                and self.topology.organization_id != self.organization_id
+            ):
+                raise ValidationError(
+                    _('node should have same organization as topology.')
+                )
             return self.organization_id
-        return self.topology.organization_id
 
     def json(self, dict=False, original=False, **kwargs):
         """

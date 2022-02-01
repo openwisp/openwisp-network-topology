@@ -56,12 +56,14 @@ class AbstractDeviceNode(UUIDModel):
             return
 
         Device = load_model('config', 'Device')
+        device_filter = models.Q(config__vpnclient__cert__common_name=common_name)
+        if node.organization_id:
+            device_filter &= models.Q(organization_id=node.organization_id)
         device = (
-            Device.objects.only('id', 'name', 'last_ip', 'management_ip')
-            .filter(
-                organization_id=node.organization_id,
-                config__vpnclient__cert__common_name=common_name,
+            Device.objects.only(
+                'id', 'name', 'last_ip', 'management_ip', 'organization_id'
             )
+            .filter(device_filter)
             .first()
         )
         if not device:
@@ -71,6 +73,11 @@ class AbstractDeviceNode(UUIDModel):
         try:
             device_node.full_clean()
             device_node.save()
+            # Update organization of the node. This is required
+            # when topology is shared.
+            if node.organization_id is None:
+                node.organization_id = device.organization_id
+                node.save(update_fields=['organization_id'])
         except Exception:
             logger.exception('Exception raised during auto_create_openvpn')
             return
