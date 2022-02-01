@@ -2,13 +2,13 @@
 
 import django.db.models.deletion
 from django.db import migrations, models
+from swapper import get_model_name
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('openwisp_users', '0017_user_language'),
-        ('topology', '0013_add_user_defined_properties_field'),
+        ('topology', '0014_remove_snapshot_organization'),
     ]
 
     operations = [
@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='openwisp_users.organization',
+                to=get_model_name('openwisp_users', 'Organization'),
                 verbose_name='organization',
             ),
         ),
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='openwisp_users.organization',
+                to=get_model_name('openwisp_users', 'Organization'),
                 verbose_name='organization',
             ),
         ),
@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='openwisp_users.organization',
+                to=get_model_name('openwisp_users', 'Organization'),
                 verbose_name='organization',
             ),
         ),
