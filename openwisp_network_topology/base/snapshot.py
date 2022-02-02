@@ -2,11 +2,10 @@ import swapper
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from openwisp_users.mixins import OrgMixin
 from openwisp_utils.base import TimeStampedEditableModel
 
 
-class AbstractSnapshot(OrgMixin, TimeStampedEditableModel):
+class AbstractSnapshot(TimeStampedEditableModel):
     """
     NetJSON NetworkGraph Snapshot implementation
     """
