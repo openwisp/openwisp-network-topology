@@ -196,14 +196,6 @@ class Migration(migrations.Migration):
                 ('date', models.DateField(auto_now=True)),
                 ('details', models.CharField(blank=True, max_length=64, null=True)),
                 (
-                    'organization',
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to=get_model_name('openwisp_users', 'Organization'),
-                        verbose_name='organization',
-                    ),
-                ),
-                (
                     'topology',
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,

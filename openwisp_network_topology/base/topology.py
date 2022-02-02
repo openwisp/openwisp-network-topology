@@ -313,7 +313,7 @@ class AbstractTopology(OrgMixin, TimeStampedEditableModel):
         """
         Snapshot = self.snapshot_model
         date = datetime.now().date()
-        options = dict(organization=self.organization, topology=self, date=date)
+        options = dict(topology=self, date=date)
         options.update(kwargs)
         try:
             s = Snapshot.objects.get(**options)
