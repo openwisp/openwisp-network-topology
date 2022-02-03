@@ -100,16 +100,31 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
             raise ValidationError(errors)
 
     def validate_organization(self):
-        if self.source.organization_id == self.target.organization_id:
-            self.organization_id = self.source.organization_id
-        elif self.topology.organization_id is None:
-            # Link is shared between two organizations.
-            self.organization = None
+        if self.topology.organization_id is None:
+            # Shared link is only created between nodes of
+            # two different organizations.
+            if self.source.organization_id == self.target.organization_id:
+                self.organization_id = self.source.organization_id
+            else:
+                self.organization_id = None
         else:
-            # Link cannot be shared if topology is not shared.
-            raise ValidationError(
-                _('source and target nodes should belong to same organization.')
-            )
+            if self.source.organization_id != self.topology.organization_id:
+                raise ValidationError(
+                    {
+                        'source': _(
+                            'Source node and topology should have same organization.'
+                        )
+                    }
+                )
+            if self.target.organization_id != self.topology.organization_id:
+                raise ValidationError(
+                    {
+                        'target': _(
+                            'Target node and topology should have same organization.'
+                        )
+                    }
+                )
+            self.organization_id = self.topology.organization_id
 
     def json(self, dict=False, original=False, **kwargs):
         """

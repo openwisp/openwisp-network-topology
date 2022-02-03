@@ -1,6 +1,5 @@
 from unittest import mock
 
-import django
 import swapper
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -94,10 +93,9 @@ class Base(
 class TestControllerIntegration(Base, TransactionTestCase):
     def test_auto_create_openvpn(self):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
-        expected_queries = 12 if django.VERSION[0:2] >= (3, 0) else 14
         self.assertEqual(DeviceNode.objects.count(), 0)
         with self.subTest('assert number of queries'):
-            with self.assertNumQueries(expected_queries):
+            with self.assertNumQueries(13):
                 node = self._init_test_node(topology, common_name=cert.common_name)
         self.assertEqual(DeviceNode.objects.count(), 1)
         device_node = DeviceNode.objects.first()
@@ -231,6 +229,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
     def test_node_label_override(self):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
         node = self._init_test_node(topology, common_name=cert.common_name)
+        node.refresh_from_db()
         self.assertEqual(node.get_name(), device.name)
 
     def test_topology_json(self):
@@ -295,7 +294,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         org1_node = DeviceNode.objects.get(device=org1_device).node
         org2_node = DeviceNode.objects.get(device=org2_device).node
         self.assertEqual(org1_node.organization, org1)
-        self.assertEqual(org2_node.organization, org2)
+        self.assertEqual(org2_node.get_organization_id(), org2.id)
 
 
 class TestMonitoringIntegration(Base, TransactionTestCase):

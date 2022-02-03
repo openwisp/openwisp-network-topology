@@ -103,7 +103,7 @@ def link_get_queryset(cls, qs):
 
 
 Node.get_name = get_name
-Node.get_organization = node_get_organization_id
+Node.get_organization_id = node_get_organization_id
 Node.get_queryset = node_get_queryset
 Link.get_queryset = link_get_queryset
 Topology.get_nodes_queryset = topology_get_nodes_queryset
