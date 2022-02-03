@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from openwisp_users.tests.utils import TestMultitenantAdminMixin, TestOrganizationMixin
+from openwisp_utils.tests import capture_any_output
 
 from ..admin import TopologyAdmin
 from .utils import CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin
@@ -83,6 +84,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         self.assertEqual(self.node_model.objects.count(), 2)
         self.assertEqual(self.link_model.objects.count(), 1)
 
+    @capture_any_output()
     @responses.activate
     def test_update_selected_failed(self):
         t = self.topology_model.objects.first()
