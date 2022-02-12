@@ -3,6 +3,7 @@ from unittest import mock
 import django
 import swapper
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import transaction
 from django.test import TransactionTestCase
@@ -310,8 +311,6 @@ class TestAdmin(Base, TransactionTestCase):
         return 'admin:{0}'.format(self.app_label)
 
     def setUp(self):
-        org = self._create_org()
-        t = self._create_topology(organization=org)
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
         node1 = self._init_test_node(topology, common_name=cert.common_name)
         node2 = self._init_test_node(topology, addresses=['netjson_id2'], label='test2')
@@ -324,7 +323,7 @@ class TestAdmin(Base, TransactionTestCase):
         )
         link.full_clean()
         link.save()
-        self._create_link(topology=t, source=node1, target=node2)
+        self._create_link(topology=topology, source=node1, target=node2)
         self.client.force_login(self.user_model.objects.get(username='admin'))
 
     def test_node_change_list_queries(self):
@@ -336,3 +335,23 @@ class TestAdmin(Base, TransactionTestCase):
         path = reverse('{0}_link_changelist'.format(self.prefix))
         with self.assertNumQueries(7):
             self.client.get(path)
+
+    def test_link_node_different_topology(self):
+        Topology.objects.all().delete()
+        org = self._create_org()
+        topology1 = self._create_topology(organization=org)
+        topology2 = self._create_topology(organization=org)
+        node1 = self._init_test_node(topology2)
+        node2 = self._init_test_node(topology2)
+        link = Link(
+            source=node1,
+            target=node2,
+            topology=topology1,
+            organization=topology1.organization,
+            cost=1,
+        )
+        with self.assertRaises(ValidationError) as context:
+            # Raises ValidationError if link belongs to diff topologies
+            link.full_clean()
+        self.assertIn('source', context.exception.error_dict)
+        self.assertIn('target', context.exception.error_dict)

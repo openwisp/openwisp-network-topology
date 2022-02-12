@@ -77,6 +77,7 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
 
     def full_clean(self, *args, **kwargs):
         self.organization = self.topology.organization
+        self.validate_topology()
         return super().full_clean(*args, **kwargs)
 
     def clean(self):
@@ -88,6 +89,15 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
         for attr in ['status', 'status_changed', 'modified', 'created']:
             if attr in self.properties:
                 del self.properties[attr]
+
+    def validate_topology(self):
+        errors = {}
+        if self.source.topology_id != self.topology_id:
+            errors['source'] = _('Source node and link should have same topology.')
+        if self.target.topology_id != self.topology_id:
+            errors['target'] = _('Target node and link should have same topology.')
+        if errors:
+            raise ValidationError(errors)
 
     def json(self, dict=False, original=False, **kwargs):
         """
