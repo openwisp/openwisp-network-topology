@@ -337,6 +337,7 @@ class TestAdmin(Base, TransactionTestCase):
             self.client.get(path)
 
     def test_link_node_different_topology(self):
+        Topology.objects.all().delete()
         org = self._create_org()
         topology1 = self._create_topology(organization=org)
         topology2 = self._create_topology(organization=org)
@@ -347,7 +348,10 @@ class TestAdmin(Base, TransactionTestCase):
             target=node2,
             topology=topology1,
             organization=topology1.organization,
+            cost=1,
         )
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(ValidationError) as context:
             # Raises ValidationError if link belongs to diff topologies
             link.full_clean()
+        self.assertIn('source', context.exception.error_dict)
+        self.assertIn('target', context.exception.error_dict)

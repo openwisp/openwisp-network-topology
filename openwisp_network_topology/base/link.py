@@ -91,14 +91,13 @@ class AbstractLink(OrgMixin, TimeStampedEditableModel):
                 del self.properties[attr]
 
     def validate_topology(self):
+        errors = {}
         if self.source.topology_id != self.topology_id:
-            raise ValidationError(
-                {'source': _('Source node and link should have same topology.')}
-            )
+            errors['source'] = _('Source node and link should have same topology.')
         if self.target.topology_id != self.topology_id:
-            raise ValidationError(
-                {'target': _('Target node and link should have same topology.')}
-            )
+            errors['target'] = _('Target node and link should have same topology.')
+        if errors:
+            raise ValidationError(errors)
 
     def json(self, dict=False, original=False, **kwargs):
         """
