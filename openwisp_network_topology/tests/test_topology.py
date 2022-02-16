@@ -7,6 +7,8 @@ from django.test import TestCase
 from freezegun import freeze_time
 from netdiff import OlsrParser
 
+from openwisp_utils.tests import capture_any_output
+
 from .utils import CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin
 
 Link = swapper.load_model('topology', 'Link')
@@ -506,6 +508,7 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         self.assertEqual(t.node_set.all().count(), 13)
         self.assertEqual(t.link_set.all().count(), 11)
 
+    @capture_any_output()
     def test_update_added_items_regression_74_first(self):
         t = self._set_receive(parser='netdiff.OpenvpnParser')
         t.save()
