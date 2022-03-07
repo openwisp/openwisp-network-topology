@@ -286,17 +286,12 @@ class TestMultitenantAdmin(
     node_model = Node
     link_model = Link
 
-    operator_permission_filters = [
-        {'codename__endswith': 'topology'},
-        {'codename__endswith': 'node'},
-        {'codename__endswith': 'link'},
-    ]
-
     def _create_multitenancy_test_env(self):
         org1 = self._create_org(name='test1org')
         org2 = self._create_org(name='test2org')
         inactive = self._create_org(name='inactive-org', is_active=False)
         operator = self._create_operator(organizations=[org1, inactive])
+        administrator = self._create_administrator(organizations=[org1, inactive])
         t1 = self._create_topology(label='topology1org', organization=org1)
         t2 = self._create_topology(label='topology2org', organization=org2)
         t3 = self._create_topology(label='topology3org', organization=inactive)
@@ -332,6 +327,7 @@ class TestMultitenantAdmin(
             org2=org2,
             inactive=inactive,
             operator=operator,
+            administrator=administrator,
         )
         return data
 
@@ -354,6 +350,7 @@ class TestMultitenantAdmin(
             visible=[data['org1'].name],
             hidden=[data['org2'].name, data['inactive']],
             select_widget=True,
+            administrator=True,
         )
 
     def test_node_queryset(self):
