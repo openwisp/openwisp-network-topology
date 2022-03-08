@@ -252,7 +252,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
 
 
 class TestMonitoringIntegration(Base, TransactionTestCase):
-    @mock.patch('openwisp_monitoring.monitoring.apps.MonitoringConfig.create_database')
+    @mock.patch('openwisp_monitoring.db.timeseries_db.create_database')
     @mock.patch('openwisp_monitoring.device.utils.manage_short_retention_policy')
     @mock.patch('openwisp_notifications.types.NOTIFICATION_TYPES', dict())
     def test_monitoring_integration(self, *args):
