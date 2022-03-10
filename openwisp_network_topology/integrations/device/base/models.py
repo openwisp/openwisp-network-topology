@@ -109,7 +109,7 @@ class AbstractDeviceNode(UUIDModel):
         addresses = self.node.addresses
         try:
             address = ip_address(addresses[1])
-        except (KeyError, ValueError) as e:
+        except (IndexError, ValueError) as e:
             addresses = ', '.join(addresses)
             logger.warning(
                 f'{e.__class__.__name__} raised while processing addresses: {addresses}'

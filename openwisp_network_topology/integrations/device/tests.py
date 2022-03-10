@@ -217,12 +217,29 @@ class TestControllerIntegration(Base, TransactionTestCase):
         )
         link.full_clean()
         link.save()
-        link.status = 'up'
+
+        with self.subTest('Test invalid addresses'):
+            link.status = 'up'
+            link.save()
+            logger_warning.assert_called_once()
+            logger_warning.assert_called_with(
+                'ValueError raised while processing addresses: netjson_id, not_an_ip'
+            )
+
+        link.status = 'down'
         link.save()
-        logger_warning.assert_called_once()
-        logger_warning.assert_called_with(
-            'ValueError raised while processing addresses: netjson_id, not_an_ip'
-        )
+        logger_warning.reset_mock()
+
+        with self.subTest('Test disconnected nodes'):
+            node.addresses = ['10.0.0.1']
+            node.save()
+            link.status = 'up'
+            link.save()
+            logger_warning.assert_called_once()
+            logger_warning.assert_called_with(
+                'IndexError raised while processing addresses: 10.0.0.1'
+            )
+
         device.refresh_from_db()
         self.assertIsNone(device.management_ip)
 
