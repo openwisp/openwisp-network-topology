@@ -280,9 +280,7 @@ class TestApi(
             self._test_api_with_not_permitted_user(user, self.list_url)
 
         with self.subTest('test api with not a member user'):
-            self._test_api_with_not_a_manager_user(
-                user, self.list_url, has_detail=False
-            )
+            self._test_api_with_not_a_manager_user(user, self.list_url)
 
     def test_detail_with_auth_enabled(self):
         user = self._create_user(username='detail-user', email='detail@email.com')
