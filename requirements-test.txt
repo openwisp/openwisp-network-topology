@@ -3,4 +3,3 @@ freezegun~=1.1.0
 # Needed to test integrations
 openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/master
 openwisp-utils[qa] @ https://github.com/openwisp/openwisp-utils/tarball/master
-openwisp-users @ https://github.com/openwisp/openwisp-users/tarball/issues/238-api-view-shared-objects
