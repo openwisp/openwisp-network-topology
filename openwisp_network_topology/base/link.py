@@ -108,8 +108,9 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
             else:
                 self.organization_id = None
         else:
+            errors = {}
             if self.source.organization_id != self.topology.organization_id:
-                raise ValidationError(
+                errors.update(
                     {
                         'source': _(
                             'Source node and topology should have same organization.'
@@ -117,13 +118,15 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
                     }
                 )
             if self.target.organization_id != self.topology.organization_id:
-                raise ValidationError(
+                errors.update(
                     {
                         'target': _(
                             'Target node and topology should have same organization.'
                         )
                     }
                 )
+            if errors:
+                raise ValidationError(errors)
             self.organization_id = self.topology.organization_id
 
     def json(self, dict=False, original=False, **kwargs):

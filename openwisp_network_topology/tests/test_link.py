@@ -160,21 +160,6 @@ class TestLink(TestOrganizationMixin, CreateGraphObjectsMixin, TestCase):
             # Test source node
             link = self.link_model(
                 source=org2_node1,
-                target=org1_node1,
-                cost=1.0,
-                cost_text='100mbit/s',
-                topology=org1_topology,
-            )
-            with self.assertRaises(ValidationError) as context_manager:
-                link.full_clean()
-            expected_error = 'Source node and topology should have same organization.'
-            self.assertIn(
-                expected_error, context_manager.exception.message_dict['source']
-            )
-
-            # Test target node
-            link = self.link_model(
-                source=org1_node1,
                 target=org2_node1,
                 cost=1.0,
                 cost_text='100mbit/s',
@@ -182,9 +167,17 @@ class TestLink(TestOrganizationMixin, CreateGraphObjectsMixin, TestCase):
             )
             with self.assertRaises(ValidationError) as context_manager:
                 link.full_clean()
-            expected_error = 'Target node and topology should have same organization.'
+            source_expected_error = (
+                'Source node and topology should have same organization.'
+            )
+            target_expected_error = (
+                'Target node and topology should have same organization.'
+            )
             self.assertIn(
-                expected_error, context_manager.exception.message_dict['target']
+                source_expected_error, context_manager.exception.message_dict['source']
+            )
+            self.assertIn(
+                target_expected_error, context_manager.exception.message_dict['target']
             )
 
         with self.subTest('Test link gets organization of non-shared topology'):

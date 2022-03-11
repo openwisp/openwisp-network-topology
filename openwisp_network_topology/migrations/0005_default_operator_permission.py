@@ -38,6 +38,7 @@ def assign_permissions_to_groups(apps, schema_editor):
         try:
             permission = Permission.objects.get(codename="view_{}".format(model_name))
             operator.permissions.add(permission.pk)
+            admin.permissions.add(permission.pk)
         except Permission.DoesNotExist:
             pass
         for operation in manage_operations:
