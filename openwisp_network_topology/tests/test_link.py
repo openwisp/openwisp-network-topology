@@ -2,17 +2,18 @@ import swapper
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.tests import catch_signal
 
 from ..utils import link_status_changed
-from .utils import CreateGraphObjectsMixin, CreateOrgMixin
+from .utils import CreateGraphObjectsMixin
 
 Link = swapper.load_model('topology', 'Link')
 Node = swapper.load_model('topology', 'Node')
 Topology = swapper.load_model('topology', 'Topology')
 
 
-class TestLink(CreateOrgMixin, CreateGraphObjectsMixin, TestCase):
+class TestLink(TestOrganizationMixin, CreateGraphObjectsMixin, TestCase):
     topology_model = Topology
     node_model = Node
     link_model = Link
@@ -142,14 +143,103 @@ class TestLink(CreateOrgMixin, CreateGraphObjectsMixin, TestCase):
         )
         self.assertEqual(link.status, 'down')
 
-    def test_link_auto_org(self):
-        t = self.topology_model.objects.first()
-        node1, node2 = self._get_nodes()
-        link = self.link_model(
-            source=node1, target=node2, cost=1.0, cost_text='100mbit/s', topology=t
+    def test_validate_organization(self):
+        org1 = self._get_org()
+        org1_topology = self.topology_model.objects.first()
+        org1_node1, org1_node2 = self._get_nodes()
+        shared_topology = self._create_topology(label='shared', organization=None)
+        org2 = self._create_org(name='org2')
+        org2_node1 = self._create_node(
+            label='org2_node1',
+            addresses=['192.168.0.3'],
+            topology=shared_topology,
+            organization=org2,
         )
-        link.full_clean()
-        self.assertEqual(link.organization, t.organization)
+
+        with self.subTest('Test toplogy and nodes belongs to different organizations'):
+            # Test source node
+            link = self.link_model(
+                source=org2_node1,
+                target=org2_node1,
+                cost=1.0,
+                cost_text='100mbit/s',
+                topology=org1_topology,
+            )
+            with self.assertRaises(ValidationError) as context_manager:
+                link.full_clean()
+            source_expected_error = (
+                'Source node and topology should have same organization.'
+            )
+            target_expected_error = (
+                'Target node and topology should have same organization.'
+            )
+            self.assertIn(
+                source_expected_error, context_manager.exception.message_dict['source']
+            )
+            self.assertIn(
+                target_expected_error, context_manager.exception.message_dict['target']
+            )
+
+        with self.subTest('Test link gets organization of non-shared topology'):
+            link = self.link_model(
+                source=org1_node1,
+                target=org1_node2,
+                cost=1.0,
+                cost_text='100mbit/s',
+                topology=org1_topology,
+            )
+            link.full_clean()
+            self.assertEqual(link.organization, org1_topology.organization)
+
+        with self.subTest('Test non-shared link of shared topology'):
+            # Since source and target nodes belong to the same organization,
+            # link will get organization of the nodes
+            source_node = self._create_node(
+                label='org1_node1_shared_topology',
+                addresses=['10.0.0.1'],
+                topology=shared_topology,
+                organization=org1,
+            )
+            target_node = self._create_node(
+                label='org1_node2_shared_topology',
+                addresses=['10.0.0.2'],
+                topology=shared_topology,
+                organization=org1,
+            )
+            link = self.link_model(
+                source=source_node,
+                target=target_node,
+                cost=1.0,
+                cost_text='100mbit/s',
+                topology=shared_topology,
+            )
+            link.full_clean()
+            self.assertEqual(link.organization, org1)
+
+        with self.subTest('Test shared link of shared topology'):
+            # Since source and target nodes belongs to different organizations,
+            # link will be shared.
+            source_node = self._create_node(
+                label='org1_node1_shared_topology',
+                addresses=['10.0.0.3'],
+                topology=shared_topology,
+                organization=org1,
+            )
+            target_node = self._create_node(
+                label='org2_node1_shared_topology',
+                addresses=['10.0.0.4'],
+                topology=shared_topology,
+                organization=org2,
+            )
+            link = self.link_model(
+                source=source_node,
+                target=target_node,
+                cost=1.0,
+                cost_text='100mbit/s',
+                topology=shared_topology,
+            )
+            link.full_clean()
+            self.assertEqual(link.organization, None)
 
     def test_user_properties_in_json(self):
         t = self.topology_model.objects.first()

@@ -1,20 +1,23 @@
 import swapper
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from rest_framework.utils.encoders import JSONEncoder
 
-from .utils import CreateGraphObjectsMixin, CreateOrgMixin
+from openwisp_users.tests.utils import TestOrganizationMixin
+
+from .utils import CreateGraphObjectsMixin
 
 Node = swapper.load_model('topology', 'Node')
 Topology = swapper.load_model('topology', 'Topology')
 
 
-class TestNode(CreateGraphObjectsMixin, CreateOrgMixin, TestCase):
+class TestNode(CreateGraphObjectsMixin, TestOrganizationMixin, TestCase):
     topology_model = Topology
     node_model = Node
     maxDiff = 0
 
     def setUp(self):
-        org = self._create_org()
+        org = self._get_org()
         t = self._create_topology(organization=org)
         self._create_node(
             label='node1', addresses=['192.168.0.1'], topology=t, organization=org
@@ -157,3 +160,57 @@ class TestNode(CreateGraphObjectsMixin, CreateOrgMixin, TestCase):
             data = n.json(dict=True, original=True)
             self.assertIn('gateway', data['properties'])
             self.assertNotIn('user_property', data['properties'])
+
+    def test_get_organization(self):
+        org = self._get_org()
+        org_topology = Topology.objects.first()
+        shared_topology = self._create_topology(
+            label='Shared Topology', organization=None
+        )
+
+        with self.subTest('Shared nodes can belong to shared topology'):
+            try:
+                shared_node = self._create_node(
+                    label='shared_node',
+                    addresses=['192.168.0.6'],
+                    topology=shared_topology,
+                    organization=None,
+                )
+            except ValidationError:
+                self.fail('Shared topology failed to include shared node.')
+            shared_node.refresh_from_db()
+            self.assertEqual(shared_node.organization, None)
+
+        with self.subTest('Non-shared nodes can belong to shared topology'):
+            try:
+                org_node = self._create_node(
+                    label='org_node',
+                    addresses=['192.168.0.7'],
+                    topology=shared_topology,
+                    organization=org,
+                )
+            except ValidationError:
+                self.fail('Shared topology failed to include non-shared node.')
+            org_node.refresh_from_db()
+            self.assertEqual(org_node.organization, org)
+
+        with self.subTest('Node gets organization of non-shared topology'):
+            node = self._create_node(
+                label='node',
+                addresses=['192.168.0.8'],
+                topology=org_topology,
+                organization=None,
+            )
+            node.refresh_from_db()
+            self.assertEqual(node.organization, org)
+
+        with self.subTest(
+            'ValidationError on different organization node and topology'
+        ):
+            with self.assertRaises(ValidationError):
+                self._create_node(
+                    label='node',
+                    addresses=['192.168.0.9'],
+                    topology=org_topology,
+                    organization=self._get_org('default'),
+                )

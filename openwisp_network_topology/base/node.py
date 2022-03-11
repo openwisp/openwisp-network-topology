@@ -4,6 +4,7 @@ from copy import deepcopy
 from datetime import timedelta
 
 import swapper
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -11,14 +12,14 @@ from django.utils.translation import gettext_lazy as _
 from jsonfield import JSONField
 from rest_framework.utils.encoders import JSONEncoder
 
-from openwisp_users.mixins import OrgMixin
+from openwisp_users.mixins import ShareableOrgMixin
 from openwisp_utils.base import TimeStampedEditableModel
 
 from .. import settings as app_settings
 from ..utils import print_info
 
 
-class AbstractNode(OrgMixin, TimeStampedEditableModel):
+class AbstractNode(ShareableOrgMixin, TimeStampedEditableModel):
     """
     NetJSON NetworkGraph Node Object implementation
     """
@@ -51,11 +52,10 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
         return self.name
 
     def full_clean(self, *args, **kwargs):
-        self.organization = self.topology.organization
+        self.organization_id = self.get_organization_id()
         return super().full_clean(*args, **kwargs)
 
     def clean(self):
-
         if self.properties is None:
             self.properties = {}
 
@@ -82,6 +82,26 @@ class AbstractNode(OrgMixin, TimeStampedEditableModel):
         from other sources (e.g: device name in openwisp-controller)
         """
         return self.name
+
+    def get_organization_id(self):
+        """
+        May be overridden/monkey patched to get the node organization
+        from other sources (e.g: device organization_id in openwisp-controller)
+        """
+        # Node will get organization of topology if it is unspecified.
+        if self.organization_id is None:
+            return self.topology.organization_id
+        else:
+            # Non-shared node can belong to shared topology. But,
+            # a shared node cannot belong to non-shared topology.
+            if (
+                self.topology.organization_id is not None
+                and self.topology.organization_id != self.organization_id
+            ):
+                raise ValidationError(
+                    _('node should have same organization as topology.')
+                )
+            return self.organization_id
 
     def json(self, dict=False, original=False, **kwargs):
         """

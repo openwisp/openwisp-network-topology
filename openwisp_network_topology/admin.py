@@ -227,13 +227,11 @@ class UserPropertiesForm(forms.ModelForm):
 
 class NodeLinkMixin(MultitenantAdminMixin):
     """
-    Hides organization in add form
-    Shows organization readonly in change form
     Adds get_queryset class method that enables
     other extensions to override the admin queryset
     """
 
-    readonly_fields = ['organization', 'readonly_properties']
+    readonly_fields = ['readonly_properties']
 
     def get_fields(self, request, obj):
         fields = super().get_fields(request, obj)
