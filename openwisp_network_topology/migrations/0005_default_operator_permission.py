@@ -14,9 +14,24 @@ def create_default_permissions(apps, schema_editor):
 
 def assign_permissions_to_groups(apps, schema_editor):
     create_default_permissions(apps, schema_editor)
-    operators_and_admin_can_change = ['link', 'node']
-    operators_read_only_admins_manage = ['topology']
-    manage_operations = ['add', 'change', 'delete']
+
+    def _add_permission_to_group(group, models, operations):
+        for model in models:
+            for operation in operations:
+                try:
+                    permission = Permission.objects.get(
+                        codename='{}_{}'.format(operation, model)
+                    )
+                except Permission.DoesNotExist:
+                    continue
+                else:
+                    group.permissions.add(permission.pk)
+
+    operators_can_manage = ['link', 'node']
+    operators_can_only_view = ['topology']
+    admin_can_manage = ['link', 'node', 'topology']
+    manage_operations = ['add', 'change', 'delete', 'view']
+    view_only_operations = ['view']
     Group = apps.get_model('openwisp_users', 'Group')
 
     try:
@@ -27,26 +42,11 @@ def assign_permissions_to_groups(apps, schema_editor):
     except Group.DoesNotExist:
         return
 
-    for model_name in operators_and_admin_can_change:
-        for operation in manage_operations:
-            permission = Permission.objects.get(
-                codename='{}_{}'.format(operation, model_name)
-            )
-            admin.permissions.add(permission.pk)
-            operator.permissions.add(permission.pk)
-    for model_name in operators_read_only_admins_manage:
-        try:
-            permission = Permission.objects.get(codename="view_{}".format(model_name))
-            operator.permissions.add(permission.pk)
-            admin.permissions.add(permission.pk)
-        except Permission.DoesNotExist:
-            pass
-        for operation in manage_operations:
-            admin.permissions.add(
-                Permission.objects.get(
-                    codename="{}_{}".format(operation, model_name)
-                ).pk
-            )
+    # Add permissions for operators
+    _add_permission_to_group(operator, operators_can_manage, manage_operations)
+    _add_permission_to_group(operator, operators_can_only_view, view_only_operations)
+    # Add permissions for Administrator
+    _add_permission_to_group(admin, admin_can_manage, manage_operations)
 
 
 class Migration(migrations.Migration):
