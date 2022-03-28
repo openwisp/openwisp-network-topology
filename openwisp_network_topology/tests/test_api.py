@@ -298,7 +298,7 @@ class TestApi(
             url = reverse('network_graph', args=(t1.pk,))
             user = self._create_user(username='org-member', email='orgmem@ber.com')
             self.client.force_login(user)
-            with self.assertNumQueries(5):
+            with self.assertNumQueries(3):
                 response = self.client.get(url)
             self.assertEqual(response.status_code, 403)
 
@@ -410,7 +410,7 @@ class TestTopologyNodeLinkApi(
             'properties': {},
             'user_properties': {},
         }
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(9):
             response = self.client.post(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['topology'], t1.pk)
@@ -439,7 +439,7 @@ class TestTopologyNodeLinkApi(
             'user_properties': {},
         }
         path = reverse('node_detail', args=(node1.pk,))
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(9):
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['label'], 'change-node')
@@ -450,7 +450,7 @@ class TestTopologyNodeLinkApi(
         node1 = self._create_node(label='node1', addresses=['192.168.0.1'], topology=t1)
         path = reverse('node_detail', args=(node1.pk,))
         data = {'label': 'change-node'}
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(8):
             response = self.client.patch(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['label'], 'change-node')

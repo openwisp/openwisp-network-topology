@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 import swapper
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from openwisp_users.api.mixins import FilterSerializerByOrgManaged
