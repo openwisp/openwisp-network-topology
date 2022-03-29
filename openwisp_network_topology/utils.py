@@ -42,24 +42,24 @@ def get_api_urls(views_module):
             name='network_collection',
         ),
         path(
-            'topology/topology/<str:pk>/',
+            'topology/topology/<uuid:pk>/',
             views_module.network_graph,
             name='network_graph',
         ),
         path(
-            'topology/topology/<str:pk>/history/',
+            'topology/topology/<uuid:pk>/history/',
             views_module.network_graph_history,
             name='network_graph_history',
         ),
         path(
-            'topology/topology/<str:pk>/receive/',
+            'topology/topology/<uuid:pk>/receive/',
             views_module.receive_topology,
             name='receive_topology',
         ),
         path('topology/node/', views_module.node_list, name='node_list'),
-        path('topology/node/<str:pk>/', views_module.node_detail, name='node_detail'),
+        path('topology/node/<uuid:pk>/', views_module.node_detail, name='node_detail'),
         path('topology/link/', views_module.link_list, name='link_list'),
-        path('topology/link/<str:pk>/', views_module.link_detail, name='link_detail'),
+        path('topology/link/<uuid:pk>/', views_module.link_detail, name='link_detail'),
     ]
     return urls
 

@@ -179,26 +179,18 @@ class NodeListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
 
 
 class NodeDetailView(ProtectedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Node.objects.all().select_related('topology')
+    queryset = Node.objects.all()
     serializer_class = NodeSerializer
 
 
 class LinkListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
-    queryset = Link.objects.select_related(
-        'topology',
-        'source',
-        'target',
-    ).order_by('-created')
+    queryset = Link.objects.order_by('-created')
     serializer_class = LinkSerializer
     pagination_class = ListViewPagination
 
 
 class LinkDetailView(ProtectedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Link.objects.select_related(
-        'topology',
-        'source',
-        'target',
-    )
+    queryset = Link.objects.all()
     serializer_class = LinkSerializer
 
 

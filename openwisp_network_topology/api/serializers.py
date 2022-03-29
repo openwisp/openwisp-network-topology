@@ -57,7 +57,7 @@ def get_representation_data(obj):
             ('label', obj.label),
             ('id', str(obj.id)),
             ('parser', obj.parser),
-            ('organization', str(obj.organization.id)),
+            ('organization', str(obj.organization.id) if obj.organization else None),
             ('strategy', obj.strategy),
             ('url', obj.url),
             ('key', obj.key),
@@ -195,7 +195,7 @@ class NodeSerializer(BaseNodeLinkSerializer):
             'created',
             'modified',
         )
-        read_only_fields = ('organization', 'created', 'modified')
+        read_only_fields = ('created', 'modified')
 
 
 class LinkSerializer(BaseNodeLinkSerializer):
