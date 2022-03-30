@@ -4,6 +4,7 @@ import logging
 import swapper
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django_filters.rest_framework import DjangoFilterBackend
 from netdiff.exceptions import NetdiffException
 from rest_framework import generics, pagination
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
@@ -65,6 +66,8 @@ class NetworkCollectionView(
 
     serializer_class = NetworkGraphSerializer
     queryset = Topology.objects.select_related('organization')
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['published']
 
     def list(self, request, *args, **kwargs):
         self.check_permissions(request)
@@ -179,18 +182,26 @@ class NodeListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
 
 
 class NodeDetailView(ProtectedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Node.objects.all()
+    queryset = Node.objects.all().select_related('topology')
     serializer_class = NodeSerializer
 
 
 class LinkListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
-    queryset = Link.objects.order_by('-created')
+    queryset = Link.objects.select_related(
+        'topology',
+        'source',
+        'target',
+    ).order_by('-created')
     serializer_class = LinkSerializer
     pagination_class = ListViewPagination
 
 
 class LinkDetailView(ProtectedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Link.objects.all()
+    queryset = Link.objects.select_related(
+        'topology',
+        'source',
+        'target',
+    )
     serializer_class = LinkSerializer
 
 

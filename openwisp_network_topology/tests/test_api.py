@@ -100,10 +100,15 @@ class TestApi(
 
     def test_list_unpublished(self):
         self._unpublish()
-        response = self.client.get(self.list_url)
+        path = f'{self.list_url}?published=false'
+        response = self.client.get(path)
         self.assertEqual(len(response.data['collection']), 1)
 
-    def test_detail_unpublished(self):
+        path = f'{self.list_url}?published=true'
+        response = self.client.get(path)
+        self.assertEqual(len(response.data['collection']), 0)
+
+    def test_detail_unpublished_topology(self):
         self._unpublish()
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
@@ -674,7 +679,7 @@ class TestApi(
             'user_properties': {},
         }
         path = reverse('node_detail', args=(self.node1.pk,))
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(11):
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['label'], 'change-node')
@@ -683,7 +688,7 @@ class TestApi(
     def test_node_patch_api(self):
         path = reverse('node_detail', args=(self.node1.pk,))
         data = {'label': 'change-node'}
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(10):
             response = self.client.patch(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['label'], 'change-node')
@@ -774,7 +779,7 @@ class TestApi(
             'properties': {},
             'user_properties': {'user': 'tester'},
         }
-        with self.assertNumQueries(17):
+        with self.assertNumQueries(14):
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['cost'], 21.0)
@@ -784,7 +789,7 @@ class TestApi(
     def test_link_patch_api(self):
         path = reverse('link_detail', args=(self.link.pk,))
         data = {'cost': 50.0}
-        with self.assertNumQueries(14):
+        with self.assertNumQueries(11):
             response = self.client.patch(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['cost'], 50.0)
