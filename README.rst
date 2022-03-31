@@ -542,42 +542,50 @@ List topologies
 
 .. code-block:: text
 
-    GET /api/v1/topology/topology/
+    GET /api/v1/network-topology/topology/
+
+**Note**: By default, ``/api/v1/network-topology/topology/`` does not include
+unpublished topologies. If you want to include unpublished topologies in the
+response, use ``?include_unpublished=true`` filter as following:
+
+.. code-block:: text
+
+    GET /api/v1/network-topology/topology/?include_unpublished=true
 
 Create topology
 ###############
 
 .. code-block:: text
 
-    POST /api/v1/topology/topology/
+    POST /api/v1/network-topology/topology/
 
 Detail of a topology
 ####################
 
 .. code-block:: text
 
-    GET /api/v1/topology/topology/{id}/
+    GET /api/v1/network-topology/topology/{id}/
 
 Change topolgy detail
 #####################
 
 .. code-block:: text
 
-    PUT /api/v1/topology/topology/{id}/
+    PUT /api/v1/network-topology/topology/{id}/
 
 Patch topology detail
 #####################
 
 .. code-block:: text
 
-    PATCH /api/v1/topology/topology/{id}/
+    PATCH /api/v1/network-topology/topology/{id}/
 
 Delete topology
 ###############
 
 .. code-block:: text
 
-    DELETE /api/v1/topology/topology/{id}/
+    DELETE /api/v1/network-topology/topology/{id}/
 
 View topology history
 #####################
@@ -591,98 +599,98 @@ saved on ``2020-08-08`` as follows.
 
 .. code-block:: text
 
-    GET /api/v1/topology/topology/{id}/history/?date=2020-08-08
+    GET /api/v1/network-topology/topology/{id}/history/?date=2020-08-08
 
 Send topology data
 ##################
 
 .. code-block:: text
 
-    POST /api/v1/topology/topology/{id}/receive/
+    POST /api/v1/network-topology/topology/{id}/receive/
 
 List links
 ##########
 
 .. code-block:: text
 
-    GET /api/v1/topology/link/
+    GET /api/v1/network-topology/link/
 
 Create link
 ###########
 
 .. code-block:: text
 
-    POST /api/v1/topology/link/
+    POST /api/v1/network-topology/link/
 
 Get link detail
 ###############
 
 .. code-block:: text
 
-    GET /api/v1/topology/link/{id}/
+    GET /api/v1/network-topology/link/{id}/
 
 Change link detail
 ##################
 
 .. code-block:: text
 
-    PUT /api/v1/topology/link/{id}/
+    PUT /api/v1/network-topology/link/{id}/
 
 Patch link detail
 #################
 
 .. code-block:: text
 
-    PATCH /api/v1/topology/link/{id}/
+    PATCH /api/v1/network-topology/link/{id}/
 
 Delete link
 ###########
 
 .. code-block:: text
 
-    DELETE /api/v1/topology/link/{id}/
+    DELETE /api/v1/network-topology/link/{id}/
 
 List nodes
 ##########
 
 .. code-block:: text
 
-    GET /api/v1/topology/node/
+    GET /api/v1/network-topology/node/
 
 Create node
 ###########
 
 .. code-block:: text
 
-    POST /api/v1/topology/node/
+    POST /api/v1/network-topology/node/
 
 Get node detail
 ###############
 
 .. code-block:: text
 
-    GET /api/v1/topology/node/{id}/
+    GET /api/v1/network-topology/node/{id}/
 
 Change node detail
 ##################
 
 .. code-block:: text
 
-    PUT /api/v1/topology/node/{id}/
+    PUT /api/v1/network-topology/node/{id}/
 
 Patch node detail
 #################
 
 .. code-block:: text
 
-    PATCH /api/v1/topology/node/{id}/
+    PATCH /api/v1/network-topology/node/{id}/
 
 Delete node
 ###########
 
 .. code-block:: text
 
-    DELETE /api/v1/topology/node/{id}/
+    DELETE /api/v1/network-topology/node/{id}/
 
 Overriding visualizer templates
 -------------------------------

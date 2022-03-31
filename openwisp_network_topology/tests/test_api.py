@@ -98,9 +98,9 @@ class TestApi(
         response = self.client.get(self.detail_url)
         self.assertEqual(response.data['type'], 'NetworkGraph')
 
-    def test_list_unpublished(self):
+    def test_list_include_unpublished(self):
         self._unpublish()
-        path = f'{self.list_url}?published=false'
+        path = f'{self.list_url}?include_unpublished=true'
         response = self.client.get(path)
         self.assertEqual(len(response.data['collection']), 1)
 

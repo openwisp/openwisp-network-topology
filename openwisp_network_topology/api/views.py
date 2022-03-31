@@ -4,7 +4,6 @@ import logging
 import swapper
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from django_filters.rest_framework import DjangoFilterBackend
 from netdiff.exceptions import NetdiffException
 from rest_framework import generics, pagination
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
@@ -66,8 +65,12 @@ class NetworkCollectionView(
 
     serializer_class = NetworkGraphSerializer
     queryset = Topology.objects.select_related('organization')
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['published']
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.query_params.get('include_unpublished'):
+            return qs
+        return qs.filter(published=True)
 
     def list(self, request, *args, **kwargs):
         self.check_permissions(request)
