@@ -566,6 +566,14 @@ Detail of a topology
 
     GET /api/v1/network-topology/topology/{id}/
 
+**Note**: By default, ``/api/v1/network-topology/topology/{id}/`` will return
+``HTTP 404 Not Found`` for unpublished topologies. If you want to retrieve an
+unpublished topology, use ``?include_unpublished=true`` filter as following:
+
+.. code-block:: text
+
+    GET /api/v1/network-topology/topology/{id}/?include_unpublished=true
+
 Change topolgy detail
 #####################
 

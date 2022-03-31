@@ -111,6 +111,10 @@ class TestApi(
     def test_detail_unpublished_topology(self):
         self._unpublish()
         response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, 404)
+
+        path = f'{self.detail_url}?include_unpublished=true'
+        response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
 
     def test_receive(self):

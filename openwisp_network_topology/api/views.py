@@ -53,7 +53,16 @@ class ListViewPagination(pagination.PageNumberPagination):
     max_page_size = 100
 
 
+class UnpublishedTopologyFilterMixin:
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.query_params.get('include_unpublished'):
+            return qs
+        return qs.filter(published=True)
+
+
 class NetworkCollectionView(
+    UnpublishedTopologyFilterMixin,
     RequireAuthentication,
     FilterByOrganizationManaged,
     generics.ListCreateAPIView,
@@ -65,12 +74,6 @@ class NetworkCollectionView(
 
     serializer_class = NetworkGraphSerializer
     queryset = Topology.objects.select_related('organization')
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        if self.request.query_params.get('include_unpublished'):
-            return qs
-        return qs.filter(published=True)
 
     def list(self, request, *args, **kwargs):
         self.check_permissions(request)
@@ -85,6 +88,7 @@ class NetworkCollectionView(
 
 
 class NetworkGraphView(
+    UnpublishedTopologyFilterMixin,
     RequireAuthentication,
     FilterByOrganizationManaged,
     generics.RetrieveUpdateDestroyAPIView,
