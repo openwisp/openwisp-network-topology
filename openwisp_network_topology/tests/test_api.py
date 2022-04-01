@@ -94,6 +94,30 @@ class TestApi(
         self.assertEqual(response.data['type'], 'NetworkCollection')
         self.assertEqual(len(response.data['collection']), 1)
 
+    def test_list_topology_filter(self):
+        admin = self._create_admin()
+        self.client.force_login(admin)
+        org2 = self._create_org(name='org2')
+        self._create_topology(
+            organization=org2, parser='netdiff.OpenvpnParser', strategy='receive'
+        )
+
+        with self.subTest('Test without filter'):
+            response = self.client.get(self.list_url)
+            self.assertEqual(len(response.data['collection']), 2)
+
+        with self.subTest('Test filter with parser'):
+            response = self.client.get(f'{self.list_url}?parser=netdiff.OpenvpnParser')
+            self.assertEqual(len(response.data['collection']), 1)
+
+        with self.subTest('Test filter with organization'):
+            response = self.client.get(f'{self.list_url}?organization={org2.pk}')
+            self.assertEqual(len(response.data['collection']), 1)
+
+        with self.subTest('Test filter with strategy'):
+            response = self.client.get(f'{self.list_url}?strategy=receive')
+            self.assertEqual(len(response.data['collection']), 1)
+
     def test_detail(self):
         response = self.client.get(self.detail_url)
         self.assertEqual(response.data['type'], 'NetworkGraph')
@@ -110,12 +134,14 @@ class TestApi(
 
     def test_detail_unpublished_topology(self):
         self._unpublish()
-        response = self.client.get(self.detail_url)
-        self.assertEqual(response.status_code, 404)
+        with self.subTest('Test view returns 404 for unpublished topology'):
+            response = self.client.get(self.detail_url)
+            self.assertEqual(response.status_code, 404)
 
-        path = f'{self.detail_url}?include_unpublished=true'
-        response = self.client.get(path)
-        self.assertEqual(response.status_code, 200)
+        with self.subTest('Test "include_unpublished" filter'):
+            path = f'{self.detail_url}?include_unpublished=true'
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200)
 
     def test_receive(self):
         self._set_receive()
@@ -623,6 +649,29 @@ class TestApi(
         # Only nodes related to user's organization are returned
         self.assertEqual(response.data['count'], 2)
 
+    def test_node_list_filter(self):
+        admin = self._get_admin()
+        self.client.force_login(admin)
+        org1 = self._get_org()
+        org2 = self._create_org(name='org2')
+        t2 = self._create_topology(organization=org2)
+        self._create_node(
+            label='node2', addresses=['192.168.0.2'], topology=t2, organization=org2
+        )
+        path = reverse('node_list')
+
+        with self.subTest('Test list without filters'):
+            response = self.client.get(path)
+            self.assertEqual(response.data['count'], 3)
+
+        with self.subTest('Test filter by organization'):
+            response = self.client.get(f'{path}?organization={org1.pk}')
+            self.assertEqual(response.data['count'], 2)
+
+        with self.subTest('Test filter by topology'):
+            response = self.client.get(f'{path}?topology={t2.pk}')
+            self.assertEqual(response.data['count'], 1)
+
     def test_node_create_api(self):
         path = reverse('node_list')
         data = {
@@ -712,6 +761,37 @@ class TestApi(
             response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 1)
+
+    def test_link_list_filters(self):
+        admin = self._get_admin()
+        self.client.force_login(admin)
+        org1 = self._get_org()
+        org2 = self._create_org(name='org2')
+        t2 = self._create_topology(organization=org2)
+        node1 = self._create_node(
+            label='node2', addresses=['192.168.0.2'], topology=t2, organization=org2
+        )
+        node2 = self._create_node(
+            label='node2', addresses=['192.168.0.3'], topology=t2, organization=org2
+        )
+        self._create_link(source=node1, target=node2, topology=t2, status='down')
+        path = reverse('link_list')
+
+        with self.subTest('Test list without filters'):
+            response = self.client.get(path)
+            self.assertEqual(response.data['count'], 2)
+
+        with self.subTest('Test filter by organization'):
+            response = self.client.get(f'{path}?organization={org1.pk}')
+            self.assertEqual(response.data['count'], 1)
+
+        with self.subTest('Test filter by topology'):
+            response = self.client.get(f'{path}?topology={t2.pk}')
+            self.assertEqual(response.data['count'], 1)
+
+        with self.subTest('Test filter by status'):
+            response = self.client.get(f'{path}?status=down')
+            self.assertEqual(response.data['count'], 1)
 
     def test_link_create_api(self):
         path = reverse('link_list')
