@@ -4,24 +4,33 @@ import logging
 import swapper
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django_filters.rest_framework import DjangoFilterBackend
 from netdiff.exceptions import NetdiffException
-from rest_framework import generics
+from rest_framework import generics, pagination
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from openwisp_users.api.authentication import BearerAuthentication
+from openwisp_users.api.mixins import FilterByOrganizationManaged
 from openwisp_users.api.permissions import DjangoModelPermissions, IsOrganizationManager
 
 from .. import settings as app_settings
 from ..utils import get_object_or_404
 from .parsers import TextParser
-from .serializers import NetworkGraphSerializer
+from .serializers import (
+    LinkSerializer,
+    NetworkGraphSerializer,
+    NetworkGraphUpdateSerializer,
+    NodeSerializer,
+)
 
 logger = logging.getLogger(__name__)
 Snapshot = swapper.load_model('topology', 'Snapshot')
 Topology = swapper.load_model('topology', 'Topology')
+Node = swapper.load_model('topology', 'Node')
+Link = swapper.load_model('topology', 'Link')
 
 
 class RequireAuthentication(APIView):
@@ -39,46 +48,68 @@ class RequireAuthentication(APIView):
         ]
 
 
-class NetworkCollectionView(generics.ListAPIView, RequireAuthentication):
+class ListViewPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class UnpublishedTopologyFilterMixin:
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.query_params.get('include_unpublished'):
+            return qs
+        return qs.filter(published=True)
+
+
+class NetworkCollectionView(
+    UnpublishedTopologyFilterMixin,
+    RequireAuthentication,
+    FilterByOrganizationManaged,
+    generics.ListCreateAPIView,
+):
     """
     Data of all the topologies returned
-    in NetJSON NetworkCollection format
+    in NetJSON NetworkCollection format.
     """
 
     serializer_class = NetworkGraphSerializer
-    queryset = Topology.objects.filter(published=True)
+    queryset = Topology.objects.select_related('organization')
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('strategy', 'parser', 'organization')
 
     def list(self, request, *args, **kwargs):
         self.check_permissions(request)
         return super().list(request, *args, **kwargs)
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        user = self.request.user
-        if user.is_superuser:
-            return queryset
-        if user.is_authenticated:
-            queryset = queryset.filter(organization__in=user.organizations_managed)
-        return queryset
+    def get_success_headers(self, data):
+        """
+        Remove `LOCATION` option from the
+        header when URL field is present.
+        """
+        return {}
 
 
-class NetworkGraphView(generics.RetrieveAPIView, RequireAuthentication):
+class NetworkGraphView(
+    UnpublishedTopologyFilterMixin,
+    RequireAuthentication,
+    FilterByOrganizationManaged,
+    generics.RetrieveUpdateDestroyAPIView,
+):
     """
     Data of a specific topology returned
-    in NetJSON NetworkGraph format
+    in NetJSON NetworkGraph format.
     """
 
-    serializer_class = NetworkGraphSerializer
-    queryset = Topology.objects.filter(published=True)
+    serializer_class = NetworkGraphUpdateSerializer
+    queryset = Topology.objects.select_related('organization')
 
 
 class ReceiveTopologyView(APIView):
     """
     This views allow nodes to send topology data using the RECEIVE strategy.
-
     Required query string parameters:
         * key
-
     Allowed content-types:
         * text/plain
     """
@@ -118,7 +149,7 @@ class ReceiveTopologyView(APIView):
 class NetworkGraphHistoryView(RequireAuthentication):
     """
     History of a specific topology returned
-    in NetJSON NetworkGraph format
+    in NetJSON NetworkGraph format.
     """
 
     topology_model = Topology
@@ -146,7 +177,53 @@ class NetworkGraphHistoryView(RequireAuthentication):
             return Response({'detail': _('invalid date supplied')}, status=403)
 
 
+class ProtectedAPIMixin(FilterByOrganizationManaged):
+    authentication_classes = [BearerAuthentication, SessionAuthentication]
+    permission_classes = [
+        IsAuthenticated,
+        DjangoModelPermissions,
+    ]
+
+
+class NodeListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
+    queryset = Node.objects.order_by('-created')
+    serializer_class = NodeSerializer
+    pagination_class = ListViewPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('topology', 'organization')
+
+
+class NodeDetailView(ProtectedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Node.objects.all().select_related('topology')
+    serializer_class = NodeSerializer
+
+
+class LinkListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
+    queryset = Link.objects.select_related(
+        'topology',
+        'source',
+        'target',
+    ).order_by('-created')
+    serializer_class = LinkSerializer
+    pagination_class = ListViewPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('topology', 'organization', 'status')
+
+
+class LinkDetailView(ProtectedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Link.objects.select_related(
+        'topology',
+        'source',
+        'target',
+    )
+    serializer_class = LinkSerializer
+
+
 network_collection = NetworkCollectionView.as_view()
 network_graph = NetworkGraphView.as_view()
 network_graph_history = NetworkGraphHistoryView.as_view()
 receive_topology = ReceiveTopologyView.as_view()
+node_list = NodeListCreateView.as_view()
+node_detail = NodeDetailView.as_view()
+link_list = LinkListCreateView.as_view()
+link_detail = LinkDetailView.as_view()
