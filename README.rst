@@ -547,7 +547,7 @@ List topologies
 Available filters:
 
 - ``strategy``: Filter topologies based on their strategy (``fetch`` or ``receive``).
-  E.g. ``?strategy=<topology_strategy``.
+  E.g. ``?strategy=<topology_strategy>``.
 - ``parser``: Filter topologies based on their parser.
   E.g. ``?parser=<topology_parsers>``.
 - ``organization``: Filter topologies based on their organization.
