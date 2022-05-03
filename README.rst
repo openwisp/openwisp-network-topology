@@ -30,7 +30,7 @@ openwisp-network-topology
    :target: https://pypi.org/project/black/
    :alt: code style: black
 
-.. image:: https://github.com/openwisp/openwisp-network-topology/raw/docs/docs/network_topology_demo.gif
+.. image:: https://github.com/openwisp/openwisp-network-topology/raw/docs/docs/demo_network_topology.gif
    :alt: Features Highlights
 
 OpenWISP Network Topology is a network topology collector and visualizer
