@@ -30,7 +30,7 @@ openwisp-network-topology
    :target: https://pypi.org/project/black/
    :alt: code style: black
 
-.. image:: https://github.com/openwisp/openwisp-network-topology/raw/master/docs/demo_network_topology.gif
+.. image:: https://github.com/openwisp/openwisp-network-topology/raw/docs/docs/demo_network_topology.gif
    :alt: Features Highlights
 
 OpenWISP Network Topology is a network topology collector and visualizer
@@ -515,14 +515,14 @@ Rest API
 Live documentation
 ^^^^^^^^^^^^^^^^^^
 
-.. image:: docs/api-doc.png
+.. image:: https://github.com/openwisp/openwisp-network-topology/raw/docs/docs/api-doc.png
 
 A general live API documentation (following the OpenAPI specification) at ``/api/v1/docs/``.
 
 Browsable web interface
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-.. image:: docs/api-ui.png
+.. image:: https://github.com/openwisp/openwisp-network-topology/raw/docs/docs/api-ui.png
 
 Additionally, opening any of the endpoints `listed below <#list-of-endpoints>`_
 directly in the browser will show the `browsable API interface of Django-REST-Framework
