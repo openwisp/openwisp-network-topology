@@ -67,16 +67,28 @@ Other popular building blocks that are part of the OpenWISP ecosystem are:
 - `openwisp-ipam <https://github.com/openwisp/openwisp-ipam>`_:
   it allows to manage the IP address space of networks
 
+**For a more complete overview of the OpenWISP modules and architecture**,
+see the
+`OpenWISP Architecture Overview
+<https://openwisp.io/docs/general/architecture.html>`_.
+
 .. image:: https://raw.githubusercontent.com/openwisp/openwisp2-docs/master/assets/design/openwisp-logo-black.svg
   :target: http://openwisp.org
   :alt: OpenWISP
+
+**Want to help OpenWISP?** `Find out how to help us grow here
+<http://openwisp.io/docs/general/help-us.html>`_.
+
+------------
 
 .. contents:: **Table of Contents**:
    :backlinks: none
    :depth: 3
 
-Current features
-----------------
+------------
+
+Available features
+------------------
 
 * **network topology collector** supporting different formats:
     - NetJSON NetworkGraph
@@ -85,30 +97,26 @@ Current features
     - BMX6 (q6m)
     - CNML 1.0
     - OpenVPN
-    - additional formats can be added by `specifying custom parsers <#netjsongraph-parsers>`_
-* **network topology visualizer** based on `netjsongraph.js <https://github.com/openwisp/netjsongraph.js>`_
-* **simple HTTP API** that exposes data in `NetJSON <http://netjson.org>`__ *NetworkGraph* format
-* **admin interface** that allows to easily manage, audit, visualize and debug topologies and their relative data (nodes, links)
-* **receive topology** from multiple nodes
-* **topology history**: allows saving daily snapshots of each topology that can be viewed in the frontend
-* **faster monitoring**: `integrates with OpenWISP Controller and OpenWISP Monitoring <#integration-with-openwisp-controller-and-openwisp-monitoring>`_
+    - additional formats can be added by
+      `writing custom netdiff parsers <https://github.com/openwisp/netdiff#parsers>`_
+* **network topology visualizer** based on
+  `netjsongraph.js <https://github.com/openwisp/netjsongraph.js>`_
+* `REST API <#rest-api>`_ that exposes data in
+  `NetJSON <http://netjson.org>`__ *NetworkGraph* format
+* **admin interface** that allows to easily manage, audit, visualize and
+  debug topologies and their relative data (nodes, links)
+* `RECEIVE network topology data <#receive-strategy>`_ from multiple nodes
+* **topology history**: allows saving daily snapshots of each topology that
+  can be viewed in the frontend
+* **faster monitoring**: `integrates with OpenWISP Controller and OpenWISP Monitoring
+  <#integration-with-openwisp-controller-and-openwisp-monitoring>`_
   for faster detection of critical events in the network
 
-Project goals
--------------
-
-* make it easy to visualize network topology data for the formats supported by `netdiff <https://github.com/openwisp/netdiff>`_
-* allow standalone usage (without the rest of OpenWISP)
-* expose topology data via RESTful resources in *NetJSON NetworkGraph* format
-* make it easy to integrate in larger django projects to improve reusability
-* make it easy to extend its models by providing abstract models
-* provide ways to customize or replace the visualizer (**needs improvement in this point**)
-* keep the core very simple
-* provide ways to extend the default behaviour
-* encourage new features to be published as extensions
+Installation instructions
+-------------------------
 
 Deploy it in production
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 An automated installer is provided by the `OpenWISP <http://openwisp.org>`_ project:
 `ansible-openwisp2 <https://github.com/openwisp/ansible-openwisp2>`_.
@@ -117,7 +125,7 @@ Ensure to follow the instructions explained in the following section: `Enabling 
 module <https://github.com/openwisp/ansible-openwisp2#enabling-the-network-topology-module>`_.
 
 Install stable version from pypi
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Install from pypi:
 
@@ -126,7 +134,7 @@ Install from pypi:
     pip install openwisp-network-topology
 
 Install development version
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Install tarball:
 
@@ -148,8 +156,53 @@ If you want to contribute, install your cloned fork:
     cd openwisp-network-topology
     python setup.py develop
 
+Installing for development
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Install sqlite:
+
+.. code-block:: shell
+
+    sudo apt-get install sqlite3 libsqlite3-dev
+
+Install your forked repo:
+
+.. code-block:: shell
+
+    git clone git://github.com/<your_fork>/openwisp-network-topology
+    cd openwisp-network-topology/
+    python setup.py develop
+
+Install test requirements:
+
+.. code-block:: shell
+
+    pip install -r requirements-test.txt
+
+Create database:
+
+.. code-block:: shell
+
+    cd tests/
+    ./manage.py migrate
+    ./manage.py createsuperuser
+
+You can access the admin interface at http://127.0.0.1:8000/admin/.
+
+Run tests with:
+
+.. code-block:: shell
+
+    ./runtests.py
+
+Run qa tests:
+
+.. code-block:: shell
+
+    ./run-qa-checks
+
 Setup (integrate in an existing django project)
------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Add ``openwisp_network_topology`` and its dependencies to ``INSTALLED_APPS``:
 
@@ -183,70 +236,11 @@ Then run:
 
     ./manage.py migrate
 
-Installing for development
---------------------------
-
-Install sqlite:
-
-.. code-block:: shell
-
-    sudo apt-get install sqlite3 libsqlite3-dev
-
-Install your forked repo:
-
-.. code-block:: shell
-
-    git clone git://github.com/<your_fork>/openwisp-network-topology
-    cd openwisp-network-topology/
-    python setup.py develop
-
-Install test requirements:
-
-.. code-block:: shell
-
-    pip install -r requirements-test.txt
-
-Create database:
-
-.. code-block:: shell
-
-    cd tests/
-    ./manage.py migrate
-    ./manage.py createsuperuser
-
-Set ``EMAIL_PORT`` in ``settings.py`` to a port number (eg: ``1025``):
-
-.. code-block:: python
-
-    EMAIL_PORT = '1025'
-
-Launch development server and SMTP deubgging server:
-
-.. code-block:: shell
-
-    ./manage.py runserver
-    # open another session and run
-    python -m smtpd -n -c DebuggingServer localhost:1025
-
-You can access the admin interface at http://127.0.0.1:8000/admin/.
-
-Run tests with:
-
-.. code-block:: shell
-
-    ./runtests.py
-
-Run qa tests:
-
-.. code-block:: shell
-
-    ./run-qa-checks
-
 Quickstart Guide
 ----------------
 
 This module works by periodically collecting the network topology
-graph data of the `supported networking software or formats <#current-features>`_.
+graph data of the `supported networking software or formats <#available-features>`_.
 The data has to be either fetched by the application or received in POST API
 requests, therefore after deploying the application, additional steps are required
 to make the data collection and visualization work, read on to find out how.

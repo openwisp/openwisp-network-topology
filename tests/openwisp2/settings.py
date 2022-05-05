@@ -146,7 +146,9 @@ LOGGING = {
 
 TEST_RUNNER = 'openwisp_network_topology.tests.utils.LoggingDisabledTestRunner'
 
-EMAIL_PORT = '1025'  # for testing purposes
+# during development only
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 LOGIN_REDIRECT_URL = 'admin:index'
 ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 
