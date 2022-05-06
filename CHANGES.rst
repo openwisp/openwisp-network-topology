@@ -1,10 +1,54 @@
 Changelog
 =========
 
-Version 0.6.0 [unreleased]
+Version 1.0.0 [2022-05-06]
 --------------------------
 
-WIP.
+Features
+~~~~~~~~
+
+- Switched to new OpenWISP theme, registered the new menu items
+- Added more REST API endpoint to manipulate details of Topology, Node and Link
+
+Changes
+~~~~~~~
+
+Backward incompatible changes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Changed URL prefix of REST API from to ``/api/v1/topology/``
+  ``/api/v1/network-topology/``
+  for consistency with the other OpenWISP Modules
+- Removed deprecated old receive topology API url;
+  use the new URL: ``/api/v1/network-topology/topology/{id}/receive/``
+
+Dependencies
+^^^^^^^^^^^^
+
+- Dropped support for Python 3.6
+- Added support for Python 3.8 and Python 3.9
+- Dropped support for Django 2.2
+- Added support for Django 3.2 and 4.0
+- Increased OpenWISP Users version to 1.0.0
+- Removed redundant django-model-utils (it's defined in openwisp-utils)
+
+Other changes
+^^^^^^^^^^^^^
+
+- Moved uuid field of topology admin after main fields
+- Changed "View topology graph" button color
+- Added the `openwisp-utils DjangoModelPermissions
+  <https://github.com/openwisp/openwisp-users#djangomodelpermissions>`_
+  class to API views
+- Allow nodes, link and topologies to be shared among different organizations
+
+Bugfixes
+~~~~~~~~
+
+- Ensured ``Link`` and ``Node`` belong to the same topology
+- Removed use of custom ``has_permission()`` of old openwisp-utils
+- Make sure migrations depend on swappable openwisp modules
+- Load Organization model with swappable in tests
 
 Version 0.5.1 [2020-11-25]
 --------------------------
