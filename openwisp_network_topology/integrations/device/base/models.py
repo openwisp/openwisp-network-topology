@@ -1,5 +1,5 @@
 import logging
-from ipaddress import ip_address
+from ipaddress import IPv4Network, ip_address
 
 from django.conf import settings
 from django.db import models
@@ -27,12 +27,33 @@ class AbstractDeviceNode(UUIDModel):
             'auto_create': 'auto_create_openvpn',
             'link_down': 'link_down_openvpn',
             'link_up': 'link_up_openvpn',
-        }
+        },
+        'netdiff.WireguardParser': {
+            'auto_create': 'auto_create_wireguard',
+        },
     }
 
     class Meta:
         abstract = True
         unique_together = ('node', 'device')
+
+    @classmethod
+    def save_device_node(cls, device, node):
+        device_node = cls(device=device, node=node)
+        try:
+            device_node.full_clean()
+            device_node.save()
+            # Update organization of the node. This is required
+            # when topology is shared.
+            if node.organization_id is None:
+                node.organization_id = device.organization_id
+                node.save(update_fields=['organization_id'])
+        except Exception:
+            logger.exception('Exception raised during auto_create_openvpn')
+            return
+        else:
+            logger.info(f'DeviceNode relation created for {node.label} - {device.name}')
+            return device_node
 
     @classmethod
     def auto_create(cls, node):
@@ -69,21 +90,28 @@ class AbstractDeviceNode(UUIDModel):
         if not device:
             return
 
-        device_node = cls(device=device, node=node)
-        try:
-            device_node.full_clean()
-            device_node.save()
-            # Update organization of the node. This is required
-            # when topology is shared.
-            if node.organization_id is None:
-                node.organization_id = device.organization_id
-                node.save(update_fields=['organization_id'])
-        except Exception:
-            logger.exception('Exception raised during auto_create_openvpn')
+        return cls.save_device_node(device, node)
+
+    @classmethod
+    def auto_create_wireguard(cls, node):
+        allowed_ips = node.properties.get('allowedIps')
+        if not allowed_ips:
             return
-        else:
-            logger.info(f'DeviceNode relation created for {node.label} - {device.name}')
-            return device_node
+        Device = load_model('config', 'Device')
+        ip_addresses = [str(IPv4Network(cidr).network_address) for cidr in allowed_ips]
+        device_filter = models.Q(config__vpnclient__ip__ip_address__in=ip_addresses)
+        if node.organization_id:
+            device_filter &= models.Q(organization_id=node.organization_id)
+        device = (
+            Device.objects.only(
+                'id', 'name', 'last_ip', 'management_ip', 'organization_id'
+            )
+            .filter(device_filter)
+            .first()
+        )
+        if not device:
+            return
+        return cls.save_device_node(device, node)
 
     def link_action(self, link, status):
         """
@@ -93,7 +121,8 @@ class AbstractDeviceNode(UUIDModel):
         opts = self.ENABLED_PARSERS.get(link.topology.parser)
         if opts:
             key = f'link_{status}'
-            return getattr(self, opts[key])()
+            if hasattr(self, opts[key]):
+                return getattr(self, opts[key])()
 
     def link_down_openvpn(self):
         """
