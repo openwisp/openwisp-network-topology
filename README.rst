@@ -97,6 +97,7 @@ Available features
     - BMX6 (q6m)
     - CNML 1.0
     - OpenVPN
+    - Wireguard
     - additional formats can be added by
       `writing custom netdiff parsers <https://github.com/openwisp/netdiff#parsers>`_
 * **network topology visualizer** based on
