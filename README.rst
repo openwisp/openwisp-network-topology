@@ -282,14 +282,17 @@ Sending data for topology with RECEIVE strategy
 .. code-block:: shell
 
     #!/bin/bash
-
-    # Get OpenVPN topology data from OpenVPN management interface
-    cat /var/log/openvpn/tun0.stats |
+    # replace COMMAND with the command used to fetch the topology data
+    COMMAND="cat /var/log/openvpn/tun0.stats"
+    UUID="<TOPOLOGY-UUID-HERE>"
+    KEY="<TOPOLOGY-KEY-HERE>"
+    OPENWISP_URL="https://<OPENWISP_DOMAIN_HERE>"
+    $COMMAND |
         # Upload the topology data to OpenWISP
-        curl -s -X POST \
+        curl -X POST \
             --data-binary @- \
             --header "Content-Type: text/plain" \
-            http://127.0.0.1:8000/api/v1/network-topology/topology/d17e539a-1793-4be2-80a4-c305eca64fd8/receive/?key=cMGsvio8q0L0BGLd5twiFHQOqIEKI423
+            $OPENWISP_URL/api/v1/network-topology/topology/$UUID/receive/?key=$KEY
 
 3. Add the ``/opt/send-topology.sh`` script created in the previous step
    to the crontab, here's an example which sends the topology data every 5 minutes:
