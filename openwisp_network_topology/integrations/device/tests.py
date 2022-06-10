@@ -81,7 +81,6 @@ class Base(
         }
         properties.update(kwargs)
         allowed_ips = properties.get('allowedIps')
-        self.allowed_ips = allowed_ips
         node = Node(
             organization=topology.organization,
             topology=topology,
@@ -178,6 +177,15 @@ class TestControllerIntegration(Base, TransactionTestCase):
         device_node = DeviceNode.objects.first()
         self.assertEqual(device_node.device, device)
         self.assertEqual(device_node.node, node)
+        device_node.delete()
+        with self.subTest('return if node has no allowed ips'):
+            node = self._init_wireguard_test_node(topology, allowedIps=[])
+            self.assertEqual(DeviceNode.objects.count(), 0)
+        with self.subTest('handle error if node has bogus allowed ips'):
+            try:
+                node = self._init_wireguard_test_node(topology, allowedIps=['invalid'])
+            except ValueError:
+                self.fail('ValueError raised')
 
     def test_filter_by_link(self):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')

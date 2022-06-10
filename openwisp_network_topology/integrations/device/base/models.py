@@ -1,5 +1,5 @@
 import logging
-from ipaddress import IPv4Network, ip_address
+from ipaddress import ip_address, ip_network
 
 from django.conf import settings
 from django.db import models
@@ -98,7 +98,13 @@ class AbstractDeviceNode(UUIDModel):
         if not allowed_ips:
             return
         Device = load_model('config', 'Device')
-        ip_addresses = [str(IPv4Network(cidr).network_address) for cidr in allowed_ips]
+        ip_addresses = []
+        for ip in allowed_ips:
+            try:
+                ip_addresses.extend([str(host) for host in ip_network(ip).hosts()])
+            except ValueError:
+                # invalid IP address
+                continue
         device_filter = models.Q(config__vpnclient__ip__ip_address__in=ip_addresses)
         if node.organization_id:
             device_filter &= models.Q(organization_id=node.organization_id)
