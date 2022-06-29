@@ -71,16 +71,16 @@ class Base(
         if not addresses:
             addresses = ['public_key']
         properties = {
-            'presharedKey': None,
+            'preshared_key': None,
             'endpoint': None,
-            'latestHandsake': '0',
-            'transferRx': '0',
-            'transferTx': '0',
-            'persistentKeepalive': 'off',
-            'allowedIps': ['10.0.0.2/32'],
+            'latest_handsake': '0',
+            'transfer_rx': '0',
+            'transfer_tx': '0',
+            'persistent_keepalive': 'off',
+            'allowed_ips': ['10.0.0.2/32'],
         }
         properties.update(kwargs)
-        allowed_ips = properties.get('allowedIps')
+        allowed_ips = properties.get('allowed_ips')
         node = Node(
             organization=topology.organization,
             topology=topology,
@@ -179,11 +179,11 @@ class TestControllerIntegration(Base, TransactionTestCase):
         self.assertEqual(device_node.node, node)
         device_node.delete()
         with self.subTest('return if node has no allowed ips'):
-            node = self._init_wireguard_test_node(topology, allowedIps=[])
+            node = self._init_wireguard_test_node(topology, allowed_ips=[])
             self.assertEqual(DeviceNode.objects.count(), 0)
         with self.subTest('handle error if node has bogus allowed ips'):
             try:
-                node = self._init_wireguard_test_node(topology, allowedIps=['invalid'])
+                node = self._init_wireguard_test_node(topology, allowed_ips=['invalid'])
             except ValueError:
                 self.fail('ValueError raised')
 
