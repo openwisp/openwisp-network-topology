@@ -439,7 +439,7 @@ available in ``openwisp_network_topology.integrations.device``.
 
 This additional and optional module provides the following features:
 
-- whenever the status of an OpenVPN link changes:
+- whenever the status of a link changes:
 
   - the management IP address of the related device is updated straightaway
   - if OpenWISP Monitoring is enabled, the device checks are triggered (e.g.: ping)
