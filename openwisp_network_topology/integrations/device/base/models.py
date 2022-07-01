@@ -134,7 +134,7 @@ class AbstractDeviceNode(UUIDModel):
         opts = self.ENABLED_PARSERS.get(link.topology.parser)
         if opts:
             key = f'link_{status}'
-            if hasattr(self, opts[key]):
+            if key in opts and hasattr(self, opts[key]):
                 return getattr(self, opts[key])()
 
     def link_down_openvpn(self):

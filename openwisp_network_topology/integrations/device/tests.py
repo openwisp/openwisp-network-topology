@@ -170,14 +170,6 @@ class TestControllerIntegration(Base, TransactionTestCase):
             parser='netdiff.WireguardParser'
         )
         self.assertEqual(DeviceNode.objects.count(), 0)
-        with self.subTest('assert number of queries'):
-            with self.assertNumQueries(13):
-                node = self._init_wireguard_test_node(topology)
-        self.assertEqual(DeviceNode.objects.count(), 1)
-        device_node = DeviceNode.objects.first()
-        self.assertEqual(device_node.device, device)
-        self.assertEqual(device_node.node, node)
-        device_node.delete()
         with self.subTest('return if node has no allowed ips'):
             node = self._init_wireguard_test_node(topology, allowed_ips=[])
             self.assertEqual(DeviceNode.objects.count(), 0)
@@ -186,6 +178,24 @@ class TestControllerIntegration(Base, TransactionTestCase):
                 node = self._init_wireguard_test_node(topology, allowed_ips=['invalid'])
             except ValueError:
                 self.fail('ValueError raised')
+        with self.subTest('assert number of queries'):
+            with self.assertNumQueries(13):
+                node = self._init_wireguard_test_node(topology)
+        self.assertEqual(DeviceNode.objects.count(), 1)
+        device_node = DeviceNode.objects.first()
+        self.assertEqual(device_node.device, device)
+        self.assertEqual(device_node.node, node)
+        with self.subTest('do not raise Exception on link status changed'):
+            try:
+                target_node = self._init_wireguard_test_node(topology)
+                link = Link(
+                    topology=node.topology, source=node, target=target_node, cost=0
+                )
+                link.save()
+                link.status = 'down'
+                link.save(update_fields=['status'])
+            except KeyError:
+                self.fail('KeyError raised')
 
     def test_filter_by_link(self):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
