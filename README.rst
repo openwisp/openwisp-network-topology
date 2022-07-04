@@ -434,12 +434,12 @@ Integration with OpenWISP Controller and OpenWISP Monitoring
 
 If you use `OpenWISP Controller <https://github.com/openwisp/openwisp-controller>`_
 or `OpenWISP Monitoring <https://github.com/openwisp/openwisp-monitoring>`_
-and you use OpenVPN for the management VPN, you can use the integration available in
-``openwisp_network_topology.integrations.device``.
+and you use OpenVPN or Wireguard for the management VPN, you can use the integration
+available in ``openwisp_network_topology.integrations.device``.
 
 This additional and optional module provides the following features:
 
-- whenever the stauts of an OpenVPN link changes:
+- whenever the status of a link changes:
 
   - the management IP address of the related device is updated straightaway
   - if OpenWISP Monitoring is enabled, the device checks are triggered (e.g.: ping)

@@ -1,5 +1,6 @@
 import swapper
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 
 
 class BaseCreateDeviceNodeCommand(BaseCommand):
@@ -9,7 +10,8 @@ class BaseCreateDeviceNodeCommand(BaseCommand):
         Node = swapper.load_model('topology', 'Node')
         DeviceNode = swapper.load_model('topology_device', 'DeviceNode')
         queryset = Node.objects.select_related('topology').filter(
-            topology__parser='netdiff.OpenvpnParser'
+            Q(topology__parser='netdiff.OpenvpnParser')
+            | Q(topology__parser='netdiff.WireguardParser')
         )
         for node in queryset.iterator():
             DeviceNode.auto_create(node)

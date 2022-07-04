@@ -11,7 +11,9 @@ from django.utils.module_loading import import_string
 from openwisp_controller.config.tests.utils import (
     CreateConfigTemplateMixin,
     TestVpnX509Mixin,
+    TestWireguardVpnMixin,
 )
+from openwisp_ipam.tests import CreateModelsMixin as SubnetIpamMixin
 
 from openwisp_network_topology.tests.utils import CreateGraphObjectsMixin
 from openwisp_users.tests.utils import TestOrganizationMixin
@@ -34,6 +36,8 @@ Cert = swapper.load_model('pki', 'Cert')
 
 class Base(
     TestVpnX509Mixin,
+    TestWireguardVpnMixin,
+    SubnetIpamMixin,
     CreateConfigTemplateMixin,
     CreateGraphObjectsMixin,
     TestOrganizationMixin,
@@ -62,6 +66,39 @@ class Base(
             node.full_clean()
             node.save()
         return node
+
+    def _init_wireguard_test_node(self, topology, addresses=[], create=True, **kwargs):
+        if not addresses:
+            addresses = ['public_key']
+        properties = {
+            'preshared_key': None,
+            'endpoint': None,
+            'latest_handsake': '0',
+            'transfer_rx': '0',
+            'transfer_tx': '0',
+            'persistent_keepalive': 'off',
+            'allowed_ips': ['10.0.0.2/32'],
+        }
+        properties.update(kwargs)
+        allowed_ips = properties.get('allowed_ips')
+        node = Node(
+            organization=topology.organization,
+            topology=topology,
+            label=','.join(allowed_ips),
+            addresses=addresses,
+            properties=properties,
+        )
+        if create:
+            node.full_clean()
+            node.save()
+        return node
+
+    def _create_wireguard_test_env(self, parser):
+        org = self._get_org()
+        device, _, _ = self._create_wireguard_vpn_template()
+        device.organization = org
+        topology = self._create_topology(organization=org, parser=parser)
+        return topology, device
 
     def _create_test_env(self, parser):
         organization = self._get_org()
@@ -127,6 +164,38 @@ class TestControllerIntegration(Base, TransactionTestCase):
                     save.assert_called_once()
                     logger_exception.assert_called_once()
                     self.assertEqual(DeviceNode.objects.count(), 0)
+
+    def test_auto_create_wireguard(self):
+        topology, device = self._create_wireguard_test_env(
+            parser='netdiff.WireguardParser'
+        )
+        self.assertEqual(DeviceNode.objects.count(), 0)
+        with self.subTest('return if node has no allowed ips'):
+            node = self._init_wireguard_test_node(topology, allowed_ips=[])
+            self.assertEqual(DeviceNode.objects.count(), 0)
+        with self.subTest('handle error if node has bogus allowed ips'):
+            try:
+                node = self._init_wireguard_test_node(topology, allowed_ips=['invalid'])
+            except ValueError:
+                self.fail('ValueError raised')
+        with self.subTest('assert number of queries'):
+            with self.assertNumQueries(13):
+                node = self._init_wireguard_test_node(topology)
+        self.assertEqual(DeviceNode.objects.count(), 1)
+        device_node = DeviceNode.objects.first()
+        self.assertEqual(device_node.device, device)
+        self.assertEqual(device_node.node, node)
+        with self.subTest('do not raise Exception on link status changed'):
+            try:
+                target_node = self._init_wireguard_test_node(topology)
+                link = Link(
+                    topology=node.topology, source=node, target=target_node, cost=0
+                )
+                link.save()
+                link.status = 'down'
+                link.save(update_fields=['status'])
+            except KeyError:
+                self.fail('KeyError raised')
 
     def test_filter_by_link(self):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
