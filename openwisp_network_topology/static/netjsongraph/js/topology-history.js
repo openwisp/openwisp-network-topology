@@ -21,7 +21,7 @@ window.initTopologyHistory = function ($) {
             },
             error: function (xhr) {
                 alert(xhr.responseJSON.detail);
-            }
+            },
         });
     });
 };

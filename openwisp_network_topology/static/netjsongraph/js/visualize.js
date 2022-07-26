@@ -14,16 +14,18 @@ django.jQuery(function ($) {
 
     var openOverlay = function () {
         // show overlay
-        window.__njg_el__ = '.djnjg-overlay .inner';
+        window.__njg_el__ = '.inner';
         $.get(visualizeUrl, function (html) {
             overlay.show();
             inner.html(html);
             body.css('overflow', 'hidden');
             inner.css('overflow', 'hidden');
-            overlay.find('.close').click(function (e) {
+            overlay.find('.closeBtn').click(function (e) {
                 e.preventDefault();
+                window.graph.echarts.dispose();
                 closeOverlay();
             });
+            window.graph.render();
         });
         $(document).keydown(disableArrowKeys);
     };

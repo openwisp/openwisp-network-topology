@@ -48,9 +48,8 @@ class BaseAdmin(TimeStampedEditableAdmin):
             ]
         }
         js = [
-            'netjsongraph/js/lib/d3.min.js',
             'netjsongraph/js/lib/jquery-ui.min.js',
-            'netjsongraph/js/src/netjsongraph.js',
+            'netjsongraph/js/src/netjsongraph.min.js',
             'netjsongraph/js/strategy-switcher.js',
             'netjsongraph/js/topology-history.js',
             'netjsongraph/js/visualize.js',

@@ -1,20 +1,167 @@
-.njg-hidden {
-    display: none !important;
-    visibility: hidden !important;
+h3 {
+    display: block;
+    font-size: 1.17em;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+
+p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+.njg-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    right: 10px;
+    top: 20px;
+    z-index: 999;
+    background-color: inherit;
+}
+
+.njg-sideBar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 350px;
+    height: 100%;
+    z-index: 1000;
+    background-color: #fff;
+    transition: left 0.5s;
+    display: flex;
+    flex-direction: column;
+    user-select: text;
+}
+
+.hidden {
+    left: -500px;
+}
+
+.sideBarHandle {
+    background: rgba(217, 79, 52, 0.85);
+    position: fixed;
+    top: 15px;
+    left: 370px;
+    border: 0;
+    border-radius: 5px;
+    outline: none;
+    font-size: 24px;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.5s;
+    transform: rotateY(180deg);
+}
+
+.sideBarHandle::before {
+    content: '\27A4';
+    color: #fff;
+}
+
+.hidden .sideBarHandle {
+    left: 15px;
+    transform: rotateY(0deg);
+}
+
+.njg-aboutContainer,
+.njg-nodeLinkInfoContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0px;
+}
+
+.njg-metaData,
+.njg-infoContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: inherit;
+    padding: 0 20px;
+    margin-top: 20px;
+}
+
+.njg-keyLabel {
+    font-size: 14px;
+    font-weight: 600;
+    flex: 1 1 50%;
+    word-break: break-word;
+}
+
+.njg-valueLabel {
+    flex: 1 1 50%;
+    word-break: break-word;
+}
+
+.njg-metaDataItems,
+.njg-infoItems {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    text-transform: capitalize;
+    padding: 5px 0;
 }
 
 .njg-tooltip {
-    font-family: sans-serif;
-    font-size: 10px;
-    fill: #fff;
-    opacity: 0.5;
-    text-anchor: middle;
+    background: #fff !important;
+    border: none !important;
 }
 
-.njg-overlay {
-    display: none;
+.njg-tooltip-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 1px 0;
+    flex-wrap: wrap;
+}
+
+.njg-tooltip-key {
+    display: inline-flex;
+    flex-basis: 40%;
+    flex-wrap: wrap;
+    text-transform: capitalize;
+    font-weight: 600;
+    color: #000;
+}
+.njg-tooltip-value {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-basis: 60%;
+    color: #000;
+}
+
+.njg-headerContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: capitalize;
+    width: 100%;
+    padding: 0 15px;
+    position: relative;
+}
+
+.njg-headerContainer #closeButton {
     position: absolute;
-    z-index: 11;
+    right: 20px;
+    cursor: pointer;
+}
+
+.njg-relativePosition {
+    position: relative;
+    left: 0;
+    right: 0;
 }
 
 .njg-close {
@@ -23,48 +170,45 @@
     right: 10px;
     top: 10px;
 }
-
 .njg-close:before {
-    content: "\2716";
+    content: '\2716';
 }
 
-.njg-metadata {
-    display: none;
-    position: absolute;
-    z-index: 12;
+#graphChartContainer {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
 }
 
-.njg-node {
-    cursor: pointer
-}
-
-.njg-link {
-    cursor: pointer
-}
-
-#njg-select-group {
-    text-align: center;
-    box-shadow: 0 0 10px #ccc;
+#loadingContainer {
     position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 100;
+}
+
+.loadingElement {
+    position: absolute;
     left: 50%;
     top: 50%;
-    width: 50%;
-    margin-top: -7.5em;
-    margin-left: -25%;
-    padding: 5em 2em;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    text-align: center;
+}
+.loadingSprite {
+    margin: 0 auto;
+    width: 40px;
+    height: 40px;
+    background: url('./loading.gif') center no-repeat;
+    background-size: contain;
 }
 
-#njg-select-group select {
-    font-size: 2em;
-    padding: 10px 15px;
-    width: 50%;
-    cursor: pointer;
-}
-
-#njg-select-group option {
-    padding: 0.5em;
-}
-
-#njg-select-group option[value=""] {
-    color: #aaa;
+.loadingTip {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
 }
