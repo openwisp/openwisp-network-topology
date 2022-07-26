@@ -17,11 +17,11 @@ window.initTopologyHistory = function ($) {
             url: url,
             dataType: 'json',
             success: function (data) {
-                window.graph = window.loadNetJsonGraph(data);
+                window.graph.utils.JSONDataUpdate.call(window.graph, data);
             },
             error: function (xhr) {
                 alert(xhr.responseJSON.detail);
-            }
+            },
         });
     });
 };

@@ -1,153 +1,107 @@
-body.frontend {
-    margin: 0;
-    padding: 8px
+#legend h4 {
+    margin: 10px 0;
+    text-align: center;
 }
 
-.njg-overlay,
-.njg-metadata,
-.njg-switcher {
+#legend {
+    position: absolute;
+    right: 25px;
+    bottom: 25px;
+    width: auto;
+    height: auto;
+    max-width: 250px;
+    padding: 8px 15px;
     background: #fbfbfb;
-    border-radius: 3px;
-    border: 1px solid #ccc;
-    color: #1e1d1d;
+    border-radius: 8px;
+    color: #000;
+    font-family: Arial, sans-serif;
+    font-family: sans-serif;
+    font-size: 14px;
+    z-index: 2;
+    user-select: text;
+    transition: all 0.5s;
+}
+
+.open {
+    left: 370px !important;
+}
+
+#legend p {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+}
+#legend span {
+    width: 16px;
+    margin-right: 5px;
+}
+#legend .link-up,
+#legend .link-down {
+    display: inline-block;
+    height: 5px;
+    border-bottom-width: 6px;
+    border-bottom-style: solid;
+}
+#legend .link-up {
+    color: #3acc38;
+    margin-right: 10px;
+}
+#legend .link-down {
+    color: red;
+    margin-right: 10px;
+}
+
+.njg-sideBar h2 {
+    color: #000;
+    margin: 0;
+    font-size: 20px;
+}
+
+.njg-sideBar * {
+    color: #000;
+    box-sizing: border-box;
+}
+
+.djnjg-overlay .closeBtn {
+    border: none;
+    outline: none;
+    background: rgba(217, 79, 52, 0.85);
+    padding: 0 8px;
+    border-radius: 5px;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 30px;
+    color: #fff;
+    cursor: pointer;
+}
+
+body .frontend {
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    line-height: 20px;
+    background-color: #2b2b2b;
+}
+
+.njg-switcher {
+    background: #fff;
+    border-radius: 5px;
     font-family: Arial, sans-serif;
     font-family: sans-serif;
     font-size: 14px;
     line-height: 20px;
     height: auto;
     max-width: 400px;
-    min-width: 200px;
-    padding: 0 15px;
-    top: 10px;
-    right: 10px;
-    width: auto;
-}
-
-.njg-metadata {
-    left: 10px;
-    right: auto;
-    max-width: 500px;
-    min-width: 200px;
-    padding-bottom: 10px
-}
-
-.njg-overlay {
-    padding-top: 10px;
-    padding-bottom: 10px
-}
-
-.njg-metadata h3 {
-    font-family: "Georgia", serif;
-    font-style: italic;
-    margin-bottom: 8px
-}
-
-.njg-overlay p,
-.njg-metadata p {
-    margin: 8px 0;
-}
-
-.njg-node {
-    stroke-width: 7px;
-    stroke-alignment: inner;
-    stroke: #f4d18c;
-    fill: #2b2b2b;
-}
-
-.njg-node:hover,
-.njg-node.njg-open {
-    stroke: #fff;
-    fill: #000;
-}
-
-.njg-link {
-    cursor: pointer;
-    stroke: #1ba619;
-    stroke-width: 3;
-    stroke-opacity: 0.8;
-}
-
-.njg-link:hover,
-.njg-link.njg-open {
-    stroke-width: 4 !important;
-    stroke-opacity: 1;
-    stroke: #3acc38;
-}
-
-.njg-tooltip {
-    fill: #fff;
-    opacity: 0.8
-}
-
-body.frontend {
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-    line-height: 20px;
-    background-color: #2b2b2b
-}
-
-.down {
-    stroke: #c92517;
-    stroke-dasharray: 10, 5
-}
-
-.down:hover,
-.down.njg-open {
-    stroke: red;
-}
-
-
-/* legend */
-
-#legend {
-    position: absolute;
-    top: auto;
-    left: 5px;
-    bottom: 5px;
-    width: auto;
-    height: auto;
-    max-width: 250px;
-    padding: 0 15px;
-    background: #fbfbfb;
-    border-radius: 2px;
-    border: 1px solid #ccc;
-    font-family: Arial, sans-serif;
-    font-family: sans-serif;
-    font-size: 14px;
-}
-
-#legend p {
-    line-height: 16px;
-    margin: 10px 0
-}
-
-#legend span {
-    width: 16px;
-    margin-right: 5px;
-}
-
-#legend span.link {
-    display: inline-block;
-    height: 5px;
-    border-bottom-width: 6px;
-    border-bottom-style: solid;
-}
-
-#legend .up {
-    border-color: #3acc38
-}
-
-#legend .down {
-    border-color: red
-}
-
-.njg-switcher {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    top: auto;
-    padding: 10px 15px;
     min-width: auto;
+    position: absolute;
+    left: 25px;
+    bottom: 25px;
+    padding: 5px 8px;
+    transition: all 0.5s;
+}
+
+.njg-switcher * {
+    color: #000;
 }
 
 #njg-datepicker {
@@ -155,16 +109,60 @@ body.frontend {
     font-size: 13px;
     padding: 5px 10px;
     width: 94px;
+    outline: none;
+    color: #000 !important;
+}
+
+#njg-datepicker:focus {
+    border: 1px solid #df5d43;
+    color: #df5d43 !important;
 }
 
 #ui-datepicker-div {
     font-size: 15px;
-    line-height: initial
+    line-height: initial;
+    margin-top: -13px !important;
+    margin-left: -45px !important;
+    border-radius: 5px !important;
+}
+
+#ui-datepicker-div tr {
+    background: #fff !important;
+}
+
+.ui-datepicker-header {
+    background: #fff !important;
+    color: #000 !important;
+    border: none !important;
+}
+
+.ui-state-default {
+    border: none !important;
+    background: #fff !important;
+    color: #000 !important;
+    text-align: center !important;
+}
+
+.ui-state-default:hover,
+.ui-state-default:focus,
+.ui-state-active {
+    background: #333 !important;
+    color: #fff !important;
+}
+
+.ui-state-default:hover {
+    background: #7b7b7b !important;
+}
+
+.ui-datepicker-today a {
+    background: #df5d43 !important;
+    color: #fff !important;
 }
 
 .ui-datepicker thead th {
     line-height: normal;
     text-transform: uppercase;
     font-size: 11px;
-    background: #f6f6f6;
+    background: #fff;
+    color: #000;
 }
