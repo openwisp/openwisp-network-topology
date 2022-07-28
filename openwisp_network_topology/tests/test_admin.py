@@ -206,7 +206,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         t = self.topology_model.objects.first()
         path = reverse('{0}_topology_visualize'.format(self.prefix), args=[t.pk])
         response = self.client.get(path)
-        self.assertContains(response, 'd3.netJsonGraph(')
+        self.assertContains(response, 'new NetJSONGraph(')
 
     def test_update_selected_receive_topology(self):
         t = self.topology_model.objects.first()

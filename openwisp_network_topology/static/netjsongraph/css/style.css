@@ -2,9 +2,10 @@
     margin: 10px 0;
     text-align: center;
 }
+
 #legend {
     position: absolute;
-    right: 25px;
+    left: 25px;
     bottom: 15px;
     width: auto;
     height: auto;
@@ -18,7 +19,13 @@
     font-size: 14px;
     z-index: 2;
     user-select: text;
+    transition: all 0.5s;
 }
+
+.open {
+    left: 360px !important;
+}
+
 #legend p {
     margin: 10px 0;
     display: flex;
@@ -62,7 +69,7 @@
     padding: 0 8px;
     border-radius: 5px;
     position: absolute;
-    right: 10px;
+    right: 15px;
     top: 15px;
     font-size: 30px;
     color: #fff;
@@ -79,7 +86,6 @@ body .frontend {
 .njg-switcher {
     background: #fff;
     border-radius: 5px;
-    color: #1e1d1d;
     font-family: Arial, sans-serif;
     font-family: sans-serif;
     font-size: 14px;
@@ -103,16 +109,56 @@ body .frontend {
     font-size: 13px;
     padding: 5px 10px;
     width: 94px;
+    outline: none;
+    color: #000 !important;
+}
+
+#njg-datepicker:focus {
+    border: 1px solid #df5d43;
+    color: #df5d43 !important;
 }
 
 #ui-datepicker-div {
     font-size: 15px;
     line-height: initial;
+    margin-top: -8px !important;
+    margin-left: -100px !important;
+    border-radius: 5px !important;
+}
+
+#ui-datepicker-div tr {
+    background: #fff !important;
+}
+
+.ui-datepicker-header {
+    background: #fff !important;
+    color: #000 !important;
+    border: none !important;
+}
+
+.ui-state-default {
+    border: none !important;
+    background: #fff !important;
+    color: #000 !important;
+    text-align: center !important;
+}
+
+.ui-state-default:hover,
+.ui-state-default:focus,
+.ui-state-active {
+    background: #333 !important;
+    color: #fff !important;
+}
+
+.ui-datepicker-today a {
+    background: #df5d43 !important;
+    color: #fff !important;
 }
 
 .ui-datepicker thead th {
     line-height: normal;
     text-transform: uppercase;
     font-size: 11px;
-    background: #f6f6f6;
+    background: #fff;
+    color: #000;
 }

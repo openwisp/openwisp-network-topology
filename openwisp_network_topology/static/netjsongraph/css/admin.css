@@ -24,12 +24,6 @@ input[type='text'].readonly {
     overflow: hidden;
 }
 
-.njg-overlay {
-    top: auto;
-    bottom: 60px;
-    right: 5px;
-}
-
 .submit-row .visualizelink {
     background: #778898;
 }

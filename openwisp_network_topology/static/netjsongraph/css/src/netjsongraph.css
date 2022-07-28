@@ -203,12 +203,13 @@ p {
     margin: 0 auto;
     width: 40px;
     height: 40px;
-    background: url('./loading.gif') center no-repeat;
+    background: url('./images/loading.gif') center no-repeat;
     background-size: contain;
 }
 
 .loadingTip {
     font-size: 18px;
+    color: #fff;
     font-weight: bold;
     text-align: center;
 }
