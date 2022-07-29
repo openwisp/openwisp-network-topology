@@ -38,6 +38,7 @@ p {
     transition: left 0.5s;
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
     user-select: text;
 }
 
