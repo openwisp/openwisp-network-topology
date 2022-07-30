@@ -32,7 +32,7 @@ django.jQuery(function ($) {
 
     var closeOverlay = function () {
         $(document).unbind('keydown', disableArrowKeys);
-        inner.html('');
+        inner.empty();
         overlay.hide();
         body.attr('style', '');
     };

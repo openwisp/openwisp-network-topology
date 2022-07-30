@@ -4,163 +4,164 @@
     // default API url
     window.__njg_default_url__ = '{{ graph_url }}';
 
-    const data = window.__njg_default_url__;
-    const history_url = '{{ history_url }}';
-    const getDataParseOptions = (data) => {
-        return {
-            dateString: data,
-            parseRegular:
-                /^([1-9]\d{3})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2})(?:\.(\d{1,6}))?Z$/,
-        };
-    };
-
-    // load graph
-    const graph = new NetJSONGraph(data, {
-        el: window.__njg_el__,
-        graphConfig: {
-            baseOptions: {
-                backgroundColor: '#282222b3',
-                toolbox: {
-                    right: '60',
-                    top: '15',
-                },
-            },
-        },
-        linkCategories: [
-            {
-                name: 'down',
-                linkStyle: {
-                    color: '#c92517',
-                    width: 6,
-                },
-                emphasis: {
-                    linkStyle: {
-                        color: '#FD0101',
-                        opacity: 1,
-                    },
-                },
-            },
-            {
-                name: 'up',
-                linkStyle: {
-                    color: '#1ba619',
-                    width: 6,
-                },
-                emphasis: {
-                    linkStyle: {
-                        color: '#3acc38',
-                        opacity: 1,
-                    },
-                },
-            },
-        ],
-        prepareData: (data) => {
-            data.links.map((link) => {
-                link.properties = link.properties || {};
-                if (link.properties.status) {
-                    link.category = link.properties.status;
-                }
-                if (link.properties.created) {
-                    link.properties.created = graph.utils.dateParse(
-                        getDataParseOptions(link.properties.created)
-                    );
-                }
-                if (link.properties.modified) {
-                    link.properties.modified = graph.utils.dateParse(
-                        getDataParseOptions(link.properties.modified)
-                    );
-                }
-                if (link.properties.status_changed) {
-                    link.properties.status_changed = graph.utils.dateParse(
-                        getDataParseOptions(link.properties.status_changed)
-                    );
-                }
-            });
-
-            data.nodes.map((node) => {
-                node.properties = node.properties || {};
-                if (node.properties.created) {
-                    node.properties.created = graph.utils.dateParse(
-                        getDataParseOptions(node.properties.created)
-                    );
-                }
-                if (node.properties.modified) {
-                    node.properties.modified = graph.utils.dateParse(
-                        getDataParseOptions(node.properties.modified)
-                    );
-                }
-            });
-        },
-
-        onLoad: () => {
-            const gui = graph.utils.getGUI(graph);
-            gui.init();
-            if (graph.config.metadata) {
-                gui.createAboutContainer(graph);
-                graph.utils.updateMetadata.call(graph);
-            }
-
-            graph.config.onClickElement = (type, data) => {
-                legend.classList.add('open');
-                let nodeLinkData;
-                if (type === 'node') {
-                    nodeLinkData = graph.utils.nodeInfo(data);
-                } else {
-                    nodeLinkData = graph.utils.linkInfo(data);
-                }
-                gui.getNodeLinkInfo(type, nodeLinkData);
-                gui.sideBar.classList.remove('hidden');
+    (() => {
+        const history_url = '{{ history_url }}';
+        const getDataParseOptions = (data) => {
+            return {
+                dateString: data,
+                parseRegular:
+                    /^([1-9]\d{3})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2})(?:\.(\d{1,6}))?Z$/,
             };
+        };
 
-            document.querySelector('.sideBarHandle').addEventListener('click', () => {
-                legend.classList.toggle('open');
-            });
+        // load graph
+        const graph = new NetJSONGraph(window.__njg_default_url__, {
+            el: window.__njg_el__,
+            graphConfig: {
+                baseOptions: {
+                    backgroundColor: '#282222b3',
+                    toolbox: {
+                        right: '60',
+                        top: '15',
+                    },
+                },
+            },
+            linkCategories: [
+                {
+                    name: 'down',
+                    linkStyle: {
+                        color: '#c92517',
+                        width: 6,
+                    },
+                    emphasis: {
+                        linkStyle: {
+                            color: '#FD0101',
+                            opacity: 1,
+                        },
+                    },
+                },
+                {
+                    name: 'up',
+                    linkStyle: {
+                        color: '#1ba619',
+                        width: 6,
+                    },
+                    emphasis: {
+                        linkStyle: {
+                            color: '#3acc38',
+                            opacity: 1,
+                        },
+                    },
+                },
+            ],
+            prepareData: (data) => {
+                data.links.map((link) => {
+                    link.properties = link.properties || {};
+                    if (link.properties.status) {
+                        link.category = link.properties.status;
+                    }
+                    if (link.properties.created) {
+                        link.properties.created = graph.utils.dateParse(
+                            getDataParseOptions(link.properties.created)
+                        );
+                    }
+                    if (link.properties.modified) {
+                        link.properties.modified = graph.utils.dateParse(
+                            getDataParseOptions(link.properties.modified)
+                        );
+                    }
+                    if (link.properties.status_changed) {
+                        link.properties.status_changed = graph.utils.dateParse(
+                            getDataParseOptions(link.properties.status_changed)
+                        );
+                    }
+                });
 
-            graph.utils.hideLoading();
-        },
-    });
+                data.nodes.map((node) => {
+                    node.properties = node.properties || {};
+                    if (node.properties.created) {
+                        node.properties.created = graph.utils.dateParse(
+                            getDataParseOptions(node.properties.created)
+                        );
+                    }
+                    if (node.properties.modified) {
+                        node.properties.modified = graph.utils.dateParse(
+                            getDataParseOptions(node.properties.modified)
+                        );
+                    }
+                });
+            },
 
-    const overlay = document.querySelector(window.__njg_el__);
-    const createLegend = (key, name) => {
-        const legendItem = document.createElement('p');
-        const legendIcon = document.createElement('span');
+            onLoad: () => {
+                const gui = graph.utils.getGUI(graph);
+                gui.init();
+                if (graph.config.metadata) {
+                    gui.createAboutContainer(graph);
+                    graph.utils.updateMetadata.call(graph);
+                }
 
-        legendIcon.setAttribute('class', name);
+                graph.config.onClickElement = (type, data) => {
+                    switcher.classList.add('open');
+                    let nodeLinkData;
+                    if (type === 'node') {
+                        nodeLinkData = graph.utils.nodeInfo(data);
+                    } else {
+                        nodeLinkData = graph.utils.linkInfo(data);
+                    }
+                    gui.getNodeLinkInfo(type, nodeLinkData);
+                    gui.sideBar.classList.remove('hidden');
+                };
 
-        legend.appendChild(legendItem);
-        legendItem.appendChild(legendIcon);
+                document.querySelector('.sideBarHandle').addEventListener('click', () => {
+                    switcher.classList.toggle('open');
+                });
 
-        legendItem.innerHTML += key;
-        return legendItem;
-    };
-    const legend = document.createElement('div');
-    const legendHeader = document.createElement('h4');
-    legend.setAttribute('id', 'legend');
-    legend.classList.add('open');
-    legendHeader.innerHTML = 'Legend';
-    legend.appendChild(legendHeader);
-    legend.appendChild(createLegend('Up', 'link-up'));
-    legend.appendChild(createLegend('Down', 'link-down'));
-    overlay.appendChild(legend);
+                graph.utils.hideLoading();
+            },
+        });
 
-    const closeBtn = document.createElement('button');
-    closeBtn.setAttribute('class', 'closeBtn');
-    closeBtn.innerHTML = '&times;';
-    overlay.appendChild(closeBtn);
+        const overlay = document.querySelector(window.__njg_el__);
+        const createLegend = (key, name) => {
+            const legendItem = document.createElement('p');
+            const legendIcon = document.createElement('span');
 
-    const switcher = document.createElement('div');
-    switcher.setAttribute('class', 'njg-switcher');
-    const dateLabel = document.createElement('label');
-    dateLabel.setAttribute('for', 'njg-datepicker');
-    dateLabel.innerHTML = 'Date:';
-    switcher.appendChild(dateLabel);
-    const datePicker = document.createElement('input');
-    datePicker.setAttribute('type', 'text');
-    datePicker.setAttribute('id', 'njg-datepicker');
-    datePicker.setAttribute('data-history-api', history_url);
-    switcher.appendChild(datePicker);
-    overlay.appendChild(switcher);
+            legendIcon.setAttribute('class', name);
 
-    window.graph = graph;
+            legend.appendChild(legendItem);
+            legendItem.appendChild(legendIcon);
+
+            legendItem.innerHTML += key;
+            return legendItem;
+        };
+        const legend = document.createElement('div');
+        const legendHeader = document.createElement('h4');
+        legend.setAttribute('id', 'legend');
+        legendHeader.innerHTML = 'Legend';
+        legend.appendChild(legendHeader);
+        legend.appendChild(createLegend('Up', 'link-up'));
+        legend.appendChild(createLegend('Down', 'link-down'));
+        overlay.appendChild(legend);
+
+        const closeBtn = document.createElement('button');
+        closeBtn.setAttribute('class', 'closeBtn');
+        closeBtn.innerHTML = '&times;';
+        overlay.appendChild(closeBtn);
+
+        const switcher = document.createElement('div');
+        switcher.setAttribute('class', 'njg-switcher');
+        switcher.classList.add('open');
+        const dateLabel = document.createElement('label');
+        dateLabel.setAttribute('for', 'njg-datepicker');
+        dateLabel.innerHTML = 'Date:';
+        switcher.appendChild(dateLabel);
+        const datePicker = document.createElement('input');
+        datePicker.setAttribute('type', 'text');
+        datePicker.setAttribute('id', 'njg-datepicker');
+        datePicker.setAttribute('data-history-api', history_url);
+        switcher.appendChild(datePicker);
+        overlay.appendChild(switcher);
+
+        window.graph = graph;
+    })();
     window.initTopologyHistory(django.jQuery);
 </script>

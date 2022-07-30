@@ -5,7 +5,7 @@
 
 #legend {
     position: absolute;
-    left: 25px;
+    right: 25px;
     bottom: 15px;
     width: auto;
     height: auto;
@@ -94,10 +94,10 @@ body .frontend {
     max-width: 400px;
     min-width: auto;
     position: absolute;
-    left: 50%;
+    left: 25px;
     bottom: 15px;
     padding: 5px 8px;
-    transform: translateX(-50%);
+    transition: all 0.5s;
 }
 
 .njg-switcher * {
@@ -122,7 +122,7 @@ body .frontend {
     font-size: 15px;
     line-height: initial;
     margin-top: -8px !important;
-    margin-left: -100px !important;
+    margin-left: -45px !important;
     border-radius: 5px !important;
 }
 
@@ -148,6 +148,10 @@ body .frontend {
 .ui-state-active {
     background: #333 !important;
     color: #fff !important;
+}
+
+.ui-state-default:hover {
+    background: #7b7b7b !important;
 }
 
 .ui-datepicker-today a {
