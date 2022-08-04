@@ -18,6 +18,9 @@
         const graph = new NetJSONGraph(window.__njg_default_url__, {
             el: window.__njg_el__,
             graphConfig: {
+                series:{
+                    zoom:'2',
+                },
                 baseOptions: {
                     backgroundColor: '#282222b3',
                     toolbox: {
@@ -97,6 +100,7 @@
                 gui.init();
                 if (graph.config.metadata) {
                     gui.createAboutContainer(graph);
+                    gui.sideBar.classList.add("hidden");
                     graph.utils.updateMetadata.call(graph);
                 }
 
@@ -149,7 +153,6 @@
 
         const switcher = document.createElement('div');
         switcher.setAttribute('class', 'njg-switcher');
-        switcher.classList.add('open');
         const dateLabel = document.createElement('label');
         dateLabel.setAttribute('for', 'njg-datepicker');
         dateLabel.innerHTML = 'Date:';

@@ -6,7 +6,7 @@
 #legend {
     position: absolute;
     right: 25px;
-    bottom: 15px;
+    bottom: 25px;
     width: auto;
     height: auto;
     max-width: 250px;
@@ -23,7 +23,7 @@
 }
 
 .open {
-    left: 360px !important;
+    left: 370px !important;
 }
 
 #legend p {
@@ -95,7 +95,7 @@ body .frontend {
     min-width: auto;
     position: absolute;
     left: 25px;
-    bottom: 15px;
+    bottom: 25px;
     padding: 5px 8px;
     transition: all 0.5s;
 }
@@ -121,7 +121,7 @@ body .frontend {
 #ui-datepicker-div {
     font-size: 15px;
     line-height: initial;
-    margin-top: -8px !important;
+    margin-top: -13px !important;
     margin-left: -45px !important;
     border-radius: 5px !important;
 }
