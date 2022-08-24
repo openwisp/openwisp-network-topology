@@ -6,6 +6,9 @@
 
     (() => {
         const history_url = '{{ history_url }}';
+        const url=`ws://${window.location.host}${window.location.pathname}`;
+        const socket = new WebSocket(url);
+        
         const getDataParseOptions = (data) => {
             return {
                 dateString: data,
@@ -165,6 +168,14 @@
         overlay.appendChild(switcher);
 
         window.graph = graph;
+
+        socket.onmessage=function(e){
+            const data=JSON.parse(e.data);
+            if(data.type==="broadcast_topology"){
+                const topology=JSON.parse(data.topology);
+                window.graph.utils.JSONDataUpdate.call(window.graph, topology);
+            }   
+        }
     })();
     window.initTopologyHistory(django.jQuery);
 </script>

@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_extensions',
     # 'debug_toolbar',
+    # channels
+    'channels',
 ]
 
 AUTH_USER_MODEL = 'openwisp_users.User'
@@ -77,6 +79,10 @@ MIDDLEWARE = [
 # INTERNAL_IPS = ['127.0.0.1']
 
 ROOT_URLCONF = 'openwisp2.urls'
+
+ASGI_APPLICATION = 'openwisp2.asgi.application'
+
+CHANNEL_LAYERS = {'default': {'BACKEND': 'channels.layers.InMemoryChannelLayer'}}
 
 LANGUAGE_CODE = 'en-gb'
 TIME_ZONE = 'UTC'

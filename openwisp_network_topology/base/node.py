@@ -6,6 +6,8 @@ from datetime import timedelta
 import swapper
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -16,6 +18,7 @@ from openwisp_users.mixins import ShareableOrgMixin
 from openwisp_utils.base import TimeStampedEditableModel
 
 from .. import settings as app_settings
+from ..signals import update_topology
 from ..utils import print_info
 
 
@@ -181,3 +184,9 @@ class AbstractNode(ShareableOrgMixin, TimeStampedEditableModel):
     def get_queryset(cls, qs):
         """admin list queryset"""
         return qs.select_related('organization', 'topology')
+
+
+@receiver(post_save, sender=swapper.get_model_name('topology', 'Node'))
+@receiver(post_delete, sender=swapper.get_model_name('topology', 'Node'))
+def send_topology_signal(sender, instance, **kwargs):
+    update_topology.send(sender=sender, topology=instance.topology)

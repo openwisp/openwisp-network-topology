@@ -132,7 +132,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
         self.assertEqual(DeviceNode.objects.count(), 0)
         with self.subTest('assert number of queries'):
-            with self.assertNumQueries(13):
+            with self.assertNumQueries(15):
                 node = self._init_test_node(topology, common_name=cert.common_name)
         self.assertEqual(DeviceNode.objects.count(), 1)
         device_node = DeviceNode.objects.first()
@@ -179,7 +179,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
             except ValueError:
                 self.fail('ValueError raised')
         with self.subTest('assert number of queries'):
-            with self.assertNumQueries(13):
+            with self.assertNumQueries(15):
                 node = self._init_wireguard_test_node(topology)
         self.assertEqual(DeviceNode.objects.count(), 1)
         device_node = DeviceNode.objects.first()
@@ -235,7 +235,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         )
         link.full_clean()
         link.save()
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             link.status = 'down'
             link.save()
         device.refresh_from_db()
@@ -259,7 +259,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         )
         link.full_clean()
         link.save()
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             link.status = 'up'
             link.save()
         device.refresh_from_db()

@@ -2,8 +2,11 @@ import json
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
+import swapper
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -17,6 +20,7 @@ from openwisp_utils.base import KeyField, TimeStampedEditableModel
 
 from ..contextmanagers import log_failure
 from ..settings import PARSERS, TIMEOUT
+from ..signals import update_topology
 from ..utils import print_info
 
 STRATEGIES = (('fetch', _('FETCH')), ('receive', _('RECEIVE')))
@@ -393,3 +397,8 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
             print_info('Saving topology {0}'.format(topology))
             with log_failure('save_snapshot', topology):
                 topology.save_snapshot()
+
+
+@receiver(post_save, sender=swapper.get_model_name('topology', 'Topology'))
+def send_topology_signal(sender, instance, **kwargs):
+    update_topology.send(sender=sender, topology=instance)

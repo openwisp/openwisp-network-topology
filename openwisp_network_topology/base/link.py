@@ -6,6 +6,8 @@ import swapper
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from jsonfield import JSONField
@@ -17,6 +19,7 @@ from openwisp_users.mixins import ShareableOrgMixin
 from openwisp_utils.base import TimeStampedEditableModel
 
 from .. import settings as app_settings
+from ..signals import update_topology
 from ..utils import link_status_changed, print_info
 
 
@@ -203,3 +206,9 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
     def get_queryset(cls, qs):
         """admin list queryset"""
         return qs.select_related('organization', 'topology', 'source', 'target')
+
+
+@receiver(post_save, sender=swapper.get_model_name('topology', 'Link'))
+@receiver(post_delete, sender=swapper.get_model_name('topology', 'Link'))
+def send_topology_signal(sender, instance, **kwargs):
+    update_topology.send(sender=sender, topology=instance.topology)

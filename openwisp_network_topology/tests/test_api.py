@@ -398,7 +398,7 @@ class TestApi(
             'url': 'http://127.0.0.1:9090',
             'published': True,
         }
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(12):
             response = self.client.post(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['label'], 'test-fetch-topology')
@@ -415,7 +415,7 @@ class TestApi(
             'expiration_time': 360,
             'published': True,
         }
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(12):
             response = self.client.post(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['label'], 'test-receive-topology')
@@ -473,7 +473,7 @@ class TestApi(
             'organization': self._get_org().pk,
             'parser': 'netdiff.OlsrParser',
         }
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(12):
             response = self.client.put(path, data, content_type='application/json')
         self.topology.refresh_from_db()
         self.assertEqual(self.topology.label, 'ChangeTestNetwork')
@@ -529,7 +529,7 @@ class TestApi(
             'strategy': 'fetch',
             'url': 'http://127.0.0.1:9090',
         }
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(12):
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['strategy'], 'fetch')
@@ -548,7 +548,7 @@ class TestApi(
             'strategy': 'receive',
             'key': 12345,
         }
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(12):
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['strategy'], 'receive')
@@ -560,7 +560,7 @@ class TestApi(
         data = {
             'label': 'ChangeTestNetwork',
         }
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(11):
             response = self.client.patch(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['label'], 'ChangeTestNetwork')
@@ -681,7 +681,7 @@ class TestApi(
             'properties': {},
             'user_properties': {},
         }
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(13):
             response = self.client.post(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['topology'], self.topology.pk)
@@ -702,7 +702,7 @@ class TestApi(
             'organization': org.pk,
         }
         path = reverse('node_list')
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(11):
             response = self.client.post(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['topology'], topology.pk)
@@ -732,7 +732,7 @@ class TestApi(
             'user_properties': {},
         }
         path = reverse('node_detail', args=(self.node1.pk,))
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(13):
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['label'], 'change-node')
@@ -741,7 +741,7 @@ class TestApi(
     def test_node_patch_api(self):
         path = reverse('node_detail', args=(self.node1.pk,))
         data = {'label': 'change-node'}
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(12):
             response = self.client.patch(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['label'], 'change-node')
@@ -804,7 +804,7 @@ class TestApi(
             'properties': {},
             'user_properties': {},
         }
-        with self.assertNumQueries(14):
+        with self.assertNumQueries(16):
             response = self.client.post(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['topology'], self.topology.pk)
@@ -863,7 +863,7 @@ class TestApi(
             'properties': {},
             'user_properties': {'user': 'tester'},
         }
-        with self.assertNumQueries(14):
+        with self.assertNumQueries(16):
             response = self.client.put(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['cost'], 21.0)
@@ -873,7 +873,7 @@ class TestApi(
     def test_link_patch_api(self):
         path = reverse('link_detail', args=(self.link.pk,))
         data = {'cost': 50.0}
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(13):
             response = self.client.patch(path, data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['cost'], 50.0)
