@@ -51,6 +51,9 @@ jobs:
         run: |
           pip install -e .
           pip install ${{ matrix.django-version }}
+          # fixes build issue
+          # TODO: remove when openwisp-controller version is updated to 1.1.0
+          pip install -U pyOpenSSL
 
       - name: QA checks
         run: ./run-qa-checks
