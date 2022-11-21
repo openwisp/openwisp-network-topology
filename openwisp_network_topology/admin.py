@@ -63,12 +63,12 @@ class TopologyAdmin(
     model = Topology
     list_display = [
         'label',
+        'organization',
         'parser',
         'strategy',
         'published',
         'created',
         'modified',
-        'organization',
     ]
     readonly_fields = [
         'uuid',
