@@ -335,6 +335,35 @@ class TestMultitenantAdmin(
         )
         return data
 
+    def _test_topology_autocomplete_filter(self, url_reverse=None, payload=None):
+        url = reverse(url_reverse)
+
+        with self.subTest('test superadmin topology autocomplete filter'):
+            user = self.user_model.objects.filter(
+                is_superuser=True, is_staff=True
+            ).first()
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            for option in response.json()['results']:
+                assert option['id'] in [
+                    str(id)
+                    for id in self.topology_model.objects.values_list('id', flat=True)
+                ]
+
+        with self.subTest('test non superadmin topology autocomplete filter'):
+            user = self.user_model.objects.get(username='administrator')
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            topologies = self.topology_model.objects.filter(
+                organization=user.organizations_managed[0]
+            )
+            for option in response.json()['results']:
+                assert option['id'] in [
+                    str(id) for id in topologies.values_list('id', flat=True)
+                ]
+
     def test_topology_queryset(self):
         data = self._create_multitenancy_test_env()
         perm = Permission.objects.get_by_natural_key(
@@ -350,34 +379,36 @@ class TestMultitenantAdmin(
     def test_topology_organization_fk_queryset(self):
         data = self._create_multitenancy_test_env()
         self._create_topology(label='special', organization=data['org1'])
-        url = reverse('admin:ow-auto-filter')
+        url = reverse('admin:autocomplete')
         payload = {
             'app_label': self.app_label,
             'model_name': self.app_label,
             'field_name': 'organization',
         }
 
-        with self.subTest('test superadmin'):
+        with self.subTest(
+            'test superadmin add topology organization autocomplete filter'
+        ):
             user = self.user_model.objects.filter(
                 is_superuser=True, is_staff=True
             ).first()
             self.client.force_login(user)
             response = self.client.get(url, payload)
             self.assertEqual(response.status_code, 200)
-            # Exclude first '-'(null) organization from the result json
-            for option in response.json()['results'][1:]:
+            for option in response.json()['results']:
                 assert option['id'] in [
                     str(id)
                     for id in self.org_model.objects.values_list('id', flat=True)
                 ]
 
-        with self.subTest('test non superadmin'):
+        with self.subTest(
+            'test non superadmin add topology organization autocomplete filter'
+        ):
             user = self.user_model.objects.get(username='administrator')
             self.client.force_login(user)
             response = self.client.get(url, payload)
             self.assertEqual(response.status_code, 200)
-            # Exclude first '-'(null) organization from the result json
-            for option in response.json()['results'][1:]:
+            for option in response.json()['results']:
                 assert option['id'] in [str(id) for id in user.organizations_managed]
                 assert option['id'] not in self.org_model.objects.exclude(
                     pk__in=user.organizations_managed
@@ -420,138 +451,46 @@ class TestMultitenantAdmin(
 
     def test_node_topology_fk_queryset(self):
         self._create_multitenancy_test_env()
-        url = reverse('admin:autocomplete')
         payload = {
             'app_label': self.app_label,
             'model_name': 'node',
             'field_name': self.app_label,
         }
-
-        with self.subTest('test superadmin'):
-            user = self.user_model.objects.filter(
-                is_superuser=True, is_staff=True
-            ).first()
-            self.client.force_login(user)
-            response = self.client.get(url, payload)
-            self.assertEqual(response.status_code, 200)
-            for option in response.json()['results']:
-                assert option['id'] in [
-                    str(id) for id in Topology.objects.values_list('id', flat=True)
-                ]
-
-        with self.subTest('test non superadmin'):
-            user = self.user_model.objects.get(username='administrator')
-            self.client.force_login(user)
-            response = self.client.get(url, payload)
-            self.assertEqual(response.status_code, 200)
-            topologies = Topology.objects.filter(
-                organization=user.organizations_managed[0]
-            )
-            for option in response.json()['results']:
-                assert option['id'] in [
-                    str(id) for id in topologies.values_list('id', flat=True)
-                ]
+        self._test_topology_autocomplete_filter(
+            url_reverse='admin:autocomplete', payload=payload
+        )
 
     def test_link_topology_fk_queryset(self):
         self._create_multitenancy_test_env()
-        url = reverse('admin:autocomplete')
         payload = {
             'app_label': self.app_label,
             'model_name': 'link',
             'field_name': self.app_label,
         }
-
-        with self.subTest('test superadmin'):
-            user = self.user_model.objects.filter(
-                is_superuser=True, is_staff=True
-            ).first()
-            self.client.force_login(user)
-            response = self.client.get(url, payload)
-            self.assertEqual(response.status_code, 200)
-            for option in response.json()['results']:
-                assert option['id'] in [
-                    str(id) for id in Topology.objects.values_list('id', flat=True)
-                ]
-
-        with self.subTest('test non superadmin'):
-            user = self.user_model.objects.get(username='administrator')
-            self.client.force_login(user)
-            response = self.client.get(url, payload)
-            self.assertEqual(response.status_code, 200)
-            topologies = Topology.objects.filter(
-                organization=user.organizations_managed[0]
-            )
-            for option in response.json()['results']:
-                assert option['id'] in [
-                    str(id) for id in topologies.values_list('id', flat=True)
-                ]
+        self._test_topology_autocomplete_filter(
+            url_reverse='admin:autocomplete', payload=payload
+        )
 
     def test_node_topology_filter(self):
         data = self._create_multitenancy_test_env()
         self._create_topology(label='special', organization=data['org1'])
-        url = reverse('admin:ow-auto-filter')
         payload = {
             'app_label': self.app_label,
             'model_name': 'node',
             'field_name': self.app_label,
         }
-
-        with self.subTest('test superadmin'):
-            user = self.user_model.objects.filter(
-                is_superuser=True, is_staff=True
-            ).first()
-            self.client.force_login(user)
-            response = self.client.get(url, payload)
-            self.assertEqual(response.status_code, 200)
-            for option in response.json()['results']:
-                assert option['id'] in [
-                    str(id) for id in Topology.objects.values_list('id', flat=True)
-                ]
-
-        with self.subTest('test non superadmin'):
-            user = self.user_model.objects.get(username='administrator')
-            self.client.force_login(user)
-            response = self.client.get(url, payload)
-            self.assertEqual(response.status_code, 200)
-            topologies = Topology.objects.filter(
-                organization=user.organizations_managed[0]
-            )
-            for option in response.json()['results']:
-                assert option['id'] in [
-                    str(id) for id in topologies.values_list('id', flat=True)
-                ]
+        self._test_topology_autocomplete_filter(
+            url_reverse='admin:ow-auto-filter', payload=payload
+        )
 
     def test_link_topology_filter(self):
         data = self._create_multitenancy_test_env()
         self._create_topology(label='special', organization=data['org1'])
-        url = reverse('admin:ow-auto-filter')
         payload = {
             'app_label': self.app_label,
             'model_name': 'link',
             'field_name': self.app_label,
         }
-
-        with self.subTest('test superadmin'):
-            user = self.user_model.objects.filter(
-                is_superuser=True, is_staff=True
-            ).first()
-            self.client.force_login(user)
-            response = self.client.get(url, payload)
-            self.assertEqual(response.status_code, 200)
-            for option in response.json()['results']:
-                assert option['id'] in [
-                    str(id) for id in Topology.objects.values_list('id', flat=True)
-                ]
-
-        with self.subTest('test non superadmin'):
-            user = self.user_model.objects.get(username='administrator')
-            self.client.force_login(user)
-            response = self.client.get(url, payload)
-            self.assertEqual(response.status_code, 200)
-            topologies = Topology.objects.filter(
-                organization=user.organizations_managed[0]
-            )
-            for option in response.json()['results']:
-                assert option['id'] in [
-                    str(id) for id in topologies.values_list('id', flat=True)
-                ]
+        self._test_topology_autocomplete_filter(
+            url_reverse='admin:ow-auto-filter', payload=payload
+        )
