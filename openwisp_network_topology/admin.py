@@ -78,8 +78,9 @@ class TopologyAdmin(
         'metric',
         'receive_url',
     ]
-    list_filter = ['parser', 'strategy', ('organization', MultitenantOrgFilter)]
+    list_filter = ['parser', 'strategy', MultitenantOrgFilter]
     search_fields = ['label', 'id']
+    autocomplete_fields = ['organization']
     actions = ['update_selected', 'unpublish_selected', 'publish_selected']
     fields = [
         'label',
@@ -253,6 +254,12 @@ class NodeLinkMixin(MultitenantAdminMixin):
     readonly_properties.short_description = _('Properties')
 
 
+class TopologyFilter(MultitenantRelatedOrgFilter):
+    field_name = 'topology'
+    parameter_name = 'topology_id'
+    title = _('topology')
+
+
 @admin.register(Node)
 class NodeAdmin(NodeLinkMixin, BaseAdmin):
     model = Node
@@ -261,10 +268,11 @@ class NodeAdmin(NodeLinkMixin, BaseAdmin):
     list_display = ['get_name', 'organization', 'topology', 'addresses']
     search_fields = ['addresses', 'label', 'properties']
     list_filter = [
-        ('organization', MultitenantOrgFilter),
-        ('topology', MultitenantRelatedOrgFilter),
+        (MultitenantOrgFilter),
+        (TopologyFilter),
     ]
     multitenant_shared_relations = ('topology',)
+    autocomplete_fields = ('topology',)
     fields = [
         'topology',
         'organization',
@@ -313,10 +321,11 @@ class LinkAdmin(NodeLinkMixin, BaseAdmin):
     ]
     list_filter = [
         'status',
-        ('organization', MultitenantOrgFilter),
-        ('topology', MultitenantRelatedOrgFilter),
+        (MultitenantOrgFilter),
+        (TopologyFilter),
     ]
     multitenant_shared_relations = ('topology', 'source', 'target')
+    autocomplete_fields = ('topology',)
     fields = [
         'topology',
         'organization',

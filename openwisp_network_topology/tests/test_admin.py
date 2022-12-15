@@ -16,6 +16,8 @@ from .utils import CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin
 Link = swapper.load_model('topology', 'Link')
 Node = swapper.load_model('topology', 'Node')
 Topology = swapper.load_model('topology', 'Topology')
+OrganizationUser = swapper.load_model('openwisp_users', 'OrganizationUser')
+Organization = swapper.load_model('openwisp_users', 'Organization')
 
 
 class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
@@ -166,7 +168,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
 
     def test_node_change_list_queries(self):
         path = reverse('{0}_node_changelist'.format(self.prefix))
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(5):
             self.client.get(path)
 
     def test_link_change_list_queries(self):
@@ -175,7 +177,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         n2 = self._create_node(label='node2org1', topology=t)
         self._create_link(topology=t, source=n1, target=n2)
         path = reverse('{0}_link_changelist'.format(self.prefix))
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(5):
             self.client.get(path)
 
     def test_link_change_form(self):
@@ -285,6 +287,8 @@ class TestMultitenantAdmin(
     topology_model = Topology
     node_model = Node
     link_model = Link
+    org_model = Organization
+    user_model = get_user_model()
 
     def _create_multitenancy_test_env(self):
         org1 = self._create_org(name='test1org')
@@ -345,13 +349,39 @@ class TestMultitenantAdmin(
 
     def test_topology_organization_fk_queryset(self):
         data = self._create_multitenancy_test_env()
-        self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_topology_add'),
-            visible=[data['org1'].name],
-            hidden=[data['org2'].name, data['inactive']],
-            select_widget=True,
-            administrator=True,
-        )
+        self._create_topology(label='special', organization=data['org1'])
+        url = reverse('admin:ow-auto-filter')
+        payload = {
+            'app_label': self.app_label,
+            'model_name': self.app_label,
+            'field_name': 'organization',
+        }
+
+        with self.subTest('test superadmin'):
+            user = self.user_model.objects.filter(
+                is_superuser=True, is_staff=True
+            ).first()
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            # Exclude first '-'(null) organization from the result json
+            for option in response.json()['results'][1:]:
+                assert option['id'] in [
+                    str(id)
+                    for id in self.org_model.objects.values_list('id', flat=True)
+                ]
+
+        with self.subTest('test non superadmin'):
+            user = self.user_model.objects.get(username='administrator')
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            # Exclude first '-'(null) organization from the result json
+            for option in response.json()['results'][1:]:
+                assert option['id'] in [str(id) for id in user.organizations_managed]
+                assert option['id'] not in self.org_model.objects.exclude(
+                    pk__in=user.organizations_managed
+                )
 
     def test_node_queryset(self):
         data = self._create_multitenancy_test_env()
@@ -389,35 +419,139 @@ class TestMultitenantAdmin(
         self.assertNotContains(response, 'organization_id')
 
     def test_node_topology_fk_queryset(self):
-        data = self._create_multitenancy_test_env()
-        self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_node_add'),
-            visible=[data['t1'].label],
-            hidden=[data['t2'].label, data['t3_inactive'].label],
-        )
+        self._create_multitenancy_test_env()
+        url = reverse('admin:autocomplete')
+        payload = {
+            'app_label': self.app_label,
+            'model_name': 'node',
+            'field_name': self.app_label,
+        }
+
+        with self.subTest('test superadmin'):
+            user = self.user_model.objects.filter(
+                is_superuser=True, is_staff=True
+            ).first()
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            for option in response.json()['results']:
+                assert option['id'] in [
+                    str(id) for id in Topology.objects.values_list('id', flat=True)
+                ]
+
+        with self.subTest('test non superadmin'):
+            user = self.user_model.objects.get(username='administrator')
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            topologies = Topology.objects.filter(
+                organization=user.organizations_managed[0]
+            )
+            for option in response.json()['results']:
+                assert option['id'] in [
+                    str(id) for id in topologies.values_list('id', flat=True)
+                ]
 
     def test_link_topology_fk_queryset(self):
-        data = self._create_multitenancy_test_env()
-        self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_link_add'),
-            visible=[data['t1'].label],
-            hidden=[data['t2'].label, data['t3_inactive'].label],
-        )
+        self._create_multitenancy_test_env()
+        url = reverse('admin:autocomplete')
+        payload = {
+            'app_label': self.app_label,
+            'model_name': 'link',
+            'field_name': self.app_label,
+        }
+
+        with self.subTest('test superadmin'):
+            user = self.user_model.objects.filter(
+                is_superuser=True, is_staff=True
+            ).first()
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            for option in response.json()['results']:
+                assert option['id'] in [
+                    str(id) for id in Topology.objects.values_list('id', flat=True)
+                ]
+
+        with self.subTest('test non superadmin'):
+            user = self.user_model.objects.get(username='administrator')
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            topologies = Topology.objects.filter(
+                organization=user.organizations_managed[0]
+            )
+            for option in response.json()['results']:
+                assert option['id'] in [
+                    str(id) for id in topologies.values_list('id', flat=True)
+                ]
 
     def test_node_topology_filter(self):
         data = self._create_multitenancy_test_env()
-        t_special = self._create_topology(label='special', organization=data['org1'])
-        self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_node_changelist'),
-            visible=[data['t1'].label, t_special.label],
-            hidden=[data['t2'].label, data['t3_inactive'].label],
-        )
+        self._create_topology(label='special', organization=data['org1'])
+        url = reverse('admin:ow-auto-filter')
+        payload = {
+            'app_label': self.app_label,
+            'model_name': 'node',
+            'field_name': self.app_label,
+        }
+
+        with self.subTest('test superadmin'):
+            user = self.user_model.objects.filter(
+                is_superuser=True, is_staff=True
+            ).first()
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            for option in response.json()['results']:
+                assert option['id'] in [
+                    str(id) for id in Topology.objects.values_list('id', flat=True)
+                ]
+
+        with self.subTest('test non superadmin'):
+            user = self.user_model.objects.get(username='administrator')
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            topologies = Topology.objects.filter(
+                organization=user.organizations_managed[0]
+            )
+            for option in response.json()['results']:
+                assert option['id'] in [
+                    str(id) for id in topologies.values_list('id', flat=True)
+                ]
 
     def test_link_topology_filter(self):
         data = self._create_multitenancy_test_env()
-        t_special = self._create_topology(label='special', organization=data['org1'])
-        self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_link_changelist'),
-            visible=[data['t1'].label, t_special.label],
-            hidden=[data['t2'].label, data['t3_inactive'].label],
-        )
+        self._create_topology(label='special', organization=data['org1'])
+        url = reverse('admin:ow-auto-filter')
+        payload = {
+            'app_label': self.app_label,
+            'model_name': 'link',
+            'field_name': self.app_label,
+        }
+
+        with self.subTest('test superadmin'):
+            user = self.user_model.objects.filter(
+                is_superuser=True, is_staff=True
+            ).first()
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            for option in response.json()['results']:
+                assert option['id'] in [
+                    str(id) for id in Topology.objects.values_list('id', flat=True)
+                ]
+
+        with self.subTest('test non superadmin'):
+            user = self.user_model.objects.get(username='administrator')
+            self.client.force_login(user)
+            response = self.client.get(url, payload)
+            self.assertEqual(response.status_code, 200)
+            topologies = Topology.objects.filter(
+                organization=user.organizations_managed[0]
+            )
+            for option in response.json()['results']:
+                assert option['id'] in [
+                    str(id) for id in topologies.values_list('id', flat=True)
+                ]

@@ -460,12 +460,12 @@ class TestAdmin(Base, TransactionTestCase):
 
     def test_node_change_list_queries(self):
         path = reverse('{0}_node_changelist'.format(self.prefix))
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(5):
             self.client.get(path)
 
     def test_link_change_list_queries(self):
         path = reverse('{0}_link_changelist'.format(self.prefix))
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(5):
             self.client.get(path)
 
     def test_link_node_different_topology(self):
