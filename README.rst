@@ -520,18 +520,6 @@ If a link is down for more days than this number, it will be deleted by the
 
 Setting this to ``False`` will disable this feature.
 
-``OPENWISP_NETWORK_TOPOLOGY_VISUALIZER_CSS``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-+--------------+--------------------------------+
-| **type**:    | ``str``                        |
-+--------------+--------------------------------+
-| **default**: | ``netjsongraph/css/style.css`` |
-+--------------+--------------------------------+
-
-Path of the visualizer css file. Allows customization of css according to user's
-preferences.
-
 ``OPENWISP_NETWORK_TOPOLOGY_NODE_EXPIRATION``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -545,6 +533,18 @@ If a node has not been modified since the days specified and if it has no links,
 it will be deleted by the ``update_topology`` management command. This depends on
 ``OPENWISP_NETWORK_TOPOLOGY_LINK_EXPIRATION`` being enabled.
 Replace ``False`` with an integer to enable the feature.
+
+``OPENWISP_NETWORK_TOPOLOGY_VISUALIZER_CSS``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
++--------------+--------------------------------+
+| **type**:    | ``str``                        |
++--------------+--------------------------------+
+| **default**: | ``netjsongraph/css/style.css`` |
++--------------+--------------------------------+
+
+Path of the visualizer css file. Allows customization of css according to user's
+preferences.
 
 ``OPENWISP_NETWORK_TOPOLOGY_API_URLCONF``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

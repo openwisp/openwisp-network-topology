@@ -159,8 +159,9 @@ class AbstractNode(ShareableOrgMixin, TimeStampedEditableModel):
     @classmethod
     def delete_expired_nodes(cls):
         """
-        deletes nodes that have not been  connected to the network
-        for more than ``NETJSONGRAPH__EXPIRATION`` days
+        deletes nodes that have not been connected to the network
+        for more than the amount of days specified in
+        ``OPENWISP_NETWORK_TOPOLOGY_NODE_EXPIRATION``
         """
         NODE_EXPIRATION = app_settings.NODE_EXPIRATION
         LINK_EXPIRATION = app_settings.LINK_EXPIRATION
