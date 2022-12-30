@@ -80,7 +80,6 @@ class TopologyAdmin(
     ]
     list_filter = ['parser', 'strategy', MultitenantOrgFilter]
     search_fields = ['label', 'id']
-    autocomplete_fields = ['organization']
     actions = ['update_selected', 'unpublish_selected', 'publish_selected']
     fields = [
         'label',
