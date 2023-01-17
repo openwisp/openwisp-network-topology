@@ -1,4 +1,4 @@
-h3 {
+.djnjg-overlay h3 {
     display: block;
     font-size: 1.17em;
     margin-block-start: 1em;
@@ -8,7 +8,7 @@ h3 {
     font-weight: bold;
 }
 
-p {
+.djnjg-overlay p {
     display: block;
     margin-block-start: 1em;
     margin-block-end: 1em;
