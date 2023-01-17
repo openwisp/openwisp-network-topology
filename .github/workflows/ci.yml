@@ -12,23 +12,21 @@ on:
 jobs:
   build:
     name: Python==${{ matrix.python-version }} | ${{ matrix.django-version }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
       matrix:
         python-version:
-          - 3.7
-          - 3.8
-          - 3.9
+          - "3.8"
+          - "3.9"
+          - "3.10"
         django-version:
-          - django~=3.0.0
-          - django~=3.1.0
-          - django~=3.2.8
+          - django~=3.2.0
+          - django~=4.0.0
         include:
-          - django-version: django~=4.0.0
-            python-version: 3.9
-            experimental: true
+          - django-version: django~=3.2.0
+            python-version: 3.7
 
     steps:
       - uses: actions/checkout@v2
@@ -41,7 +39,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install python system packages
-        run: pip install -U "pip==20.2.4" wheel setuptools
+        run: pip install -U pip wheel setuptools
 
       - name: Install test dependencies
         run: |
@@ -51,9 +49,6 @@ jobs:
         run: |
           pip install -e .
           pip install ${{ matrix.django-version }}
-          # fixes build issue
-          # TODO: remove when openwisp-controller version is updated to 1.1.0
-          pip install -U pyOpenSSL
 
       - name: QA checks
         run: ./run-qa-checks
@@ -79,7 +74,7 @@ jobs:
     steps:
       - name: Finished
         run: |
-          pip3 install --upgrade coveralls
+          pip install --upgrade coveralls
           coveralls --finish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
