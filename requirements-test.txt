@@ -3,7 +3,6 @@ pytest-asyncio~=0.14.0
 pytest-django~=4.5.2
 freezegun~=1.1.0
 # Needed to test integrations
-openwisp-monitoring~=1.0.0
-# Needed to test auto-complete filters
+openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/master
 openwisp-controller @ https://github.com/openwisp/openwisp-controller/tarball/master
 openwisp-utils[qa] @ https://github.com/openwisp/openwisp-utils/tarball/master
