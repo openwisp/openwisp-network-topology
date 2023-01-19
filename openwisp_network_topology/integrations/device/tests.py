@@ -386,6 +386,8 @@ class TestControllerIntegration(Base, TransactionTestCase):
 class TestMonitoringIntegration(Base, TransactionTestCase):
     @mock.patch('openwisp_monitoring.db.timeseries_db.create_database')
     @mock.patch('openwisp_monitoring.device.utils.manage_short_retention_policy')
+    @mock.patch('openwisp_monitoring.device.utils.manage_default_retention_policy')
+    @mock.patch('openwisp_monitoring.device.exportable._exportable_fields', [])
     @mock.patch('openwisp_notifications.types.NOTIFICATION_TYPES', dict())
     def test_monitoring_integration(self, *args):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
@@ -460,12 +462,12 @@ class TestAdmin(Base, TransactionTestCase):
 
     def test_node_change_list_queries(self):
         path = reverse('{0}_node_changelist'.format(self.prefix))
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(5):
             self.client.get(path)
 
     def test_link_change_list_queries(self):
         path = reverse('{0}_link_changelist'.format(self.prefix))
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(5):
             self.client.get(path)
 
     def test_link_node_different_topology(self):

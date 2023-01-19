@@ -166,7 +166,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
 
     def test_node_change_list_queries(self):
         path = reverse('{0}_node_changelist'.format(self.prefix))
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(5):
             self.client.get(path)
 
     def test_link_change_list_queries(self):
@@ -175,7 +175,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         n2 = self._create_node(label='node2org1', topology=t)
         self._create_link(topology=t, source=n1, target=n2)
         path = reverse('{0}_link_changelist'.format(self.prefix))
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(5):
             self.client.get(path)
 
     def test_link_change_form(self):
@@ -331,6 +331,14 @@ class TestMultitenantAdmin(
         )
         return data
 
+    def _get_autocomplete_view_path(
+        self, app_label, model_name, field_name, path='admin:ow-auto-filter'
+    ):
+        return (
+            f'{reverse(path)}?app_label={app_label}'
+            f'&model_name={model_name}&field_name={field_name}'
+        )
+
     def test_topology_queryset(self):
         data = self._create_multitenancy_test_env()
         perm = Permission.objects.get_by_natural_key(
@@ -343,13 +351,14 @@ class TestMultitenantAdmin(
             hidden=[data['t2'].label, data['org2'].name, data['t3_inactive'].label],
         )
 
-    def test_topology_organization_fk_queryset(self):
+    def test_topology_organization_fk_autocomplete_view(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_topology_add'),
+            url=self._get_autocomplete_view_path(
+                self.app_label, 'topology', 'organization'
+            ),
             visible=[data['org1'].name],
             hidden=[data['org2'].name, data['inactive']],
-            select_widget=True,
             administrator=True,
         )
 
@@ -388,36 +397,40 @@ class TestMultitenantAdmin(
         response = self.client.get(reverse(f'admin:{self.app_label}_link_add'))
         self.assertNotContains(response, 'organization_id')
 
-    def test_node_topology_fk_queryset(self):
+    def test_node_topology_fk_autocomplete_view(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_node_add'),
+            url=self._get_autocomplete_view_path(
+                self.app_label, 'node', 'topology', path='admin:autocomplete'
+            ),
             visible=[data['t1'].label],
             hidden=[data['t2'].label, data['t3_inactive'].label],
         )
 
-    def test_link_topology_fk_queryset(self):
+    def test_link_topology_fk_autocomplete_view(self):
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_link_add'),
+            url=self._get_autocomplete_view_path(
+                self.app_label, 'link', 'topology', path='admin:autocomplete'
+            ),
             visible=[data['t1'].label],
             hidden=[data['t2'].label, data['t3_inactive'].label],
         )
 
-    def test_node_topology_filter(self):
+    def test_node_topology_autocomplete_filter(self):
         data = self._create_multitenancy_test_env()
         t_special = self._create_topology(label='special', organization=data['org1'])
         self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_node_changelist'),
+            url=self._get_autocomplete_view_path(self.app_label, 'node', 'topology'),
             visible=[data['t1'].label, t_special.label],
             hidden=[data['t2'].label, data['t3_inactive'].label],
         )
 
-    def test_link_topology_filter(self):
+    def test_link_topology_autocomplete_filter(self):
         data = self._create_multitenancy_test_env()
         t_special = self._create_topology(label='special', organization=data['org1'])
         self._test_multitenant_admin(
-            url=reverse(f'admin:{self.app_label}_link_changelist'),
+            url=self._get_autocomplete_view_path(self.app_label, 'link', 'topology'),
             visible=[data['t1'].label, t_special.label],
             hidden=[data['t2'].label, data['t3_inactive'].label],
         )
