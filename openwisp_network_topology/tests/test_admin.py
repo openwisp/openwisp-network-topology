@@ -355,7 +355,7 @@ class TestMultitenantAdmin(
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
             url=self._get_autocomplete_view_path(
-                self.app_label, self.app_label, 'organization'
+                self.app_label, 'topology', 'organization'
             ),
             visible=[data['org1'].name],
             hidden=[data['org2'].name, data['inactive']],
@@ -401,7 +401,7 @@ class TestMultitenantAdmin(
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
             url=self._get_autocomplete_view_path(
-                self.app_label, 'node', self.app_label, path='admin:autocomplete'
+                self.app_label, 'node', 'topology', path='admin:autocomplete'
             ),
             visible=[data['t1'].label],
             hidden=[data['t2'].label, data['t3_inactive'].label],
@@ -411,7 +411,7 @@ class TestMultitenantAdmin(
         data = self._create_multitenancy_test_env()
         self._test_multitenant_admin(
             url=self._get_autocomplete_view_path(
-                self.app_label, 'link', self.app_label, path='admin:autocomplete'
+                self.app_label, 'link', 'topology', path='admin:autocomplete'
             ),
             visible=[data['t1'].label],
             hidden=[data['t2'].label, data['t3_inactive'].label],
@@ -421,9 +421,7 @@ class TestMultitenantAdmin(
         data = self._create_multitenancy_test_env()
         t_special = self._create_topology(label='special', organization=data['org1'])
         self._test_multitenant_admin(
-            url=self._get_autocomplete_view_path(
-                self.app_label, 'node', self.app_label
-            ),
+            url=self._get_autocomplete_view_path(self.app_label, 'node', 'topology'),
             visible=[data['t1'].label, t_special.label],
             hidden=[data['t2'].label, data['t3_inactive'].label],
         )
@@ -432,9 +430,7 @@ class TestMultitenantAdmin(
         data = self._create_multitenancy_test_env()
         t_special = self._create_topology(label='special', organization=data['org1'])
         self._test_multitenant_admin(
-            url=self._get_autocomplete_view_path(
-                self.app_label, 'link', self.app_label
-            ),
+            url=self._get_autocomplete_view_path(self.app_label, 'link', 'topology'),
             visible=[data['t1'].label, t_special.label],
             hidden=[data['t2'].label, data['t3_inactive'].label],
         )
