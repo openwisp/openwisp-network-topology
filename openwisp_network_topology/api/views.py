@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from openwisp_users.api.authentication import BearerAuthentication
-from openwisp_users.api.mixins import FilterByOrganizationManaged
+from openwisp_users.api.mixins import FilterByOrganizationManaged, ProtectedAPIMixin
 from openwisp_users.api.permissions import DjangoModelPermissions, IsOrganizationManager
 
 from .. import settings as app_settings
@@ -177,15 +177,9 @@ class NetworkGraphHistoryView(RequireAuthentication):
             return Response({'detail': _('invalid date supplied')}, status=403)
 
 
-class ProtectedAPIMixin(FilterByOrganizationManaged):
-    authentication_classes = [BearerAuthentication, SessionAuthentication]
-    permission_classes = [
-        IsAuthenticated,
-        DjangoModelPermissions,
-    ]
-
-
-class NodeListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
+class NodeListCreateView(
+    ProtectedAPIMixin, FilterByOrganizationManaged, generics.ListCreateAPIView
+):
     queryset = Node.objects.order_by('-created')
     serializer_class = NodeSerializer
     pagination_class = ListViewPagination
@@ -193,12 +187,18 @@ class NodeListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
     filterset_fields = ('topology', 'organization')
 
 
-class NodeDetailView(ProtectedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
+class NodeDetailView(
+    ProtectedAPIMixin,
+    FilterByOrganizationManaged,
+    generics.RetrieveUpdateDestroyAPIView,
+):
     queryset = Node.objects.all().select_related('topology')
     serializer_class = NodeSerializer
 
 
-class LinkListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
+class LinkListCreateView(
+    ProtectedAPIMixin, FilterByOrganizationManaged, generics.ListCreateAPIView
+):
     queryset = Link.objects.select_related(
         'topology',
         'source',
@@ -210,7 +210,11 @@ class LinkListCreateView(ProtectedAPIMixin, generics.ListCreateAPIView):
     filterset_fields = ('topology', 'organization', 'status')
 
 
-class LinkDetailView(ProtectedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
+class LinkDetailView(
+    ProtectedAPIMixin,
+    FilterByOrganizationManaged,
+    generics.RetrieveUpdateDestroyAPIView,
+):
     queryset = Link.objects.select_related(
         'topology',
         'source',
