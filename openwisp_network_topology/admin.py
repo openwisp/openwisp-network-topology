@@ -102,6 +102,7 @@ class TopologyAdmin(
     receive_url_name = 'receive_topology'
     receive_url_urlconf = app_settings.TOPOLOGY_API_URLCONF
     receive_url_baseurl = app_settings.TOPOLOGY_API_BASEURL
+    change_form_template = 'admin/topology/topology/change_form.html'
 
     def get_actions(self, request):
         """

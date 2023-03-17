@@ -14,18 +14,24 @@ django.jQuery(function ($) {
 
     var openOverlay = function () {
         // show overlay
-        window.__njg_el__ = '.inner';
         $.get(visualizeUrl, function (html) {
             overlay.show();
             inner.html(html);
             body.css('overflow', 'hidden');
             inner.css('overflow', 'hidden');
+
+            const closeBtn = document.createElement('button');
+            closeBtn.setAttribute('class', 'closeBtn');
+            closeBtn.innerHTML = '&times;';
+            overlay.get(0).appendChild(closeBtn);
+
+            window.graph = window.loadNetJsonGraph('.djnjg-overlay .inner');
+
             overlay.find('.closeBtn').click(function (e) {
                 e.preventDefault();
                 window.graph.echarts.dispose();
                 closeOverlay();
             });
-            window.graph.render();
         });
         $(document).keydown(disableArrowKeys);
     };

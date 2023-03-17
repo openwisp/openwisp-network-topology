@@ -4,7 +4,6 @@
         <title>{% block title %}{% endblock %}</title>
         <meta charset="utf-8" />
         <script src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
-
         {% block style %}
         <link href="{% static 'netjsongraph/css/src/netjsongraph.css' %}" rel="stylesheet" />
         <link href="{% static 'netjsongraph/css/lib/jquery-ui.min.css' %}" rel="stylesheet" />
@@ -12,7 +11,8 @@
         {% endblock %}
     </head>
     <body class="frontend">
-        {% block body %}{% endblock %} {% block script %}
+        {% block body %}{% endblock %}
+        {% block script %}
         <script src="{% static 'netjsongraph/js/src/netjsongraph.min.js' %}"></script>
         <script src="{% static 'netjsongraph/js/topology-history.js' %}"></script>
         {% endblock %}

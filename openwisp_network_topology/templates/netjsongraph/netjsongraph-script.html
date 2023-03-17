@@ -1,14 +1,9 @@
 <script>
-    // the graph may be loaded elsewhere than body
-    window.__njg_el__ = window.__njg_el__ || 'body';
-    // default API url
-    window.__njg_default_url__ = '{{ graph_url }}';
-
-    (() => {
+    loadNetJsonGraph = (el='body', url='{{ graph_url }}') => {
         const history_url = '{{ history_url }}';
-        const url=`ws://${window.location.host}${window.location.pathname}`;
-        const socket = new WebSocket(url);
-        
+        const wsUrl = `ws://${window.location.host}${window.location.pathname}`;
+        const socket = new WebSocket(wsUrl);
+
         const getDataParseOptions = (data) => {
             return {
                 dateString: data,
@@ -18,8 +13,8 @@
         };
 
         // load graph
-        const graph = new NetJSONGraph(window.__njg_default_url__, {
-            el: window.__njg_el__,
+        const graph = new NetJSONGraph(url, {
+            el: el,
             graphConfig: {
                 series:{
                     zoom:'2',
@@ -127,7 +122,7 @@
             },
         });
 
-        const overlay = document.querySelector(window.__njg_el__);
+        const overlay = document.querySelector(el);
         const createLegend = (key, name) => {
             const legendItem = document.createElement('p');
             const legendIcon = document.createElement('span');
@@ -149,11 +144,6 @@
         legend.appendChild(createLegend('Down', 'link-down'));
         overlay.appendChild(legend);
 
-        const closeBtn = document.createElement('button');
-        closeBtn.setAttribute('class', 'closeBtn');
-        closeBtn.innerHTML = '&times;';
-        overlay.appendChild(closeBtn);
-
         const switcher = document.createElement('div');
         switcher.setAttribute('class', 'njg-switcher');
         const dateLabel = document.createElement('label');
@@ -167,15 +157,17 @@
         switcher.appendChild(datePicker);
         overlay.appendChild(switcher);
 
-        window.graph = graph;
-
         socket.onmessage=function(e){
             const data=JSON.parse(e.data);
             if(data.type==="broadcast_topology"){
                 const topology=JSON.parse(data.topology);
-                window.graph.utils.JSONDataUpdate.call(window.graph, topology);
-            }   
+                window.__njg_graph__.utils.JSONDataUpdate.call(window.__njg_graph__, topology);
+            }
         }
-    })();
-    window.initTopologyHistory(django.jQuery);
+
+        graph.render();
+        window.initTopologyHistory(django.jQuery);
+        return graph
+    };
+
 </script>
