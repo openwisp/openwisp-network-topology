@@ -201,6 +201,7 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         self.assertContains(
             response, '<div class="readonly">{0}</div>'.format(topology.pk)
         )
+        self.assertContains(response, '<div class="djnjg-overlay">')
 
     def test_topology_visualize_view(self):
         t = self.topology_model.objects.first()
