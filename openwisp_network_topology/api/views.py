@@ -17,6 +17,7 @@ from openwisp_users.api.mixins import FilterByOrganizationManaged, ProtectedAPIM
 from openwisp_users.api.permissions import DjangoModelPermissions, IsOrganizationManager
 
 from .. import settings as app_settings
+from ..tasks import handle_topology_receive
 from ..utils import get_object_or_404
 from .parsers import TextParser
 from .serializers import (
@@ -117,8 +118,7 @@ class ReceiveTopologyView(APIView):
     model = Topology
     parser_classes = (TextParser,)
 
-    def post(self, request, pk, format=None):
-        topology = get_object_or_404(self.model, pk, strategy='receive')
+    def _validate_request(self, request, topology):
         key = request.query_params.get('key')
         # wrong content type: 415
         if request.content_type != 'text/plain':
@@ -133,8 +133,15 @@ class ReceiveTopologyView(APIView):
         # wrong key 403
         if topology.key != key:
             return Response({'detail': _('wrong key')}, status=403)
+        return
+
+    def post(self, request, pk, format=None):
+        topology = get_object_or_404(self.model, pk, strategy='receive')
+        validation_response = self._validate_request(request, topology)
+        if validation_response:
+            return validation_response
         try:
-            topology.receive(request.data)
+            handle_topology_receive.delay(topology.pk, request.data)
         except NetdiffException as e:
             error = _(
                 'Supplied data not recognized as %s, '

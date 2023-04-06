@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from uuid import uuid4
 
 import swapper
 from django.contrib.auth.models import Permission
@@ -6,6 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.views import APIView
 
+from openwisp_network_topology.tasks import handle_topology_receive
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.tests import AssertNumQueriesSubTestMixin
 
@@ -152,6 +154,26 @@ class TestApi(
         self.assertEqual(response.data['detail'], 'data received successfully')
         self.assertEqual(self.node_model.objects.count(), 2)
         self.assertEqual(self.link_model.objects.count(), 1)
+
+    @patch('openwisp_network_topology.tasks.handle_topology_receive.delay')
+    def test_background_topology_receive_task(self, mocked_task):
+        self._set_receive()
+        self.node_model.objects.all().delete()
+        topology = self.topology_model.objects.first()
+        data = self._load('static/netjson-1-link.json')
+        response = self.client.post(self.receive_url, data, content_type='text/plain')
+        mocked_task.assert_called_once_with(topology.id, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['detail'], 'data received successfully')
+
+    @patch('openwisp_network_topology.tasks.logger.warning')
+    def test_background_topology_receive_task_warning(self, mock_warn):
+        topology_pk = str(uuid4())
+        data = {'test_key': 'test_value'}
+        handle_topology_receive(topology_pk, data)
+        mock_warn.assert_called_once_with(
+            f'handle_topology_receive("{topology_pk}") failed: Topology matching query does not exist.'
+        )
 
     def test_receive_404(self):
         # topology is set to FETCH strategy
