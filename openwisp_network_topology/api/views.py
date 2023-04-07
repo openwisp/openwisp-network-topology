@@ -17,7 +17,6 @@ from openwisp_users.api.mixins import FilterByOrganizationManaged, ProtectedAPIM
 from openwisp_users.api.permissions import DjangoModelPermissions, IsOrganizationManager
 
 from .. import settings as app_settings
-from ..tasks import handle_topology_receive
 from ..utils import get_object_or_404
 from .parsers import TextParser
 from .serializers import (
@@ -141,7 +140,7 @@ class ReceiveTopologyView(APIView):
         if validation_response:
             return validation_response
         try:
-            handle_topology_receive.delay(topology.pk, request.data)
+            topology.receive(request.data)
         except NetdiffException as e:
             error = _(
                 'Supplied data not recognized as %s, '

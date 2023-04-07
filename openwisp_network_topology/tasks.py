@@ -8,23 +8,22 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def handle_topology_receive(topology_pk, data):
+def handle_update_topology(topology_pk, diff):
     """
-    A Celery task that receives topology data
-    from ReceiveTopologyView and perform topology.receive(data)
+    A Celery task that updates the network topology
+    of a Topology instance in the background.
 
     Args:
-        topology_pk (str):
+        topology_pk (uuid):
         The primary key of the Topology instance.
 
-        data (str):
-        A dict containing the topology data
-        to be written to the database.
+        diff (str):
+        A dict containing the network topology diff.
     """
     Topology = load_model('topology', 'Topology')
     try:
         topology = Topology.objects.get(pk=topology_pk)
     except ObjectDoesNotExist as e:
-        logger.warning(f'handle_topology_receive("{topology_pk}") failed: {e}')
+        logger.warning(f'handle_update_topology("{topology_pk}") failed: {e}')
         return
-    topology.receive(data)
+    topology.update_topology(diff)
