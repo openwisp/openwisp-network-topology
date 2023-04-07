@@ -55,9 +55,6 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=get_install_requires(),
-    extras_require={
-        'openwisp-utils[celery]': ['openwisp-utils[celery]'],
-    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
