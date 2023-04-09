@@ -1,7 +1,10 @@
 <script>
     loadNetJsonGraph = (el='body', url='{{ graph_url }}') => {
         const history_url = '{{ history_url }}';
-        const wsUrl = `ws://${window.location.host}${window.location.pathname}`;
+        const nonAdminView = {{ non_admin_view | yesno:"true,false" }};
+        const wsUrl = nonAdminView ?
+        `ws://${window.location.host}/admin${window.location.pathname}change/`:
+        `ws://${window.location.host}${window.location.pathname}`;
         const socket = new WebSocket(wsUrl);
 
         const getDataParseOptions = (data) => {
