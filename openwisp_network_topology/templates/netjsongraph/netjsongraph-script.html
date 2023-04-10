@@ -165,6 +165,38 @@
             }
         }
 
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Failed to fetch NetJSONGraph data.');
+            }
+        }).then(data => {
+            if (data.nodes.length > 20) {
+                let graphConfig = {
+                    series: {
+                        force: {
+                            layoutAnimation: false,
+                        },
+                        draggable: false
+                    }
+                };
+                if (data.nodes.length > 50) {
+                    graphConfig.series.force.edgeLength = 250;
+                }
+                graph.setConfig({
+                    graphConfig: graphConfig
+                })
+            }
+        }).catch(error => {
+            console.error(error);
+        });
         graph.render();
         window.initTopologyHistory(django.jQuery);
         return graph
