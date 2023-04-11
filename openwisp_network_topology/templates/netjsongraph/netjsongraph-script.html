@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <script>
     loadNetJsonGraph = (el='body', url='{{ graph_url }}') => {
         const history_url = '{{ history_url }}';
@@ -175,7 +177,7 @@
             if (response.ok) {
                 return response.json();
             } else {
-                throw new Error('Failed to fetch NetJSONGraph data.');
+                throw new Error("{% trans 'Failed to fetch NetJSONGraph data.' %}");
             }
         }).then(data => {
             if (data.nodes.length > 20) {
