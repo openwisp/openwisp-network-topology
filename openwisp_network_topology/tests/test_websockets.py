@@ -2,10 +2,13 @@ import pytest
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.utils.module_loading import import_string
 from swapper import load_model
 
-from .utils import CreateGraphObjectsMixin, CreateOrgMixin
+from openwisp_users.tests.utils import TestOrganizationMixin
+
+from .utils import CreateGraphObjectsMixin
 
 Topology = load_model('topology', 'Topology')
 Node = load_model('topology', 'Node')
@@ -14,7 +17,7 @@ Link = load_model('topology', 'Link')
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
-class TestTopologySockets(CreateGraphObjectsMixin, CreateOrgMixin):
+class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
     node_model = Node
     link_model = Link
     topology_model = Topology
@@ -34,7 +37,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, CreateOrgMixin):
         )
         return communicator
 
-    async def test_consumer_connection(self, admin_user, admin_client):
+    async def test_consumer_connection_superuser(self, admin_user, admin_client):
         org = await database_sync_to_async(self._create_org)()
         t = await database_sync_to_async(self._create_topology)(organization=org)
         communicator = await self._get_communicator(admin_client, t.pk)
@@ -42,7 +45,47 @@ class TestTopologySockets(CreateGraphObjectsMixin, CreateOrgMixin):
         assert connected is True
         await communicator.disconnect()
 
-    async def test_unauthenticated_users(self, client):
+    async def test_consumer_connection_org_manager_with_topology_view_perm(
+        self, client
+    ):
+        org = await database_sync_to_async(self._create_org)()
+        test_user = await database_sync_to_async(self._create_user)(
+            username='test-user-org-manager', email='test@orgmanger.com', is_staff=True
+        )
+        await database_sync_to_async(self._create_org_user)(
+            is_admin=True, user=test_user, organization=org
+        )
+        t = await database_sync_to_async(self._create_topology)(organization=org)
+        topology_view_permission = await database_sync_to_async(Permission.objects.get)(
+            codename='view_topology'
+        )
+        await database_sync_to_async(test_user.user_permissions.add)(
+            topology_view_permission
+        )
+        await database_sync_to_async(client.force_login)(test_user)
+        communicator = await self._get_communicator(client, t.pk)
+        connected, _ = await communicator.connect()
+        assert connected is True
+        await communicator.disconnect()
+
+    async def test_consumer_connection_org_manager_without_topology_view_perm(
+        self, client
+    ):
+        org = await database_sync_to_async(self._create_org)()
+        test_user = await database_sync_to_async(self._create_user)(
+            username='test-user-org-manager', email='test@orgmanger.com', is_staff=True
+        )
+        await database_sync_to_async(self._create_org_user)(
+            is_admin=True, user=test_user, organization=org
+        )
+        t = await database_sync_to_async(self._create_topology)(organization=org)
+        await database_sync_to_async(client.force_login)(test_user)
+        communicator = await self._get_communicator(client, t.pk)
+        connected, _ = await communicator.connect()
+        assert connected is False
+        await communicator.disconnect()
+
+    async def test_consumer_connection_unauthenticated_user(self, client):
         client.cookies['sessionid'] = 'random'
         org = await database_sync_to_async(self._create_org)()
         t = await database_sync_to_async(self._create_topology)(organization=org)
