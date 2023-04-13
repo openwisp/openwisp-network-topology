@@ -20,19 +20,11 @@ class TestTopologySockets(CreateGraphObjectsMixin, CreateOrgMixin):
     topology_model = Topology
     application = import_string(getattr(settings, 'ASGI_APPLICATION'))
 
-    async def _get_url(self, topology_id, admin_view):
-        non_admin_view_url = f'topology/topology/{topology_id}/'
-        admin_view_url = f'admin/topology/topology/{topology_id}/change/'
-        if not admin_view:
-            return non_admin_view_url
-        return admin_view_url
-
-    async def _get_communicator(self, admin_client, topology_id, admin_view=True):
-        url = await self._get_url(topology_id, admin_view)
+    async def _get_communicator(self, admin_client, topology_id):
         session_id = admin_client.cookies['sessionid'].value
         communicator = WebsocketCommunicator(
             self.application,
-            url,
+            path=f'network-topology/topology/{topology_id}/',
             headers=[
                 (
                     b'cookie',
@@ -134,14 +126,4 @@ class TestTopologySockets(CreateGraphObjectsMixin, CreateOrgMixin):
         response = await communicator.receive_json_from()
         assert response['topology'] is not None
         assert response['topology'] == expected_response
-        await communicator.disconnect()
-
-    async def test_non_admin_view_consumer_connection(self, admin_user, admin_client):
-        org = await database_sync_to_async(self._create_org)()
-        t = await database_sync_to_async(self._create_topology)(organization=org)
-        communicator = await self._get_communicator(
-            admin_client, t.pk, admin_view=False
-        )
-        connected, _ = await communicator.connect()
-        assert connected is True
         await communicator.disconnect()
