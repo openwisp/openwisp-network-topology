@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 import pytest
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
@@ -45,6 +47,26 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         assert connected is True
         await communicator.disconnect()
 
+    async def test_consumer_connection_invalid_topology_pk(
+        self, admin_user, admin_client
+    ):
+        org = await database_sync_to_async(self._create_org)()
+        await database_sync_to_async(self._create_topology)(organization=org)
+        communicator = await self._get_communicator(admin_client, 'invalid_topology_pk')
+        connected, _ = await communicator.connect()
+        assert connected is False
+        await communicator.disconnect()
+
+    async def test_consumer_connection_incorrect_topology_pk_uuid(
+        self, admin_user, admin_client
+    ):
+        org = await database_sync_to_async(self._create_org)()
+        await database_sync_to_async(self._create_topology)(organization=org)
+        communicator = await self._get_communicator(admin_client, uuid4())
+        connected, _ = await communicator.connect()
+        assert connected is False
+        await communicator.disconnect()
+
     async def test_consumer_connection_org_manager_with_topology_view_perm(
         self, client
     ):
@@ -85,7 +107,9 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         assert connected is False
         await communicator.disconnect()
 
-    async def test_consumer_connection_unauthenticated_user(self, client):
+    async def test_consumer_connection_unauthenticated_user_and_topology_api_auth(
+        self, client
+    ):
         client.cookies['sessionid'] = 'random'
         org = await database_sync_to_async(self._create_org)()
         t = await database_sync_to_async(self._create_topology)(organization=org)

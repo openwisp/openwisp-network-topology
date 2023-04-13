@@ -2,7 +2,10 @@ import json
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from django.core.exceptions import ValidationError
 from swapper import load_model
+
+from .settings import TOPOLOGY_API_AUTH_REQUIRED
 
 Topology = load_model('topology', 'Topology')
 
@@ -11,13 +14,15 @@ class TopologyConsumer(WebsocketConsumer):
     channel_layer_group = 'topology'
 
     def _is_user_authorized_to_view_topology(self, user, topology_pk):
-        if user.is_authenticated and user.is_superuser:
-            return True
-        topology = Topology.objects.get(pk=topology_pk)
-        return (
-            user.is_authenticated
+        try:
+            topology = Topology.objects.get(pk=topology_pk)
+        except (Topology.DoesNotExist, ValidationError):
+            return False
+        if not user.is_authenticated and TOPOLOGY_API_AUTH_REQUIRED:
+            return False
+        return user.is_superuser or (
+            user.is_manager(topology.organization_id)
             and user.has_perm(f'{Topology._meta.app_label}.view_topology')
-            and user.is_manager(topology.organization.pk)
         )
 
     def connect(self):
