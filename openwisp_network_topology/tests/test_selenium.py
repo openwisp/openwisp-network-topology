@@ -76,6 +76,10 @@ class TestTopologyGraphVisualizer(
             organization=org,
         )
 
+    def tearDown(self):
+        # Clear the web driver console logs after each test
+        self.web_driver.get_log('browser')
+
     def _get_console_errors(self, console_logs=[]):
         console_errors = []
         exclude_socket_icon_errors = [
