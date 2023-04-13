@@ -20,12 +20,11 @@ class TestTopologySockets(CreateGraphObjectsMixin, CreateOrgMixin):
     topology_model = Topology
     application = import_string(getattr(settings, 'ASGI_APPLICATION'))
 
-    async def _get_communicator(self, admin_client, topology_id, admin_view=True):
-        url = f'admin/topology/topology/{topology_id}/change/'
+    async def _get_communicator(self, admin_client, topology_id):
         session_id = admin_client.cookies['sessionid'].value
         communicator = WebsocketCommunicator(
             self.application,
-            url,
+            path=f'network-topology/topology/{topology_id}/',
             headers=[
                 (
                     b'cookie',

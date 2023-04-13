@@ -1,10 +1,8 @@
 <script>
     loadNetJsonGraph = (el='body', url='{{ graph_url }}') => {
         const history_url = '{{ history_url }}';
-        const nonAdminView = {{ non_admin_view | yesno:"true,false" }};
-        const wsUrl = nonAdminView ?
-        `ws://${window.location.host}/admin${window.location.pathname}change/`:
-        `ws://${window.location.host}${window.location.pathname}`;
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/network-topology/topology/${getTopologyIdFromUrl()}/`;
         const socket = new WebSocket(wsUrl);
 
         const getDataParseOptions = (data) => {
@@ -171,6 +169,21 @@
         graph.render();
         window.initTopologyHistory(django.jQuery);
         return graph
+
+        // Utility function
+        function getTopologyIdFromUrl() {
+            let topologyId;
+            try {
+                topologyId = /\/((\w{4,12}-?)){5}\//.exec(window.location)[0];
+            } catch (error) {
+                try {
+                    topologyId = /\/(\d+)\//.exec(window.location)[0];
+                } catch (error) {
+                    throw error;
+                }
+            }
+            return topologyId.replace(/\//g, '');
+        }
     };
 
 </script>

@@ -54,10 +54,6 @@ class TopologyDetailView(View, GraphVisualizerUrls):
                 'graph_url': graph_url,
                 'history_url': history_url,
                 'VISUALIZER_CSS': VISUALIZER_CSS,
-                # This flag ensures that we consume
-                # the same WebSocket route for both
-                # the admin and non-admin topology view
-                'non_admin_view': True,
             },
         )
 
