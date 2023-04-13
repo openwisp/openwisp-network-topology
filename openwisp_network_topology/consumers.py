@@ -5,7 +5,7 @@ from channels.generic.websocket import WebsocketConsumer
 from django.core.exceptions import ValidationError
 from swapper import load_model
 
-from .settings import TOPOLOGY_API_AUTH_REQUIRED
+from . import settings as app_settings
 
 Topology = load_model('topology', 'Topology')
 
@@ -18,10 +18,13 @@ class TopologyConsumer(WebsocketConsumer):
             topology = Topology.objects.get(pk=topology_pk)
         except (Topology.DoesNotExist, ValidationError):
             return False
-        if not user.is_authenticated and TOPOLOGY_API_AUTH_REQUIRED:
+        if not user.is_authenticated and app_settings.TOPOLOGY_API_AUTH_REQUIRED:
             return False
         return user.is_superuser or (
-            user.is_manager(topology.organization_id)
+            # Check user is authenticated,
+            # and has permission to view the topology
+            user.is_authenticated
+            and user.is_manager(topology.organization_id)
             and user.has_perm(f'{Topology._meta.app_label}.view_topology')
         )
 

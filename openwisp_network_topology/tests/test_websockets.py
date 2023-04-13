@@ -57,7 +57,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         assert connected is False
         await communicator.disconnect()
 
-    async def test_consumer_connection_incorrect_topology_pk_uuid(
+    async def test_consumer_connection_unexisting_topology(
         self, admin_user, admin_client
     ):
         org = await database_sync_to_async(self._create_org)()
@@ -67,9 +67,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         assert connected is False
         await communicator.disconnect()
 
-    async def test_consumer_connection_org_manager_with_topology_view_perm(
-        self, client
-    ):
+    async def test_consumer_connection_org_manager_view_perm(self, client):
         org = await database_sync_to_async(self._create_org)()
         test_user = await database_sync_to_async(self._create_user)(
             username='test-user-org-manager', email='test@orgmanger.com', is_staff=True
@@ -90,9 +88,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         assert connected is True
         await communicator.disconnect()
 
-    async def test_consumer_connection_org_manager_without_topology_view_perm(
-        self, client
-    ):
+    async def test_consumer_connection_org_manager_without_view_perm(self, client):
         org = await database_sync_to_async(self._create_org)()
         test_user = await database_sync_to_async(self._create_user)(
             username='test-user-org-manager', email='test@orgmanger.com', is_staff=True
@@ -107,9 +103,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         assert connected is False
         await communicator.disconnect()
 
-    async def test_consumer_connection_unauthenticated_user_and_topology_api_auth(
-        self, client
-    ):
+    async def test_consumer_connection_unauthenticated_user(self, client):
         client.cookies['sessionid'] = 'random'
         org = await database_sync_to_async(self._create_org)()
         t = await database_sync_to_async(self._create_topology)(organization=org)
