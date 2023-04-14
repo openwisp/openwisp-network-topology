@@ -1,3 +1,4 @@
+from unittest.mock import patch
 from uuid import uuid4
 
 import pytest
@@ -10,6 +11,7 @@ from swapper import load_model
 
 from openwisp_users.tests.utils import TestOrganizationMixin
 
+from .. import settings as app_settings
 from .utils import CreateGraphObjectsMixin
 
 Topology = load_model('topology', 'Topology')
@@ -88,6 +90,49 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         assert connected is True
         await communicator.disconnect()
 
+    @patch.object(app_settings, 'TOPOLOGY_API_AUTH_REQUIRED', False)
+    async def test_consumer_connection_auth_disabled_superuser(
+        self, admin_user, admin_client
+    ):
+        org = await database_sync_to_async(self._create_org)()
+        t = await database_sync_to_async(self._create_topology)(organization=org)
+        communicator = await self._get_communicator(admin_client, t.pk)
+        connected, _ = await communicator.connect()
+        assert connected is True
+        await communicator.disconnect()
+
+    @patch.object(app_settings, 'TOPOLOGY_API_AUTH_REQUIRED', False)
+    async def test_consumer_connection_auth_disabled_unauth_user(self, client):
+        client.cookies['sessionid'] = 'random'
+        org = await database_sync_to_async(self._create_org)()
+        t = await database_sync_to_async(self._create_topology)(organization=org)
+        communicator = await self._get_communicator(client, t.pk)
+        connected, _ = await communicator.connect()
+        assert connected is True
+        await communicator.disconnect()
+
+    @patch.object(app_settings, 'TOPOLOGY_API_AUTH_REQUIRED', False)
+    async def test_consumer_connection_auth_disabled_org_manager(self, client):
+        org = await database_sync_to_async(self._create_org)()
+        test_user = await database_sync_to_async(self._create_user)(
+            username='test-user-org-manager', email='test@orgmanger.com', is_staff=True
+        )
+        await database_sync_to_async(self._create_org_user)(
+            is_admin=True, user=test_user, organization=org
+        )
+        t = await database_sync_to_async(self._create_topology)(organization=org)
+        topology_view_permission = await database_sync_to_async(Permission.objects.get)(
+            codename='view_topology'
+        )
+        await database_sync_to_async(test_user.user_permissions.add)(
+            topology_view_permission
+        )
+        await database_sync_to_async(client.force_login)(test_user)
+        communicator = await self._get_communicator(client, t.pk)
+        connected, _ = await communicator.connect()
+        assert connected is True
+        await communicator.disconnect()
+
     async def test_consumer_connection_org_manager_without_view_perm(self, client):
         org = await database_sync_to_async(self._create_org)()
         test_user = await database_sync_to_async(self._create_user)(
@@ -103,7 +148,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         assert connected is False
         await communicator.disconnect()
 
-    async def test_consumer_connection_unauthenticated_user(self, client):
+    async def test_consumer_connection_unauth_user(self, client):
         client.cookies['sessionid'] = 'random'
         org = await database_sync_to_async(self._create_org)()
         t = await database_sync_to_async(self._create_topology)(organization=org)
