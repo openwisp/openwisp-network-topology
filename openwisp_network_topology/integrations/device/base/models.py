@@ -1,3 +1,4 @@
+import json
 import logging
 from ipaddress import ip_address, ip_network
 
@@ -185,3 +186,76 @@ class AbstractDeviceNode(UUIDModel):
             if 'openwisp_monitoring.device' in settings.INSTALLED_APPS:
                 run_checks = import_string(trigger_device_checks_path)
                 run_checks.delay(device_node.device.pk, recovery=link.status == 'up')
+
+
+class AbstractWifiMesh(UUIDModel):
+    topology = models.OneToOneField(
+        get_model_name('topology', 'Topology'), on_delete=models.CASCADE
+    )
+    ssid = models.CharField(max_length=32, null=False, blank=False)
+
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def create_wifi_mesh_topology(cls, instance, *args, **kwargs):
+        for interface in instance.data.get('interfaces', []):
+            if not interface.get('wireless'):
+                continue
+            if not interface['wireless'].get('mode') in ['802.11s']:
+                continue
+            if not interface['wireless'].get('clients'):
+                continue
+            # This is a mesh interface. Get topology for this mesh.
+            try:
+                mesh_topology = (
+                    cls.objects.select_related('topology')
+                    .get(
+                        ssid=interface['wireless']['ssid'],
+                        topology__organization_id=instance.organization_id,
+                    )
+                    .topology
+                )
+            except cls.DoesNotExist:
+                Topology = load_model('topology', 'Topology')
+                mesh_topology = Topology(
+                    organization=instance.organization,
+                    label=interface['wireless']['ssid'],
+                    parser='netdiff.NetJsonParser',
+                    strategy='receive',
+                    expiration_time=330,
+                )
+                mesh_topology.full_clean()
+                mesh_topology.save()
+                wifi_mesh = cls(
+                    ssid=interface['wireless']['ssid'], topology=mesh_topology
+                )
+                wifi_mesh.full_clean()
+                wifi_mesh.save()
+
+            # Create NetJSONGraph for this mesh
+            graph = {
+                'type': 'NetworkGraph',
+                'protocol': 'OLSR',
+                'version': '0.8',
+                'metric': 'ETX',
+                'nodes': [
+                    {
+                        'id': interface['mac'],
+                        'local_addresses': [interface['mac']],
+                    }
+                ],
+                'links': [],
+            }
+            for client in interface['wireless']['clients']:
+                graph['nodes'].append(
+                    {'id': client['mac'], 'local_addresses': [client['mac']]}
+                )
+                graph['links'].append(
+                    {
+                        'source': interface['mac'],
+                        'target': client['mac'],
+                        'cost': 1.0,
+                    }
+                )
+            mesh_topology.receive(json.dumps(graph))

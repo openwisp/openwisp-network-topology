@@ -20,6 +20,7 @@ urlpatterns += [
     path('', include('openwisp_network_topology.urls')),
     # needed to test integrations
     path('', include('openwisp_controller.urls')),
+    path('', include('openwisp_monitoring.urls')),
     path('admin/', admin.site.urls),
     path('api/v1/', include('openwisp_utils.api.urls')),
     path('api/v1/', include(get_api_urls())),
