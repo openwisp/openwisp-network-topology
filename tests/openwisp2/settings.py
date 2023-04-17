@@ -164,9 +164,13 @@ OPENWISP_ORGANIZATION_USER_ADMIN = True
 OPENWISP_ORGANIZATION_OWNER_ADMIN = True
 OPENWISP_USERS_AUTH_API = True
 
-CELERY_TASK_ALWAYS_EAGER = True
-CELERY_TASK_EAGER_PROPAGATES = True
-CELERY_BROKER_URL = 'memory://'
+if not TESTING:
+    CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost/1')
+else:
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
+    CELERY_BROKER_URL = 'memory://'
+
 
 if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
     LOGGING.update(
