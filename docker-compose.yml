@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  influxdb:
+    image: influxdb:1.8-alpine
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      INFLUXDB_DB: openwisp2
+      INFLUXDB_USER: openwisp
+      INFLUXDB_USER_PASSWORD: openwisp
+
+volumes:
+  influxdb-data: {}

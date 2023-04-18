@@ -166,7 +166,8 @@ Install sqlite:
 
 .. code-block:: shell
 
-    sudo apt-get install sqlite3 libsqlite3-dev
+    sudo apt install -y sqlite3 libsqlite3-dev \
+                        libspatialite-dev libsqlite3-mod-spatialite
 
 Install your forked repo:
 
@@ -175,6 +176,12 @@ Install your forked repo:
     git clone git://github.com/<your_fork>/openwisp-network-topology
     cd openwisp-network-topology/
     python setup.py develop
+
+Start InfluxDB using Docker:
+
+.. code-block:: shell
+
+    docker-compose up -d influxdb
 
 Install test requirements:
 

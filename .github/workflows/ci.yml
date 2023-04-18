@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     name: Python==${{ matrix.python-version }} | ${{ matrix.django-version }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
 
     strategy:
       fail-fast: false
@@ -26,6 +26,19 @@ jobs:
           - django~=4.0.0
 
     steps:
+      - name: Install system packages
+        run: |
+          sudo apt update &&
+          sudo apt -qq install \
+          sqlite3 \
+          fping \
+          gdal-bin \
+          libproj-dev \
+          libgeos-dev \
+          libspatialite-dev \
+          spatialite-bin \
+          libsqlite3-mod-spatialite
+
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -44,6 +57,9 @@ jobs:
 
       - name: Install python system packages
         run: pip install -U pip wheel setuptools
+
+      - name: Start InfluxDB container
+        run: docker-compose up -d influxdb
 
       - name: Install test dependencies
         run: |
