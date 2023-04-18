@@ -1070,6 +1070,7 @@ Once you have created the models, add the following to your ``settings.py``:
     TOPOLOGY_TOPOLOGY_MODEL = 'sample_network_topology.Topology'
     # if you use the integration with OpenWISP Controller and/or OpenWISP Monitoring
     TOPOLOGY_DEVICE_DEVICENODE_MODEL = 'sample_integration_device.DeviceNode'
+    TOPOLOGY_DEVICE_WIFIMESH_MODEL = 'sample_integration_device.WifiMesh'
 
 Substitute ``sample_network_topology`` with the name you chose in step 1.
 

@@ -227,6 +227,7 @@ if os.environ.get('SAMPLE_APP', False):
     TOPOLOGY_SNAPSHOT_MODEL = 'sample_network_topology.Snapshot'
     TOPOLOGY_TOPOLOGY_MODEL = 'sample_network_topology.Topology'
     TOPOLOGY_DEVICE_DEVICENODE_MODEL = 'sample_integration_device.DeviceNode'
+    TOPOLOGY_DEVICE_WIFIMESH_MODEL = 'sample_integration_device.WifiMesh'
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:
