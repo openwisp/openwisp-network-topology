@@ -1,3 +1,4 @@
+import json
 from unittest import mock
 
 import swapper
@@ -8,6 +9,7 @@ from django.db import transaction
 from django.test import TransactionTestCase
 from django.urls import reverse
 from django.utils.module_loading import import_string
+from django.utils.timezone import now
 from openwisp_controller.config.tests.utils import (
     CreateConfigTemplateMixin,
     TestVpnX509Mixin,
@@ -20,13 +22,15 @@ from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.admin_theme.dashboard import DASHBOARD_CHARTS, DASHBOARD_TEMPLATES
 from openwisp_utils.admin_theme.menu import MENU
 
-from .base.models import logger as models_logger
-from .base.models import trigger_device_checks_path
+from ..base.models import logger as models_logger
+from ..base.models import trigger_device_checks_path
+from . import SIMPLE_MESH_DATA
 
 Node = swapper.load_model('topology', 'Node')
 Link = swapper.load_model('topology', 'Link')
 Topology = swapper.load_model('topology', 'Topology')
 DeviceNode = swapper.load_model('topology_device', 'DeviceNode')
+WifiMesh = swapper.load_model('topology_device', 'WifiMesh')
 Device = swapper.load_model('config', 'Device')
 Template = swapper.load_model('config', 'Template')
 Vpn = swapper.load_model('config', 'Template')
@@ -432,6 +436,43 @@ class TestMonitoringIntegration(Base, TransactionTestCase):
                 link.save()
             mocked_task.assert_called_once()
             mocked_task.assert_called_with(device.pk, recovery=False)
+
+
+class TestWifiMeshIntegration(Base, TransactionTestCase):
+    def test_simple_mesh(self):
+        devices = []
+        org = self._get_org()
+        for mac, interfaces in SIMPLE_MESH_DATA.items():
+            device = self._create_device(name=mac, mac_address=mac, organization=org)
+            devices.append(device)
+            response = self.client.post(
+                '{0}?key={1}&time={2}'.format(
+                    reverse('monitoring:api_device_metric', args=[device.id]),
+                    device.key,
+                    now().utcnow().strftime('%d-%m-%Y_%H:%M:%S.%f'),
+                ),
+                data=json.dumps(
+                    {
+                        'type': 'DeviceMonitoring',
+                        'interfaces': interfaces,
+                    }
+                ),
+                content_type='application/json',
+            )
+            self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
+        topology = Topology.objects.filter(organization=org).first()
+        self.assertEqual(
+            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh').count(), 1
+        )
+        self.assertEqual(
+            Node.objects.filter(topology=topology, organization=org).count(), 3
+        )
+        self.assertEqual(
+            Link.objects.filter(topology=topology, organization=org).count(), 3
+        )
+        self.assertEqual(DeviceNode.objects.filter(device__in=devices).count(), 3)
 
 
 class TestAdmin(Base, TransactionTestCase):

@@ -7,7 +7,7 @@ TESTING = 'test' in sys.argv
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default': {
@@ -211,6 +211,8 @@ if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
             }
         }
     )
+
+OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION = True
 
 if os.environ.get('SAMPLE_APP', False):
     INSTALLED_APPS.remove('openwisp_network_topology')

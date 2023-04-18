@@ -1,4 +1,3 @@
-import json
 import logging
 from ipaddress import ip_address, ip_network
 
@@ -8,6 +7,8 @@ from django.utils.module_loading import import_string
 from swapper import get_model_name, load_model
 
 from openwisp_utils.base import UUIDModel
+
+from ..tasks import create_mesh_topology
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,9 @@ class AbstractDeviceNode(UUIDModel):
         },
         'netdiff.WireguardParser': {
             'auto_create': 'auto_create_wireguard',
+        },
+        'netdiff.NetJsonParser': {
+            'auto_create': 'auto_create_netjsongraph',
         },
     }
 
@@ -127,6 +131,22 @@ class AbstractDeviceNode(UUIDModel):
             return
         return cls.save_device_node(device, node)
 
+    @classmethod
+    def auto_create_netjsongraph(cls, node):
+        device_id = node.properties.get('device_id')
+        if not device_id:
+            return
+        if device_id:
+            Device = load_model('config', 'Device')
+            device = (
+                Device.objects.only(
+                    'id', 'name', 'last_ip', 'management_ip', 'organization_id'
+                )
+                .filter(id=device_id)
+                .first()
+            )
+        return cls.save_device_node(device, node)
+
     def link_action(self, link, status):
         """
         Performs clean-up operations when link goes down.
@@ -207,55 +227,4 @@ class AbstractWifiMesh(UUIDModel):
             if not interface['wireless'].get('clients'):
                 continue
             # This is a mesh interface. Get topology for this mesh.
-            try:
-                mesh_topology = (
-                    cls.objects.select_related('topology')
-                    .get(
-                        ssid=interface['wireless']['ssid'],
-                        topology__organization_id=instance.organization_id,
-                    )
-                    .topology
-                )
-            except cls.DoesNotExist:
-                Topology = load_model('topology', 'Topology')
-                mesh_topology = Topology(
-                    organization=instance.organization,
-                    label=interface['wireless']['ssid'],
-                    parser='netdiff.NetJsonParser',
-                    strategy='receive',
-                    expiration_time=330,
-                )
-                mesh_topology.full_clean()
-                mesh_topology.save()
-                wifi_mesh = cls(
-                    ssid=interface['wireless']['ssid'], topology=mesh_topology
-                )
-                wifi_mesh.full_clean()
-                wifi_mesh.save()
-
-            # Create NetJSONGraph for this mesh
-            graph = {
-                'type': 'NetworkGraph',
-                'protocol': 'OLSR',
-                'version': '0.8',
-                'metric': 'ETX',
-                'nodes': [
-                    {
-                        'id': interface['mac'],
-                        'local_addresses': [interface['mac']],
-                    }
-                ],
-                'links': [],
-            }
-            for client in interface['wireless']['clients']:
-                graph['nodes'].append(
-                    {'id': client['mac'], 'local_addresses': [client['mac']]}
-                )
-                graph['links'].append(
-                    {
-                        'source': interface['mac'],
-                        'target': client['mac'],
-                        'cost': 1.0,
-                    }
-                )
-            mesh_topology.receive(json.dumps(graph))
+            create_mesh_topology.delay(interface, instance.id)
