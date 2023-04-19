@@ -1,6 +1,7 @@
 from importlib import import_module
 
 import swapper
+from django.conf import settings
 from django.apps import AppConfig
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -24,8 +25,6 @@ class OpenwispTopologyDeviceConfig(AppConfig):
     def connect_signals(self):
         Node = swapper.load_model('topology', 'Node')
         Link = swapper.load_model('topology', 'Link')
-        WifiMesh = swapper.load_model('topology_device', 'WifiMesh')
-        DeviceData = swapper.load_model('device_monitoring', 'DeviceData')
 
         post_save.connect(
             self.create_device_rel, sender=Node, dispatch_uid='node_to_device_rel'
@@ -36,6 +35,8 @@ class OpenwispTopologyDeviceConfig(AppConfig):
             dispatch_uid='controller_integration_link_status_chaged',
         )
         if app_settings.WIFI_MESH_INTEGRATION:
+            WifiMesh = swapper.load_model('topology_device', 'WifiMesh')
+            DeviceData = swapper.load_model('device_monitoring', 'DeviceData')
             device_metrics_received.connect(
                 WifiMesh.create_wifi_mesh_topology,
                 sender=DeviceData,

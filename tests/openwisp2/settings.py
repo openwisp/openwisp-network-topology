@@ -136,7 +136,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'openwisp_utils.admin_theme.context_processor.menu_groups',
                 'openwisp_utils.admin_theme.context_processor.admin_theme_settings',
-                'openwisp_notifications.context_processors.notification_api_settings',
             ],
         },
     }

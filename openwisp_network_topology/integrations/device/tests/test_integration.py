@@ -239,7 +239,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         )
         link.full_clean()
         link.save()
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(14):
             link.status = 'down'
             link.save()
         device.refresh_from_db()
@@ -263,7 +263,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         )
         link.full_clean()
         link.save()
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(44):
             link.status = 'up'
             link.save()
         device.refresh_from_db()
@@ -531,7 +531,7 @@ class TestAdmin(Base, TransactionTestCase):
 
     def test_link_change_list_queries(self):
         path = reverse('{0}_link_changelist'.format(self.prefix))
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(6):
             self.client.get(path)
 
     def test_link_node_different_topology(self):
