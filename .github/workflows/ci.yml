@@ -31,7 +31,6 @@ jobs:
           sudo apt update &&
           sudo apt -qq install \
           sqlite3 \
-          fping \
           gdal-bin \
           libproj-dev \
           libgeos-dev \

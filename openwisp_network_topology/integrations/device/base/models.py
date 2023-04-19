@@ -133,18 +133,23 @@ class AbstractDeviceNode(UUIDModel):
 
     @classmethod
     def auto_create_netjsongraph(cls, node):
-        device_id = node.properties.get('device_id')
-        if not device_id:
+        if len(node.addresses) < 2:
+            # The second MAC address in node.addresses is same as
+            # Device.mac_address. Therefore, it is used for lookup.
             return
-        if device_id:
-            Device = load_model('config', 'Device')
-            device = (
-                Device.objects.only(
-                    'id', 'name', 'last_ip', 'management_ip', 'organization_id'
-                )
-                .filter(id=device_id)
-                .first()
+        Device = load_model('config', 'Device')
+        device_filter = models.Q(mac_address__iexact=node.addresses[-1])
+        if node.organization_id:
+            device_filter &= models.Q(organization_id=node.organization_id)
+        device = (
+            Device.objects.only(
+                'id', 'name', 'last_ip', 'management_ip', 'organization_id'
             )
+            .filter(device_filter)
+            .first()
+        )
+        if not device:
+            return
         return cls.save_device_node(device, node)
 
     def link_action(self, link, status):

@@ -27,6 +27,7 @@ def create_mesh_topology(interface, device_id):
     DeviceNode = swapper.load_model('topology_device', 'DeviceNode')
     WifiMesh = swapper.load_model('topology_device', 'WifiMesh')
     Device = swapper.load_model('config', 'Device')
+    create_device_node = True
     try:
         device = Device.objects.only('id', 'organization_id').get(id=device_id)
     except Device.DoesNotExist:
@@ -55,36 +56,63 @@ def create_mesh_topology(interface, device_id):
         wifi_mesh.save()
 
     # Create NetJSONGraph for this mesh
+    interface_mac = interface['mac'].upper()
     graph = {
         'type': 'NetworkGraph',
         'protocol': 'OLSR',
         'version': '1',
         'metric': 'ETX',
-        'nodes': [
-            {
-                'id': interface['mac'],
-                'label': interface['mac'],
-                'properties': {
-                    'device_id': str(device.id),
-                },
-            }
-        ],
+        'nodes': [{
+            'id': interface_mac,
+            'label': interface_mac,
+            'local_addresses': [device.mac_address.upper()],
+        }],
         'links': [],
     }
+    collected_nodes = {
+        interface_mac: {
+            'id': interface_mac,
+            'label': interface_mac,
+            'local_addresses': [device.mac_address.upper()],
+        }
+    }
     for client in interface['wireless']['clients']:
-        graph['nodes'].append({'id': client['mac'], 'label': client['mac']})
+        client_mac = client['mac'].upper()
+        collected_nodes[client_mac] = {'id': client_mac, 'label': client_mac}
         graph['links'].append(
             {
-                'source': interface['mac'],
-                'target': client['mac'],
+                'source': interface_mac,
+                'target': client_mac,
                 'cost': 1.0,
             }
         )
+    for node in Node.objects.only('properties', 'addresses').filter(
+        topology_id=mesh_topology.id, label__in=collected_nodes.keys()
+    ):
+        if 'local_address' in collected_nodes[node.label]:
+            # Only the collected node for the current device
+            # contains "local_address"
+            if node.local_addresses:
+                # The node for the current device already contains
+                # MAC address of the device. This signifies a DeviceNode
+                # has already been created for the device.
+                create_device_node = False
+        elif node.local_addresses:
+            # Collected nodes for other devices does not contain "local_addresses".
+            # Updated the "local_addresses" for these nodes from the database,
+            # this prevents deleting this information from the database.
+            collected_nodes[node.label]['local_addresses'] = node.local_addresses
+
+    graph['nodes'] = list(collected_nodes.values())
+    mesh_topology.receive(json.dumps(graph))
+
+    if not create_device_node:
+        return
     try:
-        node = Node.objects.get(
+        node = Node.objects.select_related('devicenode').get(
             organization_id=device.organization_id,
-            addresses__icontains=interface['mac'],
-            topology_id=mesh_topology.id,
+            addresses__icontains=interface_mac,
+            topology_id=mesh_topology.id
         )
     except Node.DoesNotExist:
         # The node for this device does not exist.
@@ -92,8 +120,5 @@ def create_mesh_topology(interface, device_id):
         # device is created.
         pass
     else:
-        if not DeviceNode.objects.filter(device_id=device.id, node_id=node.id).exists():
-            device_node = DeviceNode(device_id=device.id, node_id=node.id)
-            device_node.full_clean()
-            device_node.save()
-    mesh_topology.receive(json.dumps(graph))
+        if not hasattr(node, 'devicenode'):
+            DeviceNode.auto_create(node)

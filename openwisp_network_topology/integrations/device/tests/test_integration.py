@@ -474,6 +474,25 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         )
         self.assertEqual(DeviceNode.objects.filter(device__in=devices).count(), 3)
 
+        with mock.patch.object(DeviceNode, 'auto_create') as mocked_auto_create:
+            for (device, interfaces) in zip(devices, SIMPLE_MESH_DATA.values()):
+                response = self.client.post(
+                    '{0}?key={1}&time={2}'.format(
+                        reverse('monitoring:api_device_metric', args=[device.id]),
+                        device.key,
+                        now().utcnow().strftime('%d-%m-%Y_%H:%M:%S.%f'),
+                    ),
+                    data=json.dumps(
+                        {
+                            'type': 'DeviceMonitoring',
+                            'interfaces': interfaces,
+                        }
+                    ),
+                    content_type='application/json',
+                )
+                self.assertEqual(response.status_code, 200)
+            mocked_auto_create.assert_not_called()
+
 
 class TestAdmin(Base, TransactionTestCase):
     module = 'openwisp_network_topology'

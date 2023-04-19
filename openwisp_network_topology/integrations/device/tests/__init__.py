@@ -1,5 +1,5 @@
 SIMPLE_MESH_DATA = {
-    '2a:9a:fb:12:11:77': [
+    '2a:9a:fb:12:11:76': [
         {
             'mac': '2a:9a:fb:12:11:77',
             'mtu': 1500,
@@ -12,16 +12,18 @@ SIMPLE_MESH_DATA = {
                 'channel': 11,
                 'clients': [
                     {
+                        # Link properties
                         'auth': True,
                         'authorized': True,
-                        'ht': False,
-                        'mac': 'a4:bc:3f:ae:c7:0c',
-                        'mfp': False,
                         'noise': -95,
                         'signal': -56,
-                        'vendor': 'TP-LINK ' 'TECHNOLOGIES ' 'CO.,LTD.',
+                        # Node properties
+                        'ht': False,
+                        'mfp': False,
                         'vht': False,
                         'wmm': True,
+                        'mac': 'a4:bc:3f:ae:c7:0c',
+                        'vendor': 'TP-LINK ' 'TECHNOLOGIES ' 'CO.,LTD.',
                     },
                 ],
                 'country': 'ES',
@@ -35,7 +37,7 @@ SIMPLE_MESH_DATA = {
             },
         }
     ],
-    '64:70:02:c3:03:b3': [
+    '64:70:02:c3:03:b2': [
         {
             'mac': '64:70:02:c3:03:b3',
             'mtu': 1500,
@@ -83,7 +85,7 @@ SIMPLE_MESH_DATA = {
             },
         }
     ],
-    'a4:bc:3f:ae:c7:0c': [
+    'a4:bc:3f:ae:c7:0b': [
         {
             'mac': 'a4:bc:3f:ae:c7:0c',
             'mtu': 1500,
