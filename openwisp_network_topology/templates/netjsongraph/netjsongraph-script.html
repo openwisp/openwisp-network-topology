@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <script>
-    loadNetJsonGraph = async (el='body', url='{{ graph_url }}') => {
+    loadNetJsonGraph = (el='body', url='{{ graph_url }}') => {
         const history_url = '{{ history_url }}';
         const wsUrl = `ws://${window.location.host}${window.location.pathname}`;
         const socket = new WebSocket(wsUrl);
@@ -25,7 +25,7 @@
                 },
             },
         }
-        const netjsonGraphData = await fetch(url, {
+        const netjsonGraphData = fetch(url, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
