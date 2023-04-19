@@ -1,7 +1,6 @@
 from importlib import import_module
 
 import swapper
-from django.conf import settings
 from django.apps import AppConfig
 from django.db import transaction
 from django.db.models.signals import post_save

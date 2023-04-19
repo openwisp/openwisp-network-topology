@@ -62,11 +62,13 @@ def create_mesh_topology(interface, device_id):
         'protocol': 'OLSR',
         'version': '1',
         'metric': 'ETX',
-        'nodes': [{
-            'id': interface_mac,
-            'label': interface_mac,
-            'local_addresses': [device.mac_address.upper()],
-        }],
+        'nodes': [
+            {
+                'id': interface_mac,
+                'label': interface_mac,
+                'local_addresses': [device.mac_address.upper()],
+            }
+        ],
         'links': [],
     }
     collected_nodes = {
@@ -112,7 +114,7 @@ def create_mesh_topology(interface, device_id):
         node = Node.objects.select_related('devicenode').get(
             organization_id=device.organization_id,
             addresses__icontains=interface_mac,
-            topology_id=mesh_topology.id
+            topology_id=mesh_topology.id,
         )
     except Node.DoesNotExist:
         # The node for this device does not exist.
