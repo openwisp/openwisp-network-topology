@@ -406,7 +406,7 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         with freeze_time() as frozen_time:
             t = self._set_receive(expiration_time=1)
             data = self._load('static/netjson-2-links.json')
-            for sleep_time in [0, 2, 1]:
+            for sleep_time in [0, 1.2, 1]:
                 frozen_time.tick(timedelta(seconds=sleep_time))
                 t.receive(data)
                 self.assertEqual(self.node_model.objects.count(), 3)
@@ -422,7 +422,7 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
             # expiration_time has not expired
             self.assertEqual(self.link_model.objects.filter(status='down').count(), 0)
             # expiration_time has now expired for 1 link
-            frozen_time.tick(timedelta(seconds=2))
+            frozen_time.tick(timedelta(seconds=1.2))
             t.receive(data)
             self.assertEqual(self.link_model.objects.filter(status='down').count(), 1)
             link = self.link_model.objects.filter(status='down').first()
@@ -451,13 +451,13 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
 
         with freeze_time() as frozen_time:
             self.node_model.objects.all().delete()
-            t = self._set_receive(expiration_time=4)
+            t = self._set_receive(expiration_time=1)
             network1 = self._load('static/netjson-1-link.json')
             network2 = self._load('static/split-network.json')
             t.receive(network1)
             t.receive(network2)
             _assert_split_topology(self, t)
-            for sleep_time in [1, 2, 3]:
+            for sleep_time in [0.1, 0.25, 0.3]:
                 frozen_time.tick(timedelta(seconds=sleep_time))
                 t.receive(network1)
                 _assert_split_topology(self, t)
