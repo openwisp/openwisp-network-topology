@@ -17,6 +17,10 @@ if __name__ == '__main__':
         args.insert(3, 'openwisp_network_topology.integrations.device')
     else:
         args.insert(2, 'openwisp2')
+    if os.environ.get('WIFI_MESH', False):
+        args.extend(['--tag', 'wifi_mesh'])
+    else:
+        args.extend(['--exclude-tag', 'wifi_mesh'])
 execute_from_command_line(args)
 sys.exit(
     pytest.main(

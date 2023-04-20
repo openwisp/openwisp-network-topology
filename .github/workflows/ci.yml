@@ -74,7 +74,9 @@ jobs:
 
       - name: Tests
         run: |
-          coverage run --source=openwisp_network_topology runtests.py
+          coverage run runtests.py --parallel
+          WIFI_MESH=1 coverage run runtests.py
+          coverage combine
           SAMPLE_APP=1 ./runtests.py --parallel --keepdb
 
       - name: Upload Coverage

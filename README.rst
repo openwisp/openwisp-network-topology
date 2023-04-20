@@ -204,6 +204,7 @@ Run tests with:
 .. code-block:: shell
 
     ./runtests.py
+    WIFI_MESH=1 ./runtests.py
 
 Run qa tests:
 

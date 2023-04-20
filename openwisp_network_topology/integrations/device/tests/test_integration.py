@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import transaction
-from django.test import TransactionTestCase
+from django.test import TransactionTestCase, tag
 from django.urls import reverse
 from django.utils.module_loading import import_string
 from django.utils.timezone import now
@@ -239,7 +239,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         )
         link.full_clean()
         link.save()
-        with self.assertNumQueries(14):
+        with self.assertNumQueries(6):
             link.status = 'down'
             link.save()
         device.refresh_from_db()
@@ -263,7 +263,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         )
         link.full_clean()
         link.save()
-        with self.assertNumQueries(44):
+        with self.assertNumQueries(6):
             link.status = 'up'
             link.save()
         device.refresh_from_db()
@@ -438,6 +438,7 @@ class TestMonitoringIntegration(Base, TransactionTestCase):
             mocked_task.assert_called_with(device.pk, recovery=False)
 
 
+@tag('wifi_mesh')
 class TestWifiMeshIntegration(Base, TransactionTestCase):
     def test_simple_mesh(self):
         devices = []
@@ -546,7 +547,7 @@ class TestAdmin(Base, TransactionTestCase):
 
     def test_link_change_list_queries(self):
         path = reverse('{0}_link_changelist'.format(self.prefix))
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             self.client.get(path)
 
     def test_link_node_different_topology(self):

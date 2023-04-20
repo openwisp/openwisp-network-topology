@@ -16,14 +16,6 @@ DATABASES = {
     }
 }
 
-TIMESERIES_DATABASE = {
-    'BACKEND': 'openwisp_monitoring.db.backends.influxdb',
-    'USER': 'openwisp',
-    'PASSWORD': 'openwisp',
-    'NAME': 'openwisp2',
-    'HOST': os.getenv('INFLUXDB_HOST', 'localhost'),
-    'PORT': '8086',
-}
 
 SECRET_KEY = '@q4z-^s=mv59#o=uutv4*m=h@)ik4%zp1)-k^_(!_7*x_&+ze$'
 
@@ -33,53 +25,42 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
+    'openwisp_utils.admin_theme',
     # all-auth
     'django.contrib.sites',
     'openwisp_users.accounts',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'django_extensions',
-    'django_filters',
-    # controller (needed to test integration)
+    # controller  (needed to test integration)
+    'openwisp_controller.pki',
     'openwisp_controller.config',
     'openwisp_controller.connection',
-    'openwisp_controller.pki',
-    'openwisp_controller.geo',
-    'openwisp_users',
-    'openwisp_ipam',
-    # monitoring (needed to test integration)
-    'openwisp_monitoring.monitoring',
-    'openwisp_monitoring.device',
-    'openwisp_monitoring.check',
-    'nested_admin',
-    # notifications
     'openwisp_notifications',
+    'openwisp_ipam',
+    'reversion',
+    'sortedm2m',
+    'flat_json_widget',
     # network topology
     'openwisp_network_topology',
     'openwisp_network_topology.integrations.device',
+    'openwisp_users',
     # admin
-    # openwisp2 admin theme
-    # (must be loaded here)
-    'openwisp_utils.admin_theme',
+    'import_export',
     'admin_auto_filters',
     'django.contrib.admin',
     'django.forms',
-    # other dependencies
-    'sortedm2m',
-    'reversion',
-    'leaflet',
-    'flat_json_widget',
     # rest framework
     'rest_framework',
-    'rest_framework.authtoken',
-    'rest_framework_gis',
     'drf_yasg',
+    'django_filters',
+    'rest_framework.authtoken',
+    'django_extensions',
+    # 'debug_toolbar',
     # channels
     'channels',
-    'import_export',
 ]
+
 
 EXTENDED_APPS = ['django_x509', 'django_loci']
 
@@ -135,7 +116,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'openwisp_utils.admin_theme.context_processor.menu_groups',
-                'openwisp_utils.admin_theme.context_processor.admin_theme_settings',
             ],
         },
     }
@@ -211,7 +191,24 @@ if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
         }
     )
 
-OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION = True
+if os.environ.get('WIFI_MESH', False):
+    OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION = True
+    INSTALLED_APPS.insert(
+        INSTALLED_APPS.index('openwisp_controller.connection'),
+        'openwisp_controller.geo',
+    )
+    openwisp_ipam_index = INSTALLED_APPS.index('openwisp_ipam')
+    INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.check')
+    INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.device')
+    INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.monitoring')
+    TIMESERIES_DATABASE = {
+        'BACKEND': 'openwisp_monitoring.db.backends.influxdb',
+        'USER': 'openwisp',
+        'PASSWORD': 'openwisp',
+        'NAME': 'openwisp2',
+        'HOST': os.getenv('INFLUXDB_HOST', 'localhost'),
+        'PORT': '8086',
+    }
 
 if os.environ.get('SAMPLE_APP', False):
     INSTALLED_APPS.remove('openwisp_network_topology')

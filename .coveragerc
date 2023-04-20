@@ -5,3 +5,6 @@ omit =
     /*/__init__.py
     /setup.py
     /*/migrations/*
+source = openwisp_network_topology
+parallel = true
+concurrency = multiprocessing

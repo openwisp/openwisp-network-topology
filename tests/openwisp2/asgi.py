@@ -1,6 +1,20 @@
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
-from openwisp_controller.routing import get_routes as get_controller_routes
+from django.conf import settings
+
+if 'openwisp_controller.geo' in settings.INSTALLED_APPS:
+    from openwisp_controller.routing import get_routes as get_controller_routes
+else:
+    from openwisp_controller.connection.channels.routing import (
+        get_routes as get_connection_routes,
+    )
+    from openwisp_notifications.websockets.routing import (
+        get_routes as get_notification_routes,
+    )
+
+    def get_controller_routes():
+        return get_connection_routes() + get_notification_routes()
+
 
 import openwisp_network_topology.routing
 
