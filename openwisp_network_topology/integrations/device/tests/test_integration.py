@@ -467,10 +467,25 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
             WifiMesh.objects.filter(topology=topology, ssid='Test Mesh').count(), 1
         )
         self.assertEqual(
-            Node.objects.filter(topology=topology, organization=org).count(), 3
+            Node.objects.filter(
+                topology=topology,
+                organization=org,
+                properties__contains=(
+                    '{\n    "ht": true,\n    "vht": false,\n    "mfp": false,\n'
+                    '    "wmm": true,\n    "vendor": "TP-LINK TECHNOLOGIES CO.,LTD."\n}'
+                ),
+            ).count(),
+            3,
         )
         self.assertEqual(
-            Link.objects.filter(topology=topology, organization=org).count(), 3
+            Link.objects.filter(
+                topology=topology,
+                organization=org,
+                properties__contains='"noise": -94',
+            )
+            .filter(properties__contains='"signal": -58')
+            .count(),
+            3,
         )
         self.assertEqual(DeviceNode.objects.filter(device__in=devices).count(), 3)
 

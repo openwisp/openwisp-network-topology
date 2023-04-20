@@ -1,3 +1,4 @@
+import json
 import logging
 from ipaddress import ip_address, ip_network
 
@@ -223,7 +224,7 @@ class AbstractWifiMesh(UUIDModel):
         abstract = True
 
     @classmethod
-    def create_wifi_mesh_topology(cls, instance, *args, **kwargs):
+    def create_wifi_mesh_topology_receiver(cls, instance, *args, **kwargs):
         for interface in instance.data.get('interfaces', []):
             if not interface.get('wireless'):
                 continue
@@ -233,3 +234,176 @@ class AbstractWifiMesh(UUIDModel):
                 continue
             # This is a mesh interface. Get topology for this mesh.
             create_mesh_topology.delay(interface, instance.id)
+
+    @staticmethod
+    def _get_mesh_topology(interface, device):
+        Topology = load_model('topology', 'Topology')
+        WifiMesh = load_model('topology_device', 'WifiMesh')
+
+        try:
+            mesh_topology = (
+                WifiMesh.objects.select_related('topology')
+                .get(
+                    ssid=interface['wireless']['ssid'],
+                    topology__organization_id=device.organization_id,
+                )
+                .topology
+            )
+        except WifiMesh.DoesNotExist:
+            mesh_topology = Topology(
+                organization_id=device.organization_id,
+                label=interface['wireless']['ssid'],
+                parser='netdiff.NetJsonParser',
+                strategy='receive',
+                expiration_time=330,
+            )
+            mesh_topology.full_clean()
+            mesh_topology.save()
+            wifi_mesh = WifiMesh(
+                ssid=interface['wireless']['ssid'], topology=mesh_topology
+            )
+            wifi_mesh.full_clean()
+            wifi_mesh.save()
+        return mesh_topology
+
+    @staticmethod
+    def _create_netjsongraph(interface, device):
+        NODE_PROPERTIES = ['ht', 'vht', 'mfp', 'wmm', 'vendor']
+        LINK_PROPERTIES = ['auth', 'authorized', 'noise', 'signal']
+        interface_mac = interface['mac'].upper()
+        collected_nodes = {
+            interface_mac: {
+                'id': interface_mac,
+                'label': interface_mac,
+                'local_addresses': [device.mac_address.upper()],
+                'properties': {},
+            }
+        }
+        collected_links = {}
+        for client in interface['wireless']['clients']:
+            client_mac = client['mac'].upper()
+            collected_nodes[client_mac] = {
+                'id': client_mac,
+                'label': client_mac,
+                'properties': {},
+            }
+            for property in NODE_PROPERTIES:
+                if property in client:
+                    collected_nodes[client_mac]['properties'][property] = client.get(
+                        property
+                    )
+
+            collected_links[client_mac] = {
+                'source': interface_mac,
+                'target': client_mac,
+                'cost': 1.0,
+                'properties': {},
+            }
+            for property in LINK_PROPERTIES:
+                if property in client:
+                    collected_links[client_mac]['properties'][property] = client.get(
+                        property
+                    )
+
+        return {
+            'type': 'NetworkGraph',
+            'protocol': 'OLSR',
+            'version': '1',
+            'metric': 'ETX',
+            'nodes': collected_nodes,
+            'links': collected_links,
+        }
+
+    @staticmethod
+    def _update_graph_from_db(graph, mesh_topology, interface):
+        def _merge_link_data(collected_link, db_link):
+            for key, value in db_link.properties.items():
+                if key not in collected_link['properties']:
+                    collected_link['properties'][key] = value
+                elif isinstance(value, int):
+                    collected_link['properties'][key] = (
+                        collected_link['properties'][key] + value
+                    ) // 2
+
+        def _merge_node_data(collected_node, db_node):
+            create_device_node = True
+            if 'local_addresses' in collected_node:
+                # Only the collected node for the current device
+                # contains "local_address"
+                if db_node.local_addresses:
+                    # The node for the current device already contains
+                    # MAC address of the device. This signifies a DeviceNode
+                    # has already been created for the device.
+                    create_device_node = False
+            elif db_node.local_addresses:
+                # Collected nodes for other devices does not contain "local_addresses".
+                # Update the "local_addresses" for these nodes from the database,
+                # this prevents deleting this information from the database.
+                collected_node['local_addresses'] = db_node.local_addresses
+            for key, value in db_node.properties.items():
+                if key not in collected_node['properties']:
+                    collected_node['properties'][key] = value
+            return create_device_node
+
+        Link = load_model('topology', 'Link')
+
+        create_device_node = True
+        collected_nodes = graph.pop('nodes')
+        collected_links = graph.pop('links')
+        device_mac_address = interface['mac'].upper()
+        current_device_node = None
+        where = models.Q(source__topology_id=mesh_topology.id) & (
+            (
+                models.Q(source__label=device_mac_address)
+                & models.Q(target__label__in=collected_nodes.keys())
+            )
+            | (
+                models.Q(target__label=device_mac_address)
+                & models.Q(source__label__in=collected_nodes.keys())
+            )
+        )
+        for link in (
+            Link.objects.select_related('source', 'target').filter(where).iterator()
+        ):
+            if link.source.label == device_mac_address:
+                _merge_link_data(collected_links[link.target.label], link)
+                _merge_node_data(collected_nodes[link.target.label], link.target)
+                current_device_node = link.source
+            else:
+                _merge_link_data(collected_links[link.source.label], link)
+                _merge_node_data(collected_nodes[link.source.label], link.source)
+                current_device_node = link.target
+        if current_device_node:
+            create_device_node &= _merge_node_data(
+                collected_nodes[current_device_node.label], current_device_node
+            )
+        graph['nodes'] = list(collected_nodes.values())
+        graph['links'] = list(collected_links.values())
+        return create_device_node
+
+    @staticmethod
+    def _create_device_node(device, mesh_topology):
+        Node = load_model('topology', 'Node')
+        DeviceNode = load_model('topology_device', 'DeviceNode')
+        try:
+            node = Node.objects.select_related('devicenode').get(
+                organization_id=device.organization_id,
+                addresses__icontains=device.mac_address.upper(),
+                topology_id=mesh_topology.id,
+            )
+        except Node.DoesNotExist:
+            # The node for this device does not exist.
+            # The DeviceNode will be created when node for this
+            # device is created.
+            pass
+        else:
+            DeviceNode.auto_create(node)
+
+    @classmethod
+    def create_topology(cls, interface, device):
+        mesh_topology = cls._get_mesh_topology(interface, device)
+        graph = cls._create_netjsongraph(interface, device)
+        create_device_node = cls._update_graph_from_db(graph, mesh_topology, interface)
+        mesh_topology.receive(json.dumps(graph))
+        if create_device_node:
+            cls._create_device_node(device, mesh_topology)

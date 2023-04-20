@@ -37,7 +37,7 @@ class OpenwispTopologyDeviceConfig(AppConfig):
             WifiMesh = swapper.load_model('topology_device', 'WifiMesh')
             DeviceData = swapper.load_model('device_monitoring', 'DeviceData')
             device_metrics_received.connect(
-                WifiMesh.create_wifi_mesh_topology,
+                WifiMesh.create_wifi_mesh_topology_receiver,
                 sender=DeviceData,
                 dispatch_uid='create_wifi_mesh_topology',
             )
