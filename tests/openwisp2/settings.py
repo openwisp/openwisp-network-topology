@@ -164,12 +164,12 @@ OPENWISP_ORGANIZATION_USER_ADMIN = True
 OPENWISP_ORGANIZATION_OWNER_ADMIN = True
 OPENWISP_USERS_AUTH_API = True
 
-if not TESTING:
-    CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost/1')
-else:
-    CELERY_TASK_ALWAYS_EAGER = True
-    CELERY_TASK_EAGER_PROPAGATES = True
-    CELERY_BROKER_URL = 'memory://'
+# Note that the following celery settings
+# are intended only for development purposes
+# and should not be used in a production environment
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_BROKER_URL = 'memory://'
 
 
 if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
