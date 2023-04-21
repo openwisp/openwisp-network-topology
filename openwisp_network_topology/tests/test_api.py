@@ -116,6 +116,10 @@ class TestApi(
             response = self.client.get(f'{self.list_url}?organization={org2.pk}')
             self.assertEqual(len(response.data['collection']), 1)
 
+        with self.subTest('Test filter with organization slug'):
+            response = self.client.get(f'{self.list_url}?organization_slug={org2.slug}')
+            self.assertEqual(len(response.data['collection']), 1)
+
         with self.subTest('Test filter with strategy'):
             response = self.client.get(f'{self.list_url}?strategy=receive')
             self.assertEqual(len(response.data['collection']), 1)
@@ -700,6 +704,10 @@ class TestApi(
             response = self.client.get(f'{path}?organization={org1.pk}')
             self.assertEqual(response.data['count'], 2)
 
+        with self.subTest('Test filter by organization slug'):
+            response = self.client.get(f'{path}?organization_slug={org1.slug}')
+            self.assertEqual(response.data['count'], 2)
+
         with self.subTest('Test filter by topology'):
             response = self.client.get(f'{path}?topology={t2.pk}')
             self.assertEqual(response.data['count'], 1)
@@ -815,6 +823,10 @@ class TestApi(
 
         with self.subTest('Test filter by organization'):
             response = self.client.get(f'{path}?organization={org1.pk}')
+            self.assertEqual(response.data['count'], 1)
+
+        with self.subTest('Test filter by organization slug'):
+            response = self.client.get(f'{path}?organization_slug={org1.slug}')
             self.assertEqual(response.data['count'], 1)
 
         with self.subTest('Test filter by topology'):

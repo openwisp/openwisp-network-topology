@@ -629,6 +629,8 @@ Available filters:
   E.g. ``?parser=<topology_parsers>``.
 - ``organization``: Filter topologies based on their organization.
   E.g. ``?organization=<topology_organization_id>``.
+- ``organization_slug``: Filter topologies based on their organization slug.
+  E.g. ``?organization_slug=<topology_organization_slug>``.
 
 You can use multiple filters in one request, e.g.:
 
@@ -721,6 +723,8 @@ Available filters:
   E.g. ``?topology=<topology_id>``.
 - ``organization``: Filter links belonging to an organization.
   E.g. ``?organization=<organization_id>``.
+- ``organization_slug``: Filter links based on their organization slug.
+  E.g. ``?organization_slug=<organization_slug>``.
 - ``status``: Filter links based on their status (``up`` or ``down``).
   E.g. ``?status=<link_status>``.
 
@@ -778,6 +782,8 @@ Available filters:
   E.g. ``?topology=<topology_id>``.
 - ``organization``: Filter nodes belonging to an organization.
   E.g. ``?organization=<organization_id>``.
+- ``organization_slug``: Filter nodes based on their organization slug.
+  E.g. ``?organization_slug=<organization_slug>``.
 
 You can use multiple filters in one request, e.g.:
 
