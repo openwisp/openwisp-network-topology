@@ -21,6 +21,7 @@ from openwisp_utils.base import KeyField, TimeStampedEditableModel
 from ..contextmanagers import log_failure
 from ..settings import PARSERS, TIMEOUT
 from ..signals import update_topology
+from ..tasks import handle_update_topology
 from ..utils import print_info
 
 STRATEGIES = (('fetch', _('FETCH')), ('receive', _('RECEIVE')))
@@ -290,14 +291,7 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
             if link:
                 self._update_link_properties(link, link_dict, section=section)
 
-    def update(self, data=None):
-        """
-        Updates topology
-        Removed nodes are not deleted or modified
-        Links are not deleted straightaway but set as "down"
-        """
-        diff = self.diff(data)
-
+    def update_topology(self, diff):
         if diff['added']:
             self._update_added_items(diff['added'])
         if diff['changed']:
@@ -310,6 +304,15 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
                 )
                 if link:
                     self._update_link_properties(link, link_dict, section='removed')
+
+    def update(self, data=None):
+        """
+        Updates topology
+        Removed nodes are not deleted or modified
+        Links are not deleted straightaway but set as "down"
+        """
+        diff = self.diff(data)
+        handle_update_topology.delay(self.pk, diff)
 
     def save_snapshot(self, **kwargs):
         """

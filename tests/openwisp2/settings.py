@@ -164,6 +164,9 @@ OPENWISP_ORGANIZATION_USER_ADMIN = True
 OPENWISP_ORGANIZATION_OWNER_ADMIN = True
 OPENWISP_USERS_AUTH_API = True
 
+# Note that the following celery settings
+# are intended only for development purposes
+# and should not be used in a production environment
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_BROKER_URL = 'memory://'
