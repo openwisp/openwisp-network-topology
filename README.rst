@@ -194,6 +194,7 @@ Create database:
 .. code-block:: shell
 
     cd tests/
+    export WIFI_MESH=1
     ./manage.py migrate
     ./manage.py createsuperuser
 

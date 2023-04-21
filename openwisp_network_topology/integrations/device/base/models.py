@@ -3,10 +3,10 @@ import logging
 from ipaddress import ip_address, ip_network
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.module_loading import import_string
 from swapper import get_model_name, load_model
-
+from django.utils.translation import gettext_lazy as _
 from openwisp_utils.base import UUIDModel
 
 from ..tasks import create_mesh_topology
@@ -45,7 +45,12 @@ class AbstractDeviceNode(UUIDModel):
 
     @classmethod
     def save_device_node(cls, device, node):
-        device_node = cls(device=device, node=node)
+        try:
+            device_node = cls.objects.get(device=device)
+        except cls.DoesNotExist:
+            device_node = cls(device=device, node=node)
+        else:
+            device_node = node
         try:
             device_node.full_clean()
             device_node.save()
@@ -55,7 +60,7 @@ class AbstractDeviceNode(UUIDModel):
                 node.organization_id = device.organization_id
                 node.save(update_fields=['organization_id'])
         except Exception:
-            logger.exception('Exception raised during auto_create_openvpn')
+            logger.exception('Exception raised during save_device_node')
             return
         else:
             logger.info(f'DeviceNode relation created for {node.label} - {device.name}')
@@ -215,10 +220,10 @@ class AbstractDeviceNode(UUIDModel):
 
 
 class AbstractWifiMesh(UUIDModel):
-    topology = models.OneToOneField(
+    topology = models.ForeignKey(
         get_model_name('topology', 'Topology'), on_delete=models.CASCADE
     )
-    ssid = models.CharField(max_length=32, null=False, blank=False)
+    ssid = models.CharField(max_length=32, null=False, blank=False, verbose_name=_('Mesh SSID'))
 
     class Meta:
         abstract = True
@@ -229,8 +234,6 @@ class AbstractWifiMesh(UUIDModel):
             if not interface.get('wireless'):
                 continue
             if not interface['wireless'].get('mode') in ['802.11s']:
-                continue
-            if not interface['wireless'].get('clients'):
                 continue
             # This is a mesh interface. Get topology for this mesh.
             create_mesh_topology.delay(interface, instance.id)
@@ -280,7 +283,7 @@ class AbstractWifiMesh(UUIDModel):
             }
         }
         collected_links = {}
-        for client in interface['wireless']['clients']:
+        for client in interface['wireless'].get('clients', []):
             client_mac = client['mac'].upper()
             collected_nodes[client_mac] = {
                 'id': client_mac,
@@ -307,9 +310,9 @@ class AbstractWifiMesh(UUIDModel):
 
         return {
             'type': 'NetworkGraph',
-            'protocol': 'OLSR',
+            'protocol': 'Mesh',
             'version': '1',
-            'metric': 'ETX',
+            'metric': 'Airtime',
             'nodes': collected_nodes,
             'links': collected_links,
         }
@@ -385,19 +388,12 @@ class AbstractWifiMesh(UUIDModel):
     def _create_device_node(device, mesh_topology):
         Node = load_model('topology', 'Node')
         DeviceNode = load_model('topology_device', 'DeviceNode')
-        try:
-            node = Node.objects.select_related('devicenode').get(
-                organization_id=device.organization_id,
-                addresses__icontains=device.mac_address.upper(),
-                topology_id=mesh_topology.id,
-            )
-        except Node.DoesNotExist:
-            # The node for this device does not exist.
-            # The DeviceNode will be created when node for this
-            # device is created.
-            pass
-        else:
-            DeviceNode.auto_create(node)
+        node = Node.objects.select_related('devicenode').get(
+            organization_id=device.organization_id,
+            addresses__icontains=device.mac_address.upper(),
+            topology_id=mesh_topology.id,
+        )
+        DeviceNode.auto_create(node)
 
     @classmethod
     def create_topology(cls, interface, device):
@@ -406,4 +402,6 @@ class AbstractWifiMesh(UUIDModel):
         create_device_node = cls._update_graph_from_db(graph, mesh_topology, interface)
         mesh_topology.receive(json.dumps(graph))
         if create_device_node:
-            cls._create_device_node(device, mesh_topology)
+            transaction.on_commit(
+                lambda: cls._create_device_node(device, mesh_topology)
+            )

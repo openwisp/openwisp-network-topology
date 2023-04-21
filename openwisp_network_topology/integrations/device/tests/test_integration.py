@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from unittest import mock
 
 import swapper
@@ -24,7 +25,7 @@ from openwisp_utils.admin_theme.menu import MENU
 
 from ..base.models import logger as models_logger
 from ..base.models import trigger_device_checks_path
-from . import SIMPLE_MESH_DATA
+from . import SIMPLE_MESH_DATA, SINGLE_NODE_MESH_DATA
 
 Node = swapper.load_model('topology', 'Node')
 Link = swapper.load_model('topology', 'Link')
@@ -440,10 +441,10 @@ class TestMonitoringIntegration(Base, TransactionTestCase):
 
 @tag('wifi_mesh')
 class TestWifiMeshIntegration(Base, TransactionTestCase):
-    def test_simple_mesh(self):
-        devices = []
+    def _populate_mesh(self, data):
         org = self._get_org()
-        for mac, interfaces in SIMPLE_MESH_DATA.items():
+        devices = []
+        for mac, interfaces in data.items():
             device = self._create_device(name=mac, mac_address=mac, organization=org)
             devices.append(device)
             response = self.client.post(
@@ -461,7 +462,10 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 content_type='application/json',
             )
             self.assertEqual(response.status_code, 200)
+        return devices, org
 
+    def test_simple_mesh(self):
+        devices, org = self._populate_mesh(SIMPLE_MESH_DATA)
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
         topology = Topology.objects.filter(organization=org).first()
         self.assertEqual(
@@ -490,6 +494,8 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         )
         self.assertEqual(DeviceNode.objects.filter(device__in=devices).count(), 3)
 
+        # Test DeviceNode creation logic is not executed when the nodes send
+        # monitoring data again.
         with mock.patch.object(DeviceNode, 'auto_create') as mocked_auto_create:
             for (device, interfaces) in zip(devices, SIMPLE_MESH_DATA.values()):
                 response = self.client.post(
@@ -508,6 +514,90 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 )
                 self.assertEqual(response.status_code, 200)
             mocked_auto_create.assert_not_called()
+
+    def test_single_node_mesh(self):
+        devices, org = self._populate_mesh(SINGLE_NODE_MESH_DATA)
+        self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
+        topology = Topology.objects.filter(organization=org).first()
+        self.assertEqual(
+            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh').count(), 1
+        )
+        self.assertEqual(
+            Node.objects.filter(
+                topology=topology,
+                organization=org,
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            Link.objects.filter(
+                topology=topology,
+                organization=org,
+            ).count(),
+            0,
+        )
+        self.assertEqual(DeviceNode.objects.filter(device__in=devices).count(), 1)
+
+    def test_mesh_ssid_changed(self):
+        devices, org = self._populate_mesh(SIMPLE_MESH_DATA)
+        self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
+        self.assertEqual(WifiMesh.objects.filter(ssid='Test Mesh').count(), 1)
+        topology = Topology.objects.filter(organization=org).first()
+        self.assertEqual(
+            Node.objects.filter(
+                topology=topology,
+                organization=org,
+            ).count(),
+            3,
+        )
+        self.assertEqual(
+            Link.objects.filter(
+                topology=topology,
+                organization=org,
+            ).count(),
+            3,
+        )
+        # Change SSID reported in the monitoring data
+        mesh_data = deepcopy(SIMPLE_MESH_DATA)
+        for (device, interfaces) in zip(devices, mesh_data.values()):
+            interfaces[0]['wireless']['ssid'] = 'New Mesh'
+            response = self.client.post(
+                '{0}?key={1}&time={2}'.format(
+                    reverse('monitoring:api_device_metric', args=[device.id]),
+                    device.key,
+                    now().utcnow().strftime('%d-%m-%Y_%H:%M:%S.%f'),
+                ),
+                data=json.dumps(
+                    {
+                        'type': 'DeviceMonitoring',
+                        'interfaces': interfaces,
+                    }
+                ),
+                content_type='application/json',
+            )
+            self.assertEqual(response.status_code, 200)
+        self.assertEqual(Topology.objects.filter(organization=org).count(), 2)
+        self.assertEqual(WifiMesh.objects.count(), 2)
+        self.assertEqual(Node.objects.count(), 6)
+        self.assertEqual(Link.objects.count(), 6)
+        self.assertEqual(WifiMesh.objects.filter(ssid='New Mesh').count(), 1)
+        topology = Topology.objects.filter(
+            organization=org, wifimesh__ssid='New Mesh'
+        ).first()
+        self.assertEqual(
+            Node.objects.filter(
+                topology=topology,
+                organization=org,
+            ).count(),
+            3,
+        )
+        self.assertEqual(
+            Link.objects.filter(
+                topology=topology,
+                organization=org,
+            ).count(),
+            3,
+        )
 
 
 class TestAdmin(Base, TransactionTestCase):
