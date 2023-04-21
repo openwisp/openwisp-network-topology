@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <script>
     loadNetJsonGraph = (el='body', url='{{ graph_url }}') => {
         const history_url = '{{ history_url }}';
@@ -12,22 +14,48 @@
                     /^([1-9]\d{3})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2})(?:\.(\d{1,6}))?Z$/,
             };
         };
-
-        // load graph
-        const graph = new NetJSONGraph(url, {
-            el: el,
-            graphConfig: {
-                series:{
-                    zoom:'2',
-                },
-                baseOptions: {
-                    backgroundColor: '#282222b3',
-                    toolbox: {
-                        right: '60',
-                        top: '15',
-                    },
+        const graphConfig = {
+            series:{
+                zoom:'2',
+            },
+            baseOptions: {
+                backgroundColor: '#282222b3',
+                toolbox: {
+                    right: '60',
+                    top: '15',
                 },
             },
+        }
+        const netjsonGraphData = fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error("{% trans 'Failed to fetch NetJSONGraph data.' %}");
+            }
+        }).then(data => {
+            if (data.nodes.length > 20) {
+                grapgConfig.series.force = {
+                    layoutAnimation: false,
+                };
+                grapgConfig.series.draggable = false;
+                if (data.nodes.length > 50) {
+                    graphConfig.series.force.edgeLength = 250;
+                }
+            }
+            return data;
+        }).catch(error => {
+            console.error(error);
+        });
+        // load graph
+        const graph = new NetJSONGraph(netjsonGraphData, {
+            el: el,
+            graphConfig: graphConfig,
             linkCategories: [
                 {
                     name: 'down',
