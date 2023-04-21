@@ -171,7 +171,6 @@ CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_BROKER_URL = 'memory://'
 
-
 if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
     LOGGING.update(
         {
