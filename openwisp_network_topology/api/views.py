@@ -18,6 +18,7 @@ from openwisp_users.api.permissions import DjangoModelPermissions, IsOrganizatio
 
 from .. import settings as app_settings
 from ..utils import get_object_or_404
+from .filters import LinkFilter, NetworkCollectionFilter, NodeFilter
 from .parsers import TextParser
 from .serializers import (
     LinkSerializer,
@@ -76,7 +77,7 @@ class NetworkCollectionView(
     serializer_class = NetworkGraphSerializer
     queryset = Topology.objects.select_related('organization')
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('strategy', 'parser', 'organization')
+    filterset_class = NetworkCollectionFilter
 
     def list(self, request, *args, **kwargs):
         self.check_permissions(request)
@@ -184,7 +185,7 @@ class NodeListCreateView(
     serializer_class = NodeSerializer
     pagination_class = ListViewPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('topology', 'organization')
+    filterset_class = NodeFilter
 
 
 class NodeDetailView(
@@ -207,7 +208,7 @@ class LinkListCreateView(
     serializer_class = LinkSerializer
     pagination_class = ListViewPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('topology', 'organization', 'status')
+    filterset_class = LinkFilter
 
 
 class LinkDetailView(
