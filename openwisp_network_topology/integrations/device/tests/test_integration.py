@@ -441,6 +441,12 @@ class TestMonitoringIntegration(Base, TransactionTestCase):
 
 @tag('wifi_mesh')
 class TestWifiMeshIntegration(Base, TransactionTestCase):
+    app_label = 'topology'
+
+    @property
+    def prefix(self):
+        return 'admin:{0}'.format(self.app_label)
+
     def _populate_mesh(self, data):
         org = self._get_org()
         devices = []
@@ -599,6 +605,24 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
             3,
         )
 
+    def test_topology_admin(self):
+        """
+        Tests WifiMeshInlineAdmin is present in TopologyAdmin
+        when OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION
+        is set to True.
+
+        Note: This test is present here because TopologyAdmin class
+        cannot be patched based on app_settings.WIFI_MESH_INTEGRATION
+        once the project is initialized.
+        """
+        admin = self._create_admin()
+        self.client.force_login(admin)
+        topology = self._create_topology()
+        response = self.client.get(
+            reverse(f'{self.prefix}_topology_change', args=[topology.id])
+        )
+        self.assertContains(response, 'Wifi mesh')
+
 
 class TestAdmin(Base, TransactionTestCase):
     module = 'openwisp_network_topology'
@@ -681,3 +705,19 @@ class TestAdmin(Base, TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         link.refresh_from_db()
         self.assertEqual(link.status, 'down')
+
+    def test_topology_admin(self):
+        """
+        Tests WifiMeshInlineAdmin is absent in TopologyAdmin
+        when OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION
+        is set to False.
+
+        Note: This test is present here because TopologyAdmin class
+        cannot be patched based on app_settings.WIFI_MESH_INTEGRATION
+        once the project is initialized.
+        """
+        topology = Topology.objects.first()
+        response = self.client.get(
+            reverse(f'{self.prefix}_topology_change', args=[topology.id])
+        )
+        self.assertNotContains(response, 'Wifi mesh')

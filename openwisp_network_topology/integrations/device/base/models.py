@@ -5,8 +5,9 @@ from ipaddress import ip_address, ip_network
 from django.conf import settings
 from django.db import models, transaction
 from django.utils.module_loading import import_string
-from swapper import get_model_name, load_model
 from django.utils.translation import gettext_lazy as _
+from swapper import get_model_name, load_model
+
 from openwisp_utils.base import UUIDModel
 
 from ..tasks import create_mesh_topology
@@ -45,12 +46,7 @@ class AbstractDeviceNode(UUIDModel):
 
     @classmethod
     def save_device_node(cls, device, node):
-        try:
-            device_node = cls.objects.get(device=device)
-        except cls.DoesNotExist:
-            device_node = cls(device=device, node=node)
-        else:
-            device_node = node
+        device_node = cls(device=device, node=node)
         try:
             device_node.full_clean()
             device_node.save()
@@ -223,13 +219,20 @@ class AbstractWifiMesh(UUIDModel):
     topology = models.ForeignKey(
         get_model_name('topology', 'Topology'), on_delete=models.CASCADE
     )
-    ssid = models.CharField(max_length=32, null=False, blank=False, verbose_name=_('Mesh SSID'))
+    ssid = models.CharField(
+        max_length=32, null=False, blank=False, verbose_name=_('Mesh SSID')
+    )
 
     class Meta:
         abstract = True
 
     @classmethod
     def create_wifi_mesh_topology_receiver(cls, instance, *args, **kwargs):
+        """
+        It iterates through the interfaces of the device reported
+        by openwisp-monitoring and asynchronously creates topology
+        for mesh interfaces.
+        """
         for interface in instance.data.get('interfaces', []):
             if not interface.get('wireless'):
                 continue
@@ -238,8 +241,24 @@ class AbstractWifiMesh(UUIDModel):
             # This is a mesh interface. Get topology for this mesh.
             create_mesh_topology.delay(interface, instance.id)
 
+    @classmethod
+    def create_topology(cls, interface, device):
+        mesh_topology = cls._get_mesh_topology(interface, device)
+        graph = cls._create_netjsongraph(interface, device)
+        create_device_node = cls._update_graph_from_db(graph, mesh_topology, interface)
+        mesh_topology.receive(json.dumps(graph))
+        if create_device_node:
+            transaction.on_commit(
+                lambda: cls._create_device_node(device, mesh_topology)
+            )
+
     @staticmethod
     def _get_mesh_topology(interface, device):
+        """
+        Get or create topology for the given interface and device.
+        It also creates WifiMesh object to keep track of mesh's SSID
+        if a new topology object is created.
+        """
         Topology = load_model('topology', 'Topology')
         WifiMesh = load_model('topology_device', 'WifiMesh')
 
@@ -271,6 +290,13 @@ class AbstractWifiMesh(UUIDModel):
 
     @staticmethod
     def _create_netjsongraph(interface, device):
+        """
+        Creates a topology graph (dict) that resembles NetJSONGraph structure
+        using the wireless client data present in interface.
+
+        Note: The "node" and "links" keys of the returned graph
+        does not follow NetJSON specification.
+        """
         NODE_PROPERTIES = ['ht', 'vht', 'mfp', 'wmm', 'vendor']
         LINK_PROPERTIES = ['auth', 'authorized', 'noise', 'signal']
         interface_mac = interface['mac'].upper()
@@ -319,6 +345,14 @@ class AbstractWifiMesh(UUIDModel):
 
     @staticmethod
     def _update_graph_from_db(graph, mesh_topology, interface):
+        """
+        Merges the data of "nodes" and "links" of the graph
+        with existing data from DB.
+
+        This prevents losing data from the topology due
+        to overwrites.
+        """
+
         def _merge_link_data(collected_link, db_link):
             for key, value in db_link.properties.items():
                 if key not in collected_link['properties']:
@@ -394,14 +428,3 @@ class AbstractWifiMesh(UUIDModel):
             topology_id=mesh_topology.id,
         )
         DeviceNode.auto_create(node)
-
-    @classmethod
-    def create_topology(cls, interface, device):
-        mesh_topology = cls._get_mesh_topology(interface, device)
-        graph = cls._create_netjsongraph(interface, device)
-        create_device_node = cls._update_graph_from_db(graph, mesh_topology, interface)
-        mesh_topology.receive(json.dumps(graph))
-        if create_device_node:
-            transaction.on_commit(
-                lambda: cls._create_device_node(device, mesh_topology)
-            )
