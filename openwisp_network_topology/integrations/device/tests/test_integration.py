@@ -475,7 +475,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
         topology = Topology.objects.filter(organization=org).first()
         self.assertEqual(
-            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh').count(), 1
+            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh:HT20').count(), 1
         )
         self.assertEqual(
             Node.objects.filter(
@@ -526,7 +526,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
         topology = Topology.objects.filter(organization=org).first()
         self.assertEqual(
-            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh').count(), 1
+            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh:HT20').count(), 1
         )
         self.assertEqual(
             Node.objects.filter(
@@ -547,7 +547,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
     def test_mesh_ssid_changed(self):
         devices, org = self._populate_mesh(SIMPLE_MESH_DATA)
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
-        self.assertEqual(WifiMesh.objects.filter(ssid='Test Mesh').count(), 1)
+        self.assertEqual(WifiMesh.objects.filter(ssid='Test Mesh:HT20').count(), 1)
         topology = Topology.objects.filter(organization=org).first()
         self.assertEqual(
             Node.objects.filter(
@@ -586,9 +586,9 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         self.assertEqual(WifiMesh.objects.count(), 2)
         self.assertEqual(Node.objects.count(), 6)
         self.assertEqual(Link.objects.count(), 6)
-        self.assertEqual(WifiMesh.objects.filter(ssid='New Mesh').count(), 1)
+        self.assertEqual(WifiMesh.objects.filter(ssid='New Mesh:HT20').count(), 1)
         topology = Topology.objects.filter(
-            organization=org, wifimesh__ssid='New Mesh'
+            organization=org, wifimesh__ssid='New Mesh:HT20'
         ).first()
         self.assertEqual(
             Node.objects.filter(

@@ -262,11 +262,14 @@ class AbstractWifiMesh(UUIDModel):
         Topology = load_model('topology', 'Topology')
         WifiMesh = load_model('topology_device', 'WifiMesh')
 
+        ssid = '{}:{}'.format(
+            interface['wireless']['ssid'], interface['wireless']['htmode']
+        )
         try:
             mesh_topology = (
                 WifiMesh.objects.select_related('topology')
                 .get(
-                    ssid=interface['wireless']['ssid'],
+                    ssid=ssid,
                     topology__organization_id=device.organization_id,
                 )
                 .topology
@@ -274,7 +277,7 @@ class AbstractWifiMesh(UUIDModel):
         except WifiMesh.DoesNotExist:
             mesh_topology = Topology(
                 organization_id=device.organization_id,
-                label=interface['wireless']['ssid'],
+                label=ssid,
                 parser='netdiff.NetJsonParser',
                 strategy='receive',
                 expiration_time=330,
@@ -282,7 +285,8 @@ class AbstractWifiMesh(UUIDModel):
             mesh_topology.full_clean()
             mesh_topology.save()
             wifi_mesh = WifiMesh(
-                ssid=interface['wireless']['ssid'], topology=mesh_topology
+                ssid=ssid,
+                topology=mesh_topology,
             )
             wifi_mesh.full_clean()
             wifi_mesh.save()
@@ -311,9 +315,10 @@ class AbstractWifiMesh(UUIDModel):
         ]
         LINK_PROPERTIES = ['auth', 'authorized', 'noise', 'signal', 'signal_avg']
         interface_mac = interface['mac'].upper()
+        htmode = interface['wireless']['htmode']
         collected_nodes = {
             interface_mac: {
-                'id': interface_mac,
+                'id': f'{interface_mac}:{htmode}',
                 'label': interface_mac,
                 'local_addresses': [device.mac_address.upper()],
                 'properties': {},
@@ -323,7 +328,7 @@ class AbstractWifiMesh(UUIDModel):
         for client in interface['wireless'].get('clients', []):
             client_mac = client['mac'].upper()
             collected_nodes[client_mac] = {
-                'id': client_mac,
+                'id': f'{client_mac}:{htmode}',
                 'label': client_mac,
                 'properties': {},
             }
@@ -334,8 +339,8 @@ class AbstractWifiMesh(UUIDModel):
                     )
 
             collected_links[client_mac] = {
-                'source': interface_mac,
-                'target': client_mac,
+                'source': f'{interface_mac}:{htmode}',
+                'target': f'{client_mac}:{htmode}',
                 'cost': 1.0,
                 'properties': {},
             }
