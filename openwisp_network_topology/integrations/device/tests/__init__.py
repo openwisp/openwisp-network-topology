@@ -212,6 +212,12 @@ SINGLE_NODE_MESH_DATA = {
                 'signal': -61,
                 'ssid': 'Test Mesh',
                 'tx_power': 17,
+                'mesh_llid': 19751,
+                'mesh_local_ps': 'ACTIVE',
+                'mesh_non_peer_ps': 'ACTIVE',
+                'mesh_peer_ps': 'ACTIVE',
+                'mesh_plid': 24413,
+                'mesh_plink': 'ESTAB',
             },
         }
     ],

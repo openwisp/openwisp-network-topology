@@ -297,8 +297,19 @@ class AbstractWifiMesh(UUIDModel):
         Note: The "node" and "links" keys of the returned graph
         does not follow NetJSON specification.
         """
-        NODE_PROPERTIES = ['ht', 'vht', 'mfp', 'wmm', 'vendor']
-        LINK_PROPERTIES = ['auth', 'authorized', 'noise', 'signal']
+        NODE_PROPERTIES = [
+            'ht',
+            'vht',
+            'he',
+            'mfp',
+            'wmm',
+            'vendor',
+            'mesh_llid',
+            'mesh_plid',
+            'mesh_plink',
+            'mesh_non_peer_ps',
+        ]
+        LINK_PROPERTIES = ['auth', 'authorized', 'noise', 'signal', 'signal_avg']
         interface_mac = interface['mac'].upper()
         collected_nodes = {
             interface_mac: {

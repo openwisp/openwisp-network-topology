@@ -456,7 +456,7 @@ This additional and optional module provides the following features:
   - if OpenWISP Monitoring is enabled, the device checks are triggered (e.g.: ping)
 
 - if OpenWISP Monitoring is enabled, the system can automatically create topology
-  for the WiFi Mesh(es) present in the network using the monitoring data.
+  for the WiFi Mesh (802.11s) interfaces using the monitoring data provided by the agent.
   You can enable this by setting `OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION
   <#openwisp_network_topology_wifi_mesh_integration>`_ to ``True``.
 
@@ -610,10 +610,12 @@ belong to the organizations the user manages.
 +--------------+---------------+
 
 When enabled, topologies will be automatically created for WiFi mesh(es) present on
-the network.
+When enabled, network topology objects will be automatically created and
+updated based on the WiFi mesh interfaces peer information supplied
+by the monitoring agent.
 
-**Note:** The topologies are created using the device monitoring data reported
-by OpenWISP Monitoring. Thus, it requires
+**Note:** The network topology objects are created using the device monitoring data
+collected by OpenWISP Monitoring. Thus, it requires
 `integration with OpenWISP Controller and OpenWISP Monitoring
 <#integration-with-openwisp-controller-and-openwisp-monitoring>`_ to be enabled
 on the Django project.
