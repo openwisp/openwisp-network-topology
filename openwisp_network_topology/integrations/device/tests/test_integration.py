@@ -521,7 +521,8 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 self.assertEqual(response.status_code, 200)
             mocked_auto_create.assert_not_called()
 
-    def test_single_node_mesh(self):
+    @mock.patch('logging.Logger.exception')
+    def test_single_node_mesh(self, mocked_logger):
         devices, org = self._populate_mesh(SINGLE_NODE_MESH_DATA)
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
         topology = Topology.objects.filter(organization=org).first()
@@ -543,6 +544,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
             0,
         )
         self.assertEqual(DeviceNode.objects.filter(device__in=devices).count(), 1)
+        mocked_logger.assert_not_called()
 
     def test_mesh_ssid_changed(self):
         devices, org = self._populate_mesh(SIMPLE_MESH_DATA)

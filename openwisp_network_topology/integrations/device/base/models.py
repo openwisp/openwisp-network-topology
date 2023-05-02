@@ -430,6 +430,8 @@ class AbstractWifiMesh(UUIDModel):
             create_device_node &= _merge_node_data(
                 collected_nodes[current_device_node.label], current_device_node
             )
+        else:
+            create_device_node = False
         graph['nodes'] = list(collected_nodes.values())
         graph['links'] = list(collected_links.values())
         return create_device_node
