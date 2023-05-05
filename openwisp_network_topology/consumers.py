@@ -18,16 +18,12 @@ class TopologyConsumer(WebsocketConsumer):
             topology = Topology.objects.get(pk=topology_pk)
         except (Topology.DoesNotExist, ValidationError):
             return False
-        if not user.is_authenticated and app_settings.TOPOLOGY_API_AUTH_REQUIRED:
-            return False
-        return (
-            user.is_superuser
-            or not app_settings.TOPOLOGY_API_AUTH_REQUIRED
-            or (
-                user.is_authenticated
-                and user.is_manager(topology.organization_id)
-                and user.has_perm(f'{Topology._meta.app_label}.view_topology')
-            )
+        if not app_settings.TOPOLOGY_API_AUTH_REQUIRED:
+            return True
+        return user.is_superuser or (
+            user.is_authenticated
+            and user.is_manager(topology.organization_id)
+            and user.has_perm(f'{Topology._meta.app_label}.view_topology')
         )
 
     def connect(self):
