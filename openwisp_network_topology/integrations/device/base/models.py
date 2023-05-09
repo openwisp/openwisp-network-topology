@@ -1,6 +1,8 @@
 import json
 import logging
+from functools import reduce
 from ipaddress import ip_address, ip_network
+from operator import or_
 
 from django.conf import settings
 from django.db import models, transaction
@@ -136,11 +138,15 @@ class AbstractDeviceNode(UUIDModel):
     @classmethod
     def auto_create_netjsongraph(cls, node):
         if len(node.addresses) < 2:
-            # The second MAC address in node.addresses is same as
-            # Device.mac_address. Therefore, it is used for lookup.
+            # The first MAC address is Device.mac_address and
+            # the second one is interface's MAC address.
+            # If a node only has one MAC address, it means that
+            # it only contains interface MAC address.
             return
         Device = load_model('config', 'Device')
-        device_filter = models.Q(mac_address__iexact=node.addresses[-1])
+        device_filter = models.Q(
+            mac_address__iexact=node.addresses[0].rpartition(':')[0]
+        )
         if node.organization_id:
             device_filter &= models.Q(organization_id=node.organization_id)
         device = (
@@ -245,7 +251,9 @@ class AbstractWifiMesh(UUIDModel):
     def create_topology(cls, interface, device):
         mesh_topology = cls._get_mesh_topology(interface, device)
         graph = cls._create_netjsongraph(interface, device)
-        create_device_node = cls._update_graph_from_db(graph, mesh_topology, interface)
+        create_device_node = cls._update_graph_from_db(
+            graph, mesh_topology, interface, device
+        )
         mesh_topology.receive(json.dumps(graph))
         if create_device_node:
             transaction.on_commit(
@@ -314,13 +322,14 @@ class AbstractWifiMesh(UUIDModel):
             'mesh_non_peer_ps',
         ]
         LINK_PROPERTIES = ['auth', 'authorized', 'noise', 'signal', 'signal_avg']
+        device_mac = device.mac_address.upper()
         interface_mac = interface['mac'].upper()
         htmode = interface['wireless']['htmode']
         collected_nodes = {
-            interface_mac: {
-                'id': f'{interface_mac}:{htmode}',
-                'label': interface_mac,
-                'local_addresses': [device.mac_address.upper()],
+            device_mac: {
+                'id': f'{device_mac}:{htmode}',
+                'label': device_mac,
+                'local_addresses': [interface_mac],
                 'properties': {},
             }
         }
@@ -339,7 +348,7 @@ class AbstractWifiMesh(UUIDModel):
                     )
 
             collected_links[client_mac] = {
-                'source': f'{interface_mac}:{htmode}',
+                'source': f'{device_mac}:{htmode}',
                 'target': f'{client_mac}:{htmode}',
                 'cost': 1.0,
                 'properties': {},
@@ -360,7 +369,7 @@ class AbstractWifiMesh(UUIDModel):
         }
 
     @staticmethod
-    def _update_graph_from_db(graph, mesh_topology, interface):
+    def _update_graph_from_db(graph, mesh_topology, interface, device):
         """
         Merges the data of "nodes" and "links" of the graph
         with existing data from DB.
@@ -369,7 +378,21 @@ class AbstractWifiMesh(UUIDModel):
         to overwrites.
         """
 
-        def _merge_link_data(collected_link, db_link):
+        def _get_collected_object(collected_objects, node):
+            try:
+                return collected_objects[node.label]
+            except KeyError:
+                try:
+                    return collected_objects[node.addresses[0]]
+                except KeyError:
+                    return collected_objects[node.addresses[1]]
+
+        def _merge_link_data(collected_links, node, db_link):
+            collected_link = _get_collected_object(collected_links, node)
+            if node.local_addresses:
+                # Update the target node address from
+                # interface MAC to Device MAC.
+                collected_link['target'] = node.netjson_id
             for key, value in db_link.properties.items():
                 if key not in collected_link['properties']:
                     collected_link['properties'][key] = value
@@ -378,7 +401,8 @@ class AbstractWifiMesh(UUIDModel):
                         collected_link['properties'][key] + value
                     ) // 2
 
-        def _merge_node_data(collected_node, db_node):
+        def _merge_node_data(collected_nodes, db_node):
+            collected_node = _get_collected_object(collected_nodes, db_node)
             create_device_node = True
             if 'local_addresses' in collected_node:
                 # Only the collected node for the current device
@@ -388,10 +412,14 @@ class AbstractWifiMesh(UUIDModel):
                     # MAC address of the device. This signifies a DeviceNode
                     # has already been created for the device.
                     create_device_node = False
-            elif db_node.local_addresses:
+            if 'local_addresses' not in collected_node and db_node.local_addresses:
                 # Collected nodes for other devices does not contain "local_addresses".
                 # Update the "local_addresses" for these nodes from the database,
                 # this prevents deleting this information from the database.
+                collected_node['local_addresses'] = db_node.local_addresses
+            if len(db_node.addresses) > 1:
+                collected_node['id'] = db_node.netjson_id
+                collected_node['label'] = db_node.label
                 collected_node['local_addresses'] = db_node.local_addresses
             for key, value in db_node.properties.items():
                 if key not in collected_node['properties']:
@@ -399,39 +427,77 @@ class AbstractWifiMesh(UUIDModel):
             return create_device_node
 
         Link = load_model('topology', 'Link')
+        Node = load_model('topology', 'Node')
 
-        create_device_node = True
         collected_nodes = graph.pop('nodes')
         collected_links = graph.pop('links')
-        device_mac_address = interface['mac'].upper()
-        current_device_node = None
+        interface_mac = interface['mac'].upper()
+        htmode = interface['wireless']['htmode']
+        device_mac_address = device.mac_address.upper()
+        create_device_node = False
+
+        # If a node for this device already exists with the interface mac,
+        # then update that node to use device_mac for id
+        current_device_node = Node.objects.filter(
+            topology=mesh_topology, addresses__contains=interface_mac
+        ).first()
+        if current_device_node:
+            if current_device_node.local_addresses:
+                create_device_node = False
+            else:
+                create_device_node = True
+                # Use update() to prevent executing signal handlers for pre_save/post_save
+                Node.objects.filter(
+                    topology=mesh_topology, addresses__contains=interface_mac
+                ).update(
+                    addresses=[f'{device_mac_address}:{htmode}', interface_mac],
+                    label=device_mac_address,
+                )
+
+        # TODO: Find an efficient way to perform this query
         where = models.Q(source__topology_id=mesh_topology.id) & (
             (
                 models.Q(source__label=device_mac_address)
-                & models.Q(target__label__in=collected_nodes.keys())
+                & (
+                    models.Q(target__label__in=collected_nodes.keys())
+                    | reduce(
+                        or_,
+                        (
+                            models.Q(target__addresses__contains=client_mac)
+                            for client_mac in collected_nodes.keys()
+                        ),
+                    )
+                )
             )
             | (
                 models.Q(target__label=device_mac_address)
-                & models.Q(source__label__in=collected_nodes.keys())
+                & (
+                    models.Q(source__label__in=collected_nodes.keys())
+                    | reduce(
+                        or_,
+                        (
+                            models.Q(source__addresses__contains=client_mac)
+                            for client_mac in collected_nodes.keys()
+                        ),
+                    )
+                )
             )
         )
-        for link in (
-            Link.objects.select_related('source', 'target').filter(where).iterator()
-        ):
-            if link.source.label == device_mac_address:
-                _merge_link_data(collected_links[link.target.label], link)
-                _merge_node_data(collected_nodes[link.target.label], link.target)
+        query = Link.objects.select_related('source', 'target').filter(where)
+        for link in query.iterator():
+            if (
+                link.source.label == device_mac_address
+                or device_mac_address in link.source.addresses[0]
+            ):
+                _merge_link_data(collected_links, link.target, link)
+                _merge_node_data(collected_nodes, link.target)
                 current_device_node = link.source
             else:
-                _merge_link_data(collected_links[link.source.label], link)
-                _merge_node_data(collected_nodes[link.source.label], link.source)
+                _merge_link_data(collected_links, link.source, link)
+                _merge_node_data(collected_nodes, link.source)
                 current_device_node = link.target
         if current_device_node:
-            create_device_node &= _merge_node_data(
-                collected_nodes[current_device_node.label], current_device_node
-            )
-        else:
-            create_device_node = False
+            _merge_node_data(collected_nodes, current_device_node)
         graph['nodes'] = list(collected_nodes.values())
         graph['links'] = list(collected_links.values())
         return create_device_node
