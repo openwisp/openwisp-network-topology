@@ -107,21 +107,15 @@ class TestTopologyGraphVisualizer(
         WebDriverWait(self.web_driver, 2).until(
             EC.visibility_of_element_located((By.CLASS_NAME, 'njg-aboutContainer'))
         )
-        topology_graph_label_keys = self.web_driver.find_elements_by_css_selector(
-            '.njg-keyLabel'
-        )
-        topology_graph_label_values = self.web_driver.find_elements_by_css_selector(
-            '.njg-valueLabel'
-        )
         console_logs = self.web_driver.get_log('browser')
         console_errors = self._get_console_errors(console_logs)
         self.assertEqual(console_errors, [])
         topology_graph_dict = self.topology.json(dict=True)
-        topology_graph_label_keys = self.web_driver.find_elements_by_css_selector(
-            '.njg-keyLabel'
+        topology_graph_label_keys = self.web_driver.find_elements(
+            By.CSS_SELECTOR, '.njg-keyLabel'
         )
-        topology_graph_label_values = self.web_driver.find_elements_by_css_selector(
-            '.njg-valueLabel'
+        topology_graph_label_values = self.web_driver.find_elements(
+            By.CSS_SELECTOR, '.njg-valueLabel'
         )
         self.assertEqual(len(topology_graph_label_keys), len(self._EXPECTED_KEYS))
         # ensure correct topology graph labels are present
@@ -144,15 +138,15 @@ class TestTopologyGraphVisualizer(
         path = reverse(f'{self.prefix}_topology_change', args=[self.topology.pk])
         self.login(username=self.admin_username, password=self.admin_password)
         self.open(path)
-        self.web_driver.find_element_by_css_selector('input.visualizelink').click()
+        self.web_driver.find_element(By.CSS_SELECTOR, 'input.visualizelink').click()
         self._assert_topology_graph()
 
     def test_topology_non_admin_view_graph_visualizer(self):
         path = reverse('topology_list')
         self.login(username=self.admin_username, password=self.admin_password)
         self.open(path)
-        topology_graph_element = self.web_driver.find_element_by_xpath(
-            "//ul[@id='menu']/li/a"
+        topology_graph_element = self.web_driver.find_element(
+            By.XPATH, "//ul[@id='menu']/li/a"
         )
         topology_graph_element.click()
         self._assert_topology_graph()
