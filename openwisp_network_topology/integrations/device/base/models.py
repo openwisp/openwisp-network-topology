@@ -456,43 +456,28 @@ class AbstractWifiMesh(UUIDModel):
 
         # TODO: Find an efficient way to perform this query
         where = models.Q(source__topology_id=mesh_topology.id) & (
-            (
-                models.Q(source__label=device_mac_address)
-                & (
-                    models.Q(target__label__in=collected_nodes.keys())
-                    | reduce(
-                        or_,
-                        (
-                            models.Q(target__addresses__contains=client_mac)
-                            for client_mac in collected_nodes.keys()
-                        ),
-                    )
-                )
-            )
-            | (
-                models.Q(target__label=device_mac_address)
-                & (
-                    models.Q(source__label__in=collected_nodes.keys())
-                    | reduce(
-                        or_,
-                        (
-                            models.Q(source__addresses__contains=client_mac)
-                            for client_mac in collected_nodes.keys()
-                        ),
-                    )
-                )
-            )
+            (models.Q(source__label=device_mac_address))
+            | (models.Q(target__label=device_mac_address))
         )
         query = Link.objects.select_related('source', 'target').filter(where)
         for link in query.iterator():
-            if (
-                link.source.label == device_mac_address
-                or device_mac_address in link.source.addresses[0]
+            if link.source.label == device_mac_address and (
+                link.target.netjson_id in collected_nodes
+                or (
+                    link.target.local_addresses
+                    and link.target.local_addresses[0] in collected_nodes
+                )
             ):
                 _merge_link_data(collected_links, link.target, link)
                 _merge_node_data(collected_nodes, link.target)
                 current_device_node = link.source
-            else:
+            elif link.target.label == device_mac_address and (
+                link.source.netjson_id in collected_nodes
+                or (
+                    link.source.local_addresses
+                    and link.source.local_addresses[0] in collected_nodes
+                )
+            ):
                 _merge_link_data(collected_links, link.source, link)
                 _merge_node_data(collected_nodes, link.source)
                 current_device_node = link.target
