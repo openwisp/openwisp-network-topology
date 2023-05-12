@@ -491,6 +491,12 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
             3,
         )
         self.assertEqual(
+            Node.objects.filter(label__iexact='0a:cc:ae:34:ff:3d').count(), 1
+        )
+        self.assertEqual(
+            Link.objects.filter(target__label__iexact='0a:cc:ae:34:ff:3d').count(), 0
+        )
+        self.assertEqual(
             Link.objects.filter(
                 topology=topology,
                 organization=org,
@@ -553,7 +559,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 topology=topology,
                 organization=org,
             ).count(),
-            3,
+            4,
         )
         self.assertEqual(
             Link.objects.filter(
@@ -584,7 +590,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         WifiMesh.create_topology(organization_ids=(org.id,))
         self.assertEqual(Topology.objects.filter(organization=org).count(), 2)
         self.assertEqual(WifiMesh.objects.count(), 2)
-        self.assertEqual(Node.objects.count(), 6)
+        self.assertEqual(Node.objects.count(), 8)
         self.assertEqual(Link.objects.count(), 6)
         self.assertEqual(WifiMesh.objects.filter(ssid='New Mesh@11').count(), 1)
         topology = Topology.objects.filter(
@@ -595,7 +601,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 topology=topology,
                 organization=org,
             ).count(),
-            3,
+            4,
         )
         self.assertEqual(
             Link.objects.filter(
