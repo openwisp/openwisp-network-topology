@@ -59,13 +59,13 @@ class Migration(migrations.Migration):
                         serialize=False,
                     ),
                 ),
-                ('ssid', models.CharField(max_length=32)),
+                ('mesh_id', models.CharField(max_length=32, verbose_name='Mesh ID')),
                 ('is_test', models.BooleanField(default=True)),
                 (
                     'topology',
-                    models.OneToOneField(
+                    models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='sample_network_topology.topology',
+                        to=settings.TOPOLOGY_TOPOLOGY_MODEL,
                     ),
                 ),
             ],

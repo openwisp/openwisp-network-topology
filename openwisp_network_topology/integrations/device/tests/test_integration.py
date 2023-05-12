@@ -477,7 +477,8 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
         topology = Topology.objects.filter(organization=org).first()
         self.assertEqual(
-            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh@11').count(), 1
+            WifiMesh.objects.filter(topology=topology, mesh_id='Test Mesh@11').count(),
+            1,
         )
         self.assertEqual(
             Node.objects.filter(
@@ -530,7 +531,8 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
         topology = Topology.objects.filter(organization=org).first()
         self.assertEqual(
-            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh@11').count(), 1
+            WifiMesh.objects.filter(topology=topology, mesh_id='Test Mesh@11').count(),
+            1,
         )
         self.assertEqual(
             Node.objects.filter(
@@ -549,10 +551,10 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         self.assertEqual(DeviceNode.objects.filter(device__in=devices).count(), 1)
         mocked_logger.assert_not_called()
 
-    def test_mesh_ssid_changed(self):
+    def test_mesh_id_changed(self):
         devices, org = self._populate_mesh(SIMPLE_MESH_DATA)
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
-        self.assertEqual(WifiMesh.objects.filter(ssid='Test Mesh@11').count(), 1)
+        self.assertEqual(WifiMesh.objects.filter(mesh_id='Test Mesh@11').count(), 1)
         topology = Topology.objects.filter(organization=org).first()
         self.assertEqual(
             Node.objects.filter(
@@ -568,7 +570,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
             ).count(),
             3,
         )
-        # Change SSID reported in the monitoring data
+        # Change mesh_id reported in the monitoring data
         mesh_data = deepcopy(SIMPLE_MESH_DATA)
         for (device, interfaces) in zip(devices, mesh_data.values()):
             interfaces[0]['wireless']['ssid'] = 'New Mesh'
@@ -592,9 +594,9 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         self.assertEqual(WifiMesh.objects.count(), 2)
         self.assertEqual(Node.objects.count(), 8)
         self.assertEqual(Link.objects.count(), 6)
-        self.assertEqual(WifiMesh.objects.filter(ssid='New Mesh@11').count(), 1)
+        self.assertEqual(WifiMesh.objects.filter(mesh_id='New Mesh@11').count(), 1)
         topology = Topology.objects.filter(
-            organization=org, wifimesh__ssid='New Mesh@11'
+            organization=org, wifimesh__mesh_id='New Mesh@11'
         ).first()
         self.assertEqual(
             Node.objects.filter(

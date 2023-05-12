@@ -240,8 +240,8 @@ class AbstractWifiMesh(UUIDModel):
     topology = models.ForeignKey(
         get_model_name('topology', 'Topology'), on_delete=models.CASCADE
     )
-    ssid = models.CharField(
-        max_length=32, null=False, blank=False, verbose_name=_('Mesh SSID')
+    mesh_id = models.CharField(
+        max_length=32, null=False, blank=False, verbose_name=_('Mesh ID')
     )
 
     class Meta:
@@ -432,7 +432,7 @@ class AbstractWifiMesh(UUIDModel):
     def _get_mesh_topology(mesh_id, organization_id):
         """
         Get or create topology for the given mesh_id and organization_id.
-        It also creates WifiMesh object to keep track of mesh's SSID
+        It also creates WifiMesh object to keep track of mesh's ID
         if a new topology object is created.
         """
         Topology = load_model('topology', 'Topology')
@@ -441,7 +441,7 @@ class AbstractWifiMesh(UUIDModel):
             mesh_topology = (
                 WifiMesh.objects.select_related('topology')
                 .get(
-                    ssid=mesh_id,
+                    mesh_id=mesh_id,
                     topology__organization_id=organization_id,
                 )
                 .topology
@@ -457,7 +457,7 @@ class AbstractWifiMesh(UUIDModel):
             mesh_topology.full_clean()
             mesh_topology.save()
             wifi_mesh = WifiMesh(
-                ssid=mesh_id,
+                mesh_id=mesh_id,
                 topology=mesh_topology,
             )
             wifi_mesh.full_clean()
