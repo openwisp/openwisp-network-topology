@@ -478,6 +478,28 @@ In order to use this module simply add
         'rest_framework',
     ]
 
+If you have enabled WiFI Mesh integration, you will also need to update the
+``CELERY_BEAT_SCHEDULE`` as follow:
+
+.. code-block:: python
+
+    CELERY_BEAT_SCHEDULE = {
+        'create_mesh_topology': {
+            # This task generates the mesh topology from monitoring data
+            'task': 'openwisp_network_topology.integrations.device.tasks.create_mesh_topology',
+            # Execute this task every 5 minutes
+            'schedule': timedelta(minutes=5),
+            # List of organization UUIDs. The mesh topology will be
+            # created only for devices belonging these organizations.
+            'args': (
+                [
+                    '4e002f97-eb01-4371-a4a8-857faa22fe5c',
+                    'be88d4c4-599a-4ca2-a1c0-3839b4fdc315'
+                ],
+            ),
+        },
+    }
+
 If you are enabling this integration on a pre-existing system, use the
 `create_device_nodes <#create-device-nodes>`_ management command to create
 the relationship between devices and nodes.

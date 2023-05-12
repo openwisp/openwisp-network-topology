@@ -19,13 +19,6 @@ def trigger_device_updates(link_pk):
 
 
 @shared_task
-def create_mesh_topology(interface, device_id):
+def create_mesh_topology(organization_ids):
     WifiMesh = swapper.load_model('topology_device', 'WifiMesh')
-    Device = swapper.load_model('config', 'Device')
-    try:
-        device = Device.objects.only('id', 'mac_address', 'organization_id').get(
-            id=device_id
-        )
-    except Device.DoesNotExist:
-        return
-    WifiMesh.create_topology(interface, device)
+    WifiMesh.create_topology(organization_ids)

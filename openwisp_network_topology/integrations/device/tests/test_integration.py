@@ -25,6 +25,7 @@ from openwisp_utils.admin_theme.menu import MENU
 
 from ..base.models import logger as models_logger
 from ..base.models import trigger_device_checks_path
+from ..tasks import create_mesh_topology
 from . import SIMPLE_MESH_DATA, SINGLE_NODE_MESH_DATA
 
 Node = swapper.load_model('topology', 'Node')
@@ -468,6 +469,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 content_type='application/json',
             )
             self.assertEqual(response.status_code, 200)
+        create_mesh_topology.delay(organization_ids=(org.id,))
         return devices, org
 
     def test_simple_mesh(self):
@@ -475,14 +477,14 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
         topology = Topology.objects.filter(organization=org).first()
         self.assertEqual(
-            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh:HT20').count(), 1
+            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh@11').count(), 1
         )
         self.assertEqual(
             Node.objects.filter(
                 topology=topology,
                 organization=org,
                 properties__contains=(
-                    '{\n    "ht": true,\n    "vht": false,\n    "mfp": false,\n'
+                    '{\n    "ht": true,\n    "vht": null,\n    "mfp": false,\n'
                     '    "wmm": true,\n    "vendor": "TP-LINK TECHNOLOGIES CO.,LTD."\n}'
                 ),
             ).count(),
@@ -495,30 +497,25 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 properties__contains='"noise": -94',
             )
             .filter(properties__contains='"signal": -58')
+            .filter(properties__contains='"mesh_llid": 19500')
+            .filter(properties__contains='"mesh_plid": 24500')
             .count(),
             3,
         )
+        self.assertEqual(
+            Link.objects.filter(
+                topology=topology,
+                organization=org,
+                properties__contains='"mesh_non_peer_ps": "INCONSISTENT: (LISTEN / ACTIVE)"',
+            ).count(),
+            1,
+        )
         self.assertEqual(DeviceNode.objects.filter(device__in=devices).count(), 3)
 
-        # Test DeviceNode creation logic is not executed when the nodes send
-        # monitoring data again.
+        # Test DeviceNode creation logic is not executed when the create_topology
+        # is executed again
         with mock.patch.object(DeviceNode, 'auto_create') as mocked_auto_create:
-            for (device, interfaces) in zip(devices, SIMPLE_MESH_DATA.values()):
-                response = self.client.post(
-                    '{0}?key={1}&time={2}'.format(
-                        reverse('monitoring:api_device_metric', args=[device.id]),
-                        device.key,
-                        now().utcnow().strftime('%d-%m-%Y_%H:%M:%S.%f'),
-                    ),
-                    data=json.dumps(
-                        {
-                            'type': 'DeviceMonitoring',
-                            'interfaces': interfaces,
-                        }
-                    ),
-                    content_type='application/json',
-                )
-                self.assertEqual(response.status_code, 200)
+            WifiMesh.create_topology(organization_ids=(org.id,))
             mocked_auto_create.assert_not_called()
 
     @mock.patch('logging.Logger.exception')
@@ -527,7 +524,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
         topology = Topology.objects.filter(organization=org).first()
         self.assertEqual(
-            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh:HT20').count(), 1
+            WifiMesh.objects.filter(topology=topology, ssid='Test Mesh@11').count(), 1
         )
         self.assertEqual(
             Node.objects.filter(
@@ -549,7 +546,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
     def test_mesh_ssid_changed(self):
         devices, org = self._populate_mesh(SIMPLE_MESH_DATA)
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)
-        self.assertEqual(WifiMesh.objects.filter(ssid='Test Mesh:HT20').count(), 1)
+        self.assertEqual(WifiMesh.objects.filter(ssid='Test Mesh@11').count(), 1)
         topology = Topology.objects.filter(organization=org).first()
         self.assertEqual(
             Node.objects.filter(
@@ -584,13 +581,14 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 content_type='application/json',
             )
             self.assertEqual(response.status_code, 200)
+        WifiMesh.create_topology(organization_ids=(org.id,))
         self.assertEqual(Topology.objects.filter(organization=org).count(), 2)
         self.assertEqual(WifiMesh.objects.count(), 2)
         self.assertEqual(Node.objects.count(), 6)
         self.assertEqual(Link.objects.count(), 6)
-        self.assertEqual(WifiMesh.objects.filter(ssid='New Mesh:HT20').count(), 1)
+        self.assertEqual(WifiMesh.objects.filter(ssid='New Mesh@11').count(), 1)
         topology = Topology.objects.filter(
-            organization=org, wifimesh__ssid='New Mesh:HT20'
+            organization=org, wifimesh__ssid='New Mesh@11'
         ).first()
         self.assertEqual(
             Node.objects.filter(
