@@ -12,7 +12,7 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-        'NAME': 'openwisp_network_topology.db',
+        'NAME': os.path.join(BASE_DIR, 'openwisp_network_topology.db'),
     }
 }
 
@@ -228,6 +228,6 @@ if os.environ.get('SAMPLE_APP', False):
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:
-    from local_settings import *
+    from .local_settings import *
 except ImportError:
     pass
