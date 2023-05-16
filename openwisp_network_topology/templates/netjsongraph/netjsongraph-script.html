@@ -190,7 +190,7 @@
             const data=JSON.parse(e.data);
             if(data.type==="broadcast_topology"){
                 const topology=JSON.parse(data.topology);
-                window.__njg_graph__.utils.JSONDataUpdate.call(window.__njg_graph__, topology);
+                window.graph.utils.JSONDataUpdate.call(window.graph, topology);
             }
         }
 
