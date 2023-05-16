@@ -4,7 +4,7 @@
     loadNetJsonGraph = (el='body', url='{{ graph_url }}') => {
         const history_url = '{{ history_url }}';
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${window.location.host}/network-topology/topology/${getTopologyIdFromUrl()}/`;
+        const wsUrl = `${wsProtocol}//${window.location.host}/ws/network-topology/topology/${getTopologyIdFromUrl()}/`;
         const socket = new WebSocket(wsUrl);
 
         const getDataParseOptions = (data) => {

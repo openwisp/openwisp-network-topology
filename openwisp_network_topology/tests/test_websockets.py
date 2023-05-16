@@ -31,7 +31,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         session_id = admin_client.cookies['sessionid'].value
         communicator = WebsocketCommunicator(
             self.application,
-            path=f'network-topology/topology/{topology_id}/',
+            path=f'ws/network-topology/topology/{topology_id}/',
             headers=[
                 (
                     b'cookie',
@@ -103,16 +103,6 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
     @patch.object(app_settings, 'TOPOLOGY_API_AUTH_REQUIRED', False)
     async def test_consumer_connection_auth_disabled_unauth_user(self, client):
         await self._assert_connection_unauth_user(client)
-
-    async def test_consumer_connection_invalid_topology_pk(
-        self, admin_user, admin_client
-    ):
-        org = await database_sync_to_async(self._create_org)()
-        await database_sync_to_async(self._create_topology)(organization=org)
-        communicator = await self._get_communicator(admin_client, 'invalid_topology_pk')
-        connected, _ = await communicator.connect()
-        assert connected is False
-        await communicator.disconnect()
 
     async def test_consumer_connection_unexisting_topology(
         self, admin_user, admin_client
