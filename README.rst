@@ -489,13 +489,16 @@ If you have enabled WiFI Mesh integration, you will also need to update the
             'task': 'openwisp_network_topology.integrations.device.tasks.create_mesh_topology',
             # Execute this task every 5 minutes
             'schedule': timedelta(minutes=5),
-            # List of organization UUIDs. The mesh topology will be
-            # created only for devices belonging these organizations.
             'args': (
+                # List of organization UUIDs. The mesh topology will be
+                # created only for devices belonging these organizations.
                 [
                     '4e002f97-eb01-4371-a4a8-857faa22fe5c',
                     'be88d4c4-599a-4ca2-a1c0-3839b4fdc315'
                 ],
+                # The task won't use monitoring data reported
+                # before this time (in seconds)
+                6 * 60 # 6 minutes
             ),
         },
     }

@@ -10,7 +10,8 @@ from django.db import transaction
 from django.test import TransactionTestCase, tag
 from django.urls import reverse
 from django.utils.module_loading import import_string
-from django.utils.timezone import now
+from django.utils.timezone import now, timedelta
+from freezegun import freeze_time
 from openwisp_controller.config.tests.utils import (
     CreateConfigTemplateMixin,
     TestVpnX509Mixin,
@@ -492,12 +493,6 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
             3,
         )
         self.assertEqual(
-            Node.objects.filter(label__iexact='0a:cc:ae:34:ff:3d').count(), 1
-        )
-        self.assertEqual(
-            Link.objects.filter(target__label__iexact='0a:cc:ae:34:ff:3d').count(), 0
-        )
-        self.assertEqual(
             Link.objects.filter(
                 topology=topology,
                 organization=org,
@@ -522,7 +517,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
         # Test DeviceNode creation logic is not executed when the create_topology
         # is executed again
         with mock.patch.object(DeviceNode, 'auto_create') as mocked_auto_create:
-            WifiMesh.create_topology(organization_ids=(org.id,))
+            create_mesh_topology.delay(organization_ids=(org.id,))
             mocked_auto_create.assert_not_called()
 
     @mock.patch('logging.Logger.exception')
@@ -561,7 +556,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 topology=topology,
                 organization=org,
             ).count(),
-            4,
+            3,
         )
         self.assertEqual(
             Link.objects.filter(
@@ -589,10 +584,10 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 content_type='application/json',
             )
             self.assertEqual(response.status_code, 200)
-        WifiMesh.create_topology(organization_ids=(org.id,))
+        create_mesh_topology.delay(organization_ids=(org.id,))
         self.assertEqual(Topology.objects.filter(organization=org).count(), 2)
         self.assertEqual(WifiMesh.objects.count(), 2)
-        self.assertEqual(Node.objects.count(), 8)
+        self.assertEqual(Node.objects.count(), 6)
         self.assertEqual(Link.objects.count(), 6)
         self.assertEqual(WifiMesh.objects.filter(mesh_id='New Mesh@11').count(), 1)
         topology = Topology.objects.filter(
@@ -603,7 +598,7 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
                 topology=topology,
                 organization=org,
             ).count(),
-            4,
+            3,
         )
         self.assertEqual(
             Link.objects.filter(
@@ -612,6 +607,44 @@ class TestWifiMeshIntegration(Base, TransactionTestCase):
             ).count(),
             3,
         )
+
+    def test_discard_old_monitoring_data(self):
+        now_time = now()
+        with freeze_time(now_time - timedelta(minutes=20)):
+            devices, org = self._populate_mesh(SIMPLE_MESH_DATA)
+        self.assertEqual(Topology.objects.count(), 1)
+        topology = Topology.objects.first()
+        self.assertEqual(topology.node_set.count(), 3)
+        self.assertEqual(topology.link_set.filter(status='up').count(), 3)
+
+        with freeze_time(now_time - timedelta(minutes=10)):
+            # Only two devices sent monitoring data
+            for device in devices[:2]:
+                response = self.client.post(
+                    '{0}?key={1}&time={2}'.format(
+                        reverse('monitoring:api_device_metric', args=[device.id]),
+                        device.key,
+                        now().utcnow().strftime('%d-%m-%Y_%H:%M:%S.%f'),
+                    ),
+                    data=json.dumps(
+                        {
+                            'type': 'DeviceMonitoring',
+                            'interfaces': SIMPLE_MESH_DATA[device.mac_address],
+                        }
+                    ),
+                    content_type='application/json',
+                )
+                self.assertEqual(response.status_code, 200)
+            create_mesh_topology.delay(organization_ids=(org.id,))
+        self.assertEqual(Topology.objects.count(), 1)
+        self.assertEqual(topology.node_set.count(), 3)
+        self.assertEqual(topology.link_set.filter(status='up').count(), 1)
+
+        # No device is sending monitoring data
+        create_mesh_topology.delay(organization_ids=(org.id,))
+        self.assertEqual(Topology.objects.count(), 1)
+        self.assertEqual(topology.node_set.count(), 3)
+        self.assertEqual(topology.link_set.filter(status='up').count(), 0)
 
     def test_topology_admin(self):
         """

@@ -4,6 +4,7 @@ from ipaddress import ip_address, ip_network
 from django.conf import settings
 from django.db import models
 from django.utils.module_loading import import_string
+from django.utils.timezone import datetime, now, timedelta
 from django.utils.translation import gettext_lazy as _
 from swapper import get_model_name, load_model
 
@@ -248,18 +249,21 @@ class AbstractWifiMesh(UUIDModel):
         abstract = True
 
     @classmethod
-    def create_topology(cls, organization_ids):
+    def create_topology(cls, organization_ids, discard_older_data_time):
         for org_id in organization_ids:
-            intermediate_topologies = cls._create_intermediate_topologies(org_id)
+            intermediate_topologies = cls._create_intermediate_topologies(
+                org_id, discard_older_data_time
+            )
             cls._create_topology(intermediate_topologies, org_id)
 
     @classmethod
-    def _create_intermediate_topologies(cls, organization_id):
+    def _create_intermediate_topologies(cls, organization_id, discard_older_data_time):
         DeviceData = load_model('device_monitoring', 'DeviceData')
         intermediate_topologies = {}
         query = DeviceData.objects.filter(organization_id=organization_id).only(
             'mac_address'
         )
+        discard_older_data_time = now() - timedelta(seconds=discard_older_data_time)
         for device_data in query.iterator():
             mesh_interfaces = AbstractWifiMesh._get_mesh_interfaces(device_data)
             for interface in mesh_interfaces:
@@ -272,6 +276,9 @@ class AbstractWifiMesh(UUIDModel):
                         'links': {},
                         'mac_mapping': {},
                     }
+                data_timestamp = datetime.fromisoformat(device_data.data_timestamp)
+                if data_timestamp < discard_older_data_time:
+                    continue
                 topology = intermediate_topologies[mesh_id]
                 (
                     collected_nodes,
@@ -399,7 +406,9 @@ class AbstractWifiMesh(UUIDModel):
         nodes = []
         mac_mapping = intermediate_topology['mac_mapping']
         for interface_mac, intermediate_node in intermediate_topology['nodes'].items():
-            device_mac = AbstractWifiMesh._get_device_mac(mac_mapping, interface_mac)
+            device_mac = mac_mapping.get(interface_mac)
+            if not device_mac:
+                continue
             node = {
                 'id': device_mac,
                 'label': device_mac,
@@ -415,18 +424,13 @@ class AbstractWifiMesh(UUIDModel):
         links = []
         mac_mapping = intermediate_topology['mac_mapping']
         for interface_mac, intermediate_link in intermediate_topology['links'].items():
-            device_mac = AbstractWifiMesh._get_device_mac(mac_mapping, interface_mac)
+            device_mac = mac_mapping.get(interface_mac)
+            if not device_mac:
+                continue
             for link in intermediate_link.values():
                 link['target'] = device_mac
                 links.append(link)
         return links
-
-    @staticmethod
-    def _get_device_mac(mac_mapping, interface_mac):
-        try:
-            return mac_mapping[interface_mac]
-        except KeyError:
-            return interface_mac
 
     @staticmethod
     def _get_mesh_topology(mesh_id, organization_id):

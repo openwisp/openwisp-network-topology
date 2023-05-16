@@ -19,6 +19,6 @@ def trigger_device_updates(link_pk):
 
 
 @shared_task
-def create_mesh_topology(organization_ids):
+def create_mesh_topology(organization_ids, discard_older_data_time=360):
     WifiMesh = swapper.load_model('topology_device', 'WifiMesh')
-    WifiMesh.create_topology(organization_ids)
+    WifiMesh.create_topology(organization_ids, discard_older_data_time)
