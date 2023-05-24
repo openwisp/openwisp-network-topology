@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse
-from openwisp_controller.tests.utils import SeleniumTestMixin
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -10,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from swapper import load_model
 
 from openwisp_users.tests.utils import TestOrganizationMixin
+from openwisp_utils.test_selenium_mixins import SeleniumTestMixin
 
 from .utils import CreateGraphObjectsMixin, LoadMixin
 
@@ -26,8 +26,6 @@ class TestTopologyGraphVisualizer(
     StaticLiveServerTestCase,
 ):
     app_label = 'topology'
-    admin_username = 'admin'
-    admin_password = 'password'
     node_model = Node
     link_model = Link
     topology_model = Topology
@@ -40,22 +38,25 @@ class TestTopologyGraphVisualizer(
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.web_driver.quit()
+        # Workaround for https://github.com/openwisp/openwisp-network-topology/issues/193
+        # The "automation" info-bar causes the visualizer to error.
+        # TODO: Remove this when the bug is fixed.
         chrome_options = webdriver.ChromeOptions()
         if getattr(settings, 'SELENIUM_HEADLESS', True):
             chrome_options.add_argument('--headless')
         chrome_options.add_argument('--window-size=1366,768')
         chrome_options.add_argument('--ignore-certificate-errors')
         chrome_options.add_argument('--remote-debugging-port=9222')
+        # Disable the info-bar in chrome browser
+        chrome_options.add_experimental_option("useAutomationExtension", False)
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         capabilities = DesiredCapabilities.CHROME
         capabilities['goog:loggingPrefs'] = {'browser': 'ALL'}
         cls.web_driver = webdriver.Chrome(
-            options=chrome_options, desired_capabilities=capabilities
+            options=chrome_options,
+            desired_capabilities=capabilities,
         )
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.web_driver.quit()
-        super().tearDownClass()
 
     def setUp(self):
         org = self._create_org()
@@ -144,7 +145,7 @@ class TestTopologyGraphVisualizer(
     def test_topology_non_admin_view_graph_visualizer(self):
         path = reverse('topology_list')
         self.login(username=self.admin_username, password=self.admin_password)
-        self.open(path)
+        self.web_driver.get(f'{self.live_server_url}{path}')
         topology_graph_element = self.web_driver.find_element(
             By.XPATH, "//ul[@id='menu']/li/a"
         )
