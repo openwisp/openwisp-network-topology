@@ -250,10 +250,18 @@ class AbstractWifiMesh(UUIDModel):
 
     @classmethod
     def create_topology(cls, organization_ids, discard_older_data_time):
+        Link = load_model('topology', 'Link')
         for org_id in organization_ids:
             intermediate_topologies = cls._create_intermediate_topologies(
                 org_id, discard_older_data_time
             )
+            if not intermediate_topologies:
+                Link.objects.filter(
+                    topology__wifimesh__isnull=False, organization_id=org_id
+                ).exclude(topology__wifimesh__in=intermediate_topologies.keys()).update(
+                    status='down'
+                )
+                continue
             cls._create_topology(intermediate_topologies, org_id)
 
     @classmethod
@@ -265,6 +273,12 @@ class AbstractWifiMesh(UUIDModel):
         )
         discard_older_data_time = now() - timedelta(seconds=discard_older_data_time)
         for device_data in query.iterator():
+            try:
+                assert device_data.data is not None
+                data_timestamp = datetime.fromisoformat(device_data.data_timestamp)
+                assert data_timestamp > discard_older_data_time
+            except (AttributeError, AssertionError):
+                continue
             mesh_interfaces = AbstractWifiMesh._get_mesh_interfaces(device_data)
             for interface in mesh_interfaces:
                 mesh_id = '{}@{}'.format(
@@ -276,9 +290,6 @@ class AbstractWifiMesh(UUIDModel):
                         'links': {},
                         'mac_mapping': {},
                     }
-                data_timestamp = datetime.fromisoformat(device_data.data_timestamp)
-                if data_timestamp < discard_older_data_time:
-                    continue
                 topology = intermediate_topologies[mesh_id]
                 (
                     collected_nodes,
@@ -331,9 +342,7 @@ class AbstractWifiMesh(UUIDModel):
     @staticmethod
     def _get_mesh_interfaces(device_data):
         mesh_interfaces = []
-        device_data = device_data.data or {}
-
-        for interface in device_data.get('interfaces', []):
+        for interface in device_data.data.get('interfaces', []):
             if not interface.get('wireless'):
                 continue
             if not interface['wireless'].get('mode') in ['802.11s']:
