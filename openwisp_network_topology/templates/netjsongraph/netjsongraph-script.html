@@ -26,34 +26,8 @@
                 },
             },
         }
-        const netjsonGraphData = fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-        }).then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error("{% trans 'Failed to fetch NetJSONGraph data.' %}");
-            }
-        }).then(data => {
-            if (data.nodes.length > 20) {
-                graphConfig.series.force = {
-                    layoutAnimation: false,
-                };
-                graphConfig.series.draggable = false;
-                if (data.nodes.length > 50) {
-                    graphConfig.series.force.edgeLength = 250;
-                }
-            }
-            return data;
-        }).catch(error => {
-            console.error(error);
-        });
         // load graph
-        const graph = new NetJSONGraph(netjsonGraphData, {
+        const graph = new NetJSONGraph(url, {
             el: el,
             graphConfig: graphConfig,
             linkCategories: [
@@ -120,6 +94,17 @@
                         );
                     }
                 });
+                // Disable animation in graph for large topologies.
+                // See https://github.com/openwisp/openwisp-network-topology/issues/164
+                if (data.nodes.length > 20) {
+                    graph.config.graphConfig.series.force = {
+                        layoutAnimation: false,
+                    };
+                    graph.config.graphConfig.series.draggable = false;
+                    if (data.nodes.length > 50) {
+                        graph.config.graphConfig.series.force.edgeLength = 250;
+                    }
+                }
             },
 
             onLoad: () => {
