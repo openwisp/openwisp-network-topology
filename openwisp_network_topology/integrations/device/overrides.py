@@ -84,6 +84,7 @@ def link_get_queryset(cls, qs):
             'organization__name',
             'organization__is_active',
             'status',
+            'properties',
             'cost',
             'cost_text',
             'source__addresses',
