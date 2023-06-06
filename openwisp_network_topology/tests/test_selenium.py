@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse
 from selenium import webdriver
+from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
@@ -151,3 +152,20 @@ class TestTopologyGraphVisualizer(
         )
         topology_graph_element.click()
         self._assert_topology_graph()
+
+    def test_topology_admin_visualizer_multiple_close_btn_append(self):
+        path = reverse(f'{self.prefix}_topology_change', args=[self.topology.pk])
+        self.login(username=self.admin_username, password=self.admin_password)
+        self.open(path)
+        self.web_driver.find_element(By.CSS_SELECTOR, 'input.visualizelink').click()
+        self._assert_topology_graph()
+        self.web_driver.find_element(By.CLASS_NAME, 'closeBtn').click()
+        # Now try to open visualizer
+        # again and make sure only single
+        # 'closeBtn' element is present in the DOM
+        self.web_driver.find_element(By.CSS_SELECTOR, 'input.visualizelink').click()
+        self._assert_topology_graph()
+        try:
+            self.web_driver.find_element(By.CLASS_NAME, 'closeBtn').click()
+        except ElementClickInterceptedException:
+            self.fail('Multiple "closeBtn" are present in the visualizer DOM')

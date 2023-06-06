@@ -20,10 +20,14 @@ django.jQuery(function ($) {
             body.css('overflow', 'hidden');
             inner.css('overflow', 'hidden');
 
-            const closeBtn = document.createElement('button');
-            closeBtn.setAttribute('class', 'closeBtn');
-            closeBtn.innerHTML = '&times;';
-            overlay.get(0).appendChild(closeBtn);
+            // Check if close button already exists
+            const closeBtn = document.querySelector('.closeBtn');
+            if (!closeBtn) {
+                const newcloseBtn = document.createElement('button');
+                newcloseBtn.setAttribute('class', 'closeBtn');
+                newcloseBtn.innerHTML = '&times;';
+                overlay.get(0).appendChild(newcloseBtn);
+            }
 
             window.graph = window.loadNetJsonGraph('.djnjg-overlay .inner');
 
