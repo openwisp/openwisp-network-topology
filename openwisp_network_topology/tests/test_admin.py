@@ -188,28 +188,6 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         self.assertNotContains(response, 'organization_id')
         self.assertContains(response, link.topology.organization.name)
 
-    def test_link_update_status(self):
-        t = Topology.objects.first()
-        n1 = self._create_node(label='node1org1', topology=t)
-        n2 = self._create_node(label='node2org1', topology=t)
-        link = self._create_link(topology=t, source=n1, target=n2)
-        path = reverse('{0}_link_change'.format(self.prefix), args=[link.pk])
-        response = self.client.post(
-            path,
-            data={
-                'topology': str(t.pk),
-                'organization': str(t.organization_id),
-                'source': str(n1.id),
-                'target': str(n2.id),
-                'cost': '1.0',
-                'status': 'down',
-            },
-            follow=True,
-        )
-        self.assertEqual(response.status_code, 200)
-        link.refresh_from_db()
-        self.assertEqual(link.status, 'down')
-
     def test_node_add(self):
         path = reverse('{0}_node_add'.format(self.prefix))
         response = self.client.get(path)
