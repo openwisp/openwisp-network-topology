@@ -2,9 +2,13 @@ from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse
 from selenium import webdriver
-from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import (
+    ElementClickInterceptedException,
+    TimeoutException,
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from swapper import load_model
@@ -109,6 +113,14 @@ class TestTopologyGraphVisualizer(
         WebDriverWait(self.web_driver, 2).until(
             EC.visibility_of_element_located((By.CLASS_NAME, 'njg-aboutContainer'))
         )
+        try:
+            # Check the visibility of the topology graph
+            WebDriverWait(self.web_driver, 2).until(
+                EC.visibility_of_element_located((By.XPATH, '//div[1]/canvas'))
+            )
+        except TimeoutException:
+            self.fail('The topology graph did not render')
+
         console_logs = self.web_driver.get_log('browser')
         console_errors = self._get_console_errors(console_logs)
         self.assertEqual(console_errors, [])
@@ -169,3 +181,21 @@ class TestTopologyGraphVisualizer(
             self.web_driver.find_element(By.CLASS_NAME, 'closeBtn').click()
         except ElementClickInterceptedException:
             self.fail('Multiple "closeBtn" are present in the visualizer DOM')
+
+    def test_topology_admin_esc_key_close_visualizer(self):
+        path = reverse(f'{self.prefix}_topology_change', args=[self.topology.pk])
+        self.login(username=self.admin_username, password=self.admin_password)
+        self.open(path)
+        self.web_driver.find_element(By.CSS_SELECTOR, 'input.visualizelink').click()
+        self._assert_topology_graph()
+        # Try to close the visualizer with the "Esc" key.
+        body = self.web_driver.find_element(By.TAG_NAME, 'body')
+        body.send_keys(Keys.ESCAPE)
+        # Open the visualizer again and make sure no JS errors
+        # are thrown when the visualizer is closed again
+        self.web_driver.find_element(By.CSS_SELECTOR, 'input.visualizelink').click()
+        self._assert_topology_graph()
+        self.web_driver.find_element(By.CLASS_NAME, 'closeBtn').click()
+        console_logs = self.web_driver.get_log('browser')
+        console_errors = self._get_console_errors(console_logs)
+        self.assertEqual(console_errors, [])

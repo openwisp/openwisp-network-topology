@@ -33,7 +33,6 @@ django.jQuery(function ($) {
 
             overlay.find('.closeBtn').click(function (e) {
                 e.preventDefault();
-                window.graph.echarts.dispose();
                 closeOverlay();
             });
         });
@@ -41,6 +40,9 @@ django.jQuery(function ($) {
     };
 
     var closeOverlay = function () {
+        // Make sure that whenever this function is called,
+        // We first destroy the echart instance
+        window.graph.echarts.dispose();
         $(document).unbind('keydown', disableArrowKeys);
         inner.empty();
         overlay.hide();
