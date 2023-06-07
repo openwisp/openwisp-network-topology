@@ -35,6 +35,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install system packages
+        run: |
+          sudo apt update
+          sudo apt-get -qq -y install sqlite3 gdal-bin libproj-dev \
+            libgeos-dev libspatialite-dev spatialite-bin \
+            libsqlite3-mod-spatialite
+
       - name: Install python system packages
         run: pip install -U pip wheel setuptools
 

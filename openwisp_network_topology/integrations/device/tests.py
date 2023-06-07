@@ -384,6 +384,9 @@ class TestControllerIntegration(Base, TransactionTestCase):
 
 
 class TestMonitoringIntegration(Base, TransactionTestCase):
+    @mock.patch(
+        'openwisp_monitoring.device.apps.DeviceMonitoringConfig.connect_device_signals'
+    )
     @mock.patch('openwisp_monitoring.db.timeseries_db.create_database')
     @mock.patch('openwisp_monitoring.device.utils.manage_short_retention_policy')
     @mock.patch('openwisp_monitoring.device.utils.manage_default_retention_policy')
@@ -416,10 +419,11 @@ class TestMonitoringIntegration(Base, TransactionTestCase):
             with self.modify_settings(
                 INSTALLED_APPS={
                     'append': [
+                        'openwisp_controller.connection',
+                        'openwisp_controller.geo',
                         'openwisp_monitoring.monitoring',
                         'openwisp_monitoring.device',
                         'openwisp_monitoring.check',
-                        'openwisp_controller.connection',
                         'openwisp_notifications',
                     ]
                 }
