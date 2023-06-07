@@ -1,13 +1,10 @@
-from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse
-from selenium import webdriver
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
     TimeoutException,
 )
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -39,29 +36,6 @@ class TestTopologyGraphVisualizer(
     @property
     def prefix(self):
         return f'admin:{self.app_label}'
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.web_driver.quit()
-        # Workaround for https://github.com/openwisp/openwisp-network-topology/issues/193
-        # The "automation" info-bar causes the visualizer to error.
-        # TODO: Remove this when the bug is fixed.
-        chrome_options = webdriver.ChromeOptions()
-        if getattr(settings, 'SELENIUM_HEADLESS', True):
-            chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--window-size=1366,768')
-        chrome_options.add_argument('--ignore-certificate-errors')
-        chrome_options.add_argument('--remote-debugging-port=9222')
-        # Disable the info-bar in chrome browser
-        chrome_options.add_experimental_option("useAutomationExtension", False)
-        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        capabilities = DesiredCapabilities.CHROME
-        capabilities['goog:loggingPrefs'] = {'browser': 'ALL'}
-        cls.web_driver = webdriver.Chrome(
-            options=chrome_options,
-            desired_capabilities=capabilities,
-        )
 
     def setUp(self):
         org = self._create_org()

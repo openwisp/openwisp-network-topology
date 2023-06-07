@@ -62,6 +62,10 @@
     box-sizing: border-box;
 }
 
+.djnjg-overlay {
+    position: fixed !important;
+}
+
 .djnjg-overlay .closeBtn {
     border: none;
     outline: none;
