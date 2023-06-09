@@ -4,11 +4,13 @@ from unittest.mock import patch
 
 import swapper
 from django.core.cache import cache
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TransactionTestCase, tag
 from django.urls import reverse
 from django.utils.timezone import now, timedelta
 from freezegun import freeze_time
 
+from .. import settings as app_settings
 from ..tasks import create_mesh_topology
 from . import SIMPLE_MESH_DATA, SINGLE_NODE_MESH_DATA
 from .utils import TopologyTestMixin
@@ -56,6 +58,28 @@ class TestWifiMeshIntegration(TopologyTestMixin, TransactionTestCase):
             self.assertEqual(response.status_code, 200)
         create_mesh_topology.delay(organization_ids=(org.id,))
         return devices, org
+
+    @patch.object(app_settings, 'WIFI_MESH_INTEGRATION', False)
+    def test_wifi_mesh_integration_disabled(self):
+        with self.subTest('Test calling "create_mesh_topology" task'):
+            with patch.object(WifiMesh, 'create_topology') as mocked:
+                _, org = self._populate_mesh(SIMPLE_MESH_DATA)
+                self.assertEqual(Topology.objects.count(), 0)
+                mocked.assert_not_called()
+
+        # Ensure the following sub-test does not fail if the
+        # previous one fails.
+        Topology.objects.all().delete()
+
+        with self.subTest('Test calling WifiMesh.create_topology'):
+            with self.assertRaises(ImproperlyConfigured) as error:
+                WifiMesh.create_topology(
+                    organization_ids=[org.id], discard_older_data_time=360
+                )
+            self.assertEqual(
+                str(error.exception),
+                '"OPENIWSP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION" is set to "False".',
+            )
 
     def test_simple_mesh(self):
         devices, org = self._populate_mesh(SIMPLE_MESH_DATA)
