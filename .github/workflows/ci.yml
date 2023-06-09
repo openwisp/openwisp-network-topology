@@ -57,8 +57,8 @@ jobs:
       - name: Install python system packages
         run: pip install -U pip wheel setuptools
 
-      - name: Start InfluxDB container
-        run: docker-compose up -d influxdb
+      - name: Start InfluxDB and Redis container
+        run: docker-compose up -d influxdb redis
 
       - name: Install test dependencies
         run: |

@@ -210,6 +210,15 @@ if os.environ.get('WIFI_MESH', False):
         'PORT': '8086',
     }
     OPENWISP_MONITORING_MAC_VENDOR_DETECTION = False
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': 'redis://localhost/9',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            },
+        }
+    }
 
 if os.environ.get('SAMPLE_APP', False):
     INSTALLED_APPS.remove('openwisp_network_topology')
