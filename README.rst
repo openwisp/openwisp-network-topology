@@ -166,8 +166,11 @@ Install sqlite:
 
 .. code-block:: shell
 
-    sudo apt install -y sqlite3 libsqlite3-dev \
-                        libspatialite-dev libsqlite3-mod-spatialite
+    sudo apt install -y sqlite3 libsqlite3-dev
+    # Install system dependencies for spatialite which is required
+    # to run tests for openwisp-network-topology integrations with
+    # openwisp-controller and openwisp-monitoring.
+    sudo apt install libspatialite-dev libsqlite3-mod-spatialite
 
 Install your forked repo:
 
@@ -177,11 +180,13 @@ Install your forked repo:
     cd openwisp-network-topology/
     python setup.py develop
 
-Start InfluxDB using Docker:
+Start InfluxDB and Redis using Docker
+(required by the test project to run tests for
+`WiFi Mesh Integration <#openwisp_network_topology_wifi_mesh_integration>`_):
 
 .. code-block:: shell
 
-    docker-compose up -d influxdb
+    docker-compose up -d influxdb redis
 
 Install test requirements:
 
@@ -194,7 +199,6 @@ Create database:
 .. code-block:: shell
 
     cd tests/
-    export WIFI_MESH=1
     ./manage.py migrate
     ./manage.py createsuperuser
 
@@ -204,7 +208,13 @@ Run tests with:
 
 .. code-block:: shell
 
+    # Running tests without setting the "WIFI_MESH" environment
+    # variable will not run tests for WiFi Mesh integration.
+    # This is done to avoid slowing down the test suite by adding
+    # dependencies which are only used by the integration.
     ./runtests.py
+    # You can run the tests only for WiFi mesh integration using
+    # the following command
     WIFI_MESH=1 ./runtests.py
 
 Run qa tests:
@@ -455,7 +465,8 @@ This additional and optional module provides the following features:
   - the management IP address of the related device is updated straightaway
   - if OpenWISP Monitoring is enabled, the device checks are triggered (e.g.: ping)
 
-- if OpenWISP Monitoring is enabled, the system can automatically create topology
+- if `OpenWISP Monitoring <https://github.com/openwisp/openwisp-monitoring>`_
+  is installed and enabled, the system can automatically create topology
   for the WiFi Mesh (802.11s) interfaces using the monitoring data provided by the agent.
   You can enable this by setting `OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION
   <#openwisp_network_topology_wifi_mesh_integration>`_ to ``True``.
@@ -634,7 +645,6 @@ belong to the organizations the user manages.
 | **default**: |   ``False``   |
 +--------------+---------------+
 
-When enabled, topologies will be automatically created for WiFi mesh(es) present on
 When enabled, network topology objects will be automatically created and
 updated based on the WiFi mesh interfaces peer information supplied
 by the monitoring agent.
@@ -643,7 +653,7 @@ by the monitoring agent.
 collected by OpenWISP Monitoring. Thus, it requires
 `integration with OpenWISP Controller and OpenWISP Monitoring
 <#integration-with-openwisp-controller-and-openwisp-monitoring>`_ to be enabled
-on the Django project.
+in the Django project.
 
 Rest API
 --------

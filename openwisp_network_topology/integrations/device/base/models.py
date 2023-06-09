@@ -2,6 +2,7 @@ import logging
 from ipaddress import ip_address, ip_network
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils.module_loading import import_string
 from django.utils.timezone import datetime, now, timedelta
@@ -9,6 +10,8 @@ from django.utils.translation import gettext_lazy as _
 from swapper import get_model_name, load_model
 
 from openwisp_utils.base import UUIDModel
+
+from .. import settings as app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -250,6 +253,10 @@ class AbstractWifiMesh(UUIDModel):
 
     @classmethod
     def create_topology(cls, organization_ids, discard_older_data_time):
+        if not app_settings.WIFI_MESH_INTEGRATION:
+            raise ImproperlyConfigured(
+                '"OPENIWSP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION" is set to "False".'
+            )
         Link = load_model('topology', 'Link')
         for org_id in organization_ids:
             intermediate_topologies = cls._create_intermediate_topologies(
@@ -266,6 +273,18 @@ class AbstractWifiMesh(UUIDModel):
 
     @classmethod
     def _create_intermediate_topologies(cls, organization_id, discard_older_data_time):
+        """
+        Creates an intermediate data structure for creating topologies.
+        The intermediate topology contains intermediate data structure
+        for nodes and links.
+
+        Every device in the mesh sends monitoring data. The data contains
+        information of the clients the device is connected to.
+        Using the information sent by individual device, a hub-spoke
+        topology is created between device (hub) and clients (spoke).
+        These individual topologies are then complied to create the
+        complete mesh topology.
+        """
         DeviceData = load_model('device_monitoring', 'DeviceData')
         intermediate_topologies = {}
         query = DeviceData.objects.filter(organization_id=organization_id).only(
@@ -300,7 +319,6 @@ class AbstractWifiMesh(UUIDModel):
                 AbstractWifiMesh._merge_nodes(
                     interface, topology['nodes'], collected_nodes
                 )
-                topology['nodes'].update(collected_nodes)
                 AbstractWifiMesh._merge_links(
                     interface, topology['links'], collected_links
                 )
@@ -308,6 +326,14 @@ class AbstractWifiMesh(UUIDModel):
 
     @classmethod
     def _get_intermediate_nodes_and_links(cls, interface, device_data, mac_mapping):
+        """
+        Create intermediate data structures for nodes and links.
+        These intermediate data structures are required because the
+        interface's MAC address can be different from the device's main
+        MAC address. Thus, these data structures are aimed to provide
+        quick lookup while mapping interface MAC address to the
+        device MAC address.
+        """
         device_mac = device_data.mac_address.upper()
         interface_mac = interface['mac'].upper()
         channel = interface['wireless']['channel']
@@ -323,6 +349,8 @@ class AbstractWifiMesh(UUIDModel):
                     node_properties[property] = client[property]
             collected_nodes[client_mac] = {'properties': node_properties}
             if client.get('mesh_plink') and client.get('mesh_plink') != 'ESTAB':
+                # The link is not established.
+                # Do not add this link to the topology.
                 continue
             link_properties = {}
             for property in cls._LINK_PROPERTIES:
@@ -361,6 +389,14 @@ class AbstractWifiMesh(UUIDModel):
 
     @staticmethod
     def _merge_links(interface, topology_links, collected_links):
+        """
+        Merges properties of links from the topology stored
+        in the database (topology_links) with link collected from
+        the interface's wireless client data (collected_links).
+
+        It takes into consideration the nature of the property
+        (e.g. taking average for signal and noise, etc.).
+        """
         interface_mac = interface['mac'].upper()
         if topology_links.get(interface_mac):
             for source, topology_link in topology_links[interface_mac].items():
@@ -370,17 +406,25 @@ class AbstractWifiMesh(UUIDModel):
                     'properties'
                 ].items():
                     if isinstance(value, int):
+                        # If the value is integer, then take average of the
+                        # values provided by the two nodes.
+                        # This is for fields like signal and noise.
                         if topology_link['properties'].get(property):
                             topology_link['properties'][property] = (
                                 value + topology_link['properties'][property]
                             ) // 2
                         else:
+                            # The link in topology does not contain this property,
+                            # hence instead of averaging, assign the current value.
                             topology_link['properties'][property] = value
                     elif (
                         property in ['mesh_plink', 'mesh_non_peer_ps']
                         and topology_link['properties'].get(property)
                         and value != topology_link['properties'][property]
                     ):
+                        # The value for "mesh_plink" and "mesh_non_peer_ps" properties
+                        # should be reported same by both the nodes.
+                        # Flag the value as inconsistent if they are different.
                         topology_link['properties'][
                             property
                         ] = 'INCONSISTENT: ({} / {})'.format(
@@ -412,6 +456,13 @@ class AbstractWifiMesh(UUIDModel):
 
     @staticmethod
     def _get_nodes_from_intermediate_topology(intermediate_topology):
+        """
+        Using the "intermediate_topology", return all the
+        nodes of the topology.
+
+        It maps the interface's MAC address to the device's main MAC address
+        which is used to create DeviceNode relation.
+        """
         nodes = []
         mac_mapping = intermediate_topology['mac_mapping']
         for interface_mac, intermediate_node in intermediate_topology['nodes'].items():
@@ -430,6 +481,12 @@ class AbstractWifiMesh(UUIDModel):
 
     @staticmethod
     def _get_links_from_intermediate_topology(intermediate_topology):
+        """
+        Using the "intermediate_topology", return all the
+        links of the topology.
+
+        It maps the interface's MAC address to the device's main MAC address.
+        """
         links = []
         mac_mapping = intermediate_topology['mac_mapping']
         for interface_mac, intermediate_link in intermediate_topology['links'].items():

@@ -191,13 +191,15 @@ if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
         }
     )
 
-if os.environ.get('WIFI_MESH', False):
+# Avoid adding unnecessary dependency to speedup tests.
+if not TESTING or (TESTING and os.environ.get('WIFI_MESH', False)):
     OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION = True
     INSTALLED_APPS.insert(
         INSTALLED_APPS.index('openwisp_controller.connection'),
         'openwisp_controller.geo',
     )
     openwisp_ipam_index = INSTALLED_APPS.index('openwisp_ipam')
+    INSTALLED_APPS.insert(openwisp_ipam_index, 'leaflet')
     INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.check')
     INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.device')
     INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.monitoring')
