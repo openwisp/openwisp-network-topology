@@ -298,8 +298,9 @@ class AbstractWifiMesh(UUIDModel):
                 assert data_timestamp > discard_older_data_time
             except (AttributeError, AssertionError):
                 continue
-            mesh_interfaces = AbstractWifiMesh._get_mesh_interfaces(device_data)
-            for interface in mesh_interfaces:
+            for interface in device_data.data.get('interfaces', []):
+                if not AbstractWifiMesh._is_mesh_interfaces(interface):
+                    continue
                 mesh_id = '{}@{}'.format(
                     interface['wireless']['ssid'], interface['wireless']['channel']
                 )
@@ -368,15 +369,10 @@ class AbstractWifiMesh(UUIDModel):
         return collected_nodes, collected_links
 
     @staticmethod
-    def _get_mesh_interfaces(device_data):
-        mesh_interfaces = []
-        for interface in device_data.data.get('interfaces', []):
-            if not interface.get('wireless'):
-                continue
-            if not interface['wireless'].get('mode') in ['802.11s']:
-                continue
-            mesh_interfaces.append(interface)
-        return mesh_interfaces
+    def _is_mesh_interfaces(interface):
+        return interface.get('wireless', False) and interface['wireless'].get(
+            'mode'
+        ) in ['802.11s']
 
     @staticmethod
     def _merge_nodes(interface, topology_nodes, collected_nodes):
