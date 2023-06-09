@@ -7,3 +7,4 @@ openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/ma
 openwisp-controller @ https://github.com/openwisp/openwisp-controller/tarball/master
 openwisp-utils[qa,selenium] @ https://github.com/openwisp/openwisp-utils/tarball/master
 redis~=4.5.4
+django_redis~=5.2.0
