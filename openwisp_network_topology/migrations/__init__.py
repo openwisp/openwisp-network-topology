@@ -1,5 +1,6 @@
 # Manually written, used during migrations
 import swapper
+from django.contrib.auth.management import create_permissions
 
 
 def get_model(apps, app_name, model):
@@ -33,3 +34,10 @@ def fix_link_properties(apps, schema_editor):
     for link in Link.objects.all():
         link.full_clean()
         link.save()
+
+
+def create_default_permissions(apps, schema_editor):
+    for app_config in apps.get_app_configs():
+        app_config.models_module = True
+        create_permissions(app_config, apps=apps, verbosity=0)
+        app_config.models_module = None

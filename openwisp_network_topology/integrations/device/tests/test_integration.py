@@ -20,13 +20,14 @@ from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.admin_theme.dashboard import DASHBOARD_CHARTS, DASHBOARD_TEMPLATES
 from openwisp_utils.admin_theme.menu import MENU
 
-from .base.models import logger as models_logger
-from .base.models import trigger_device_checks_path
+from ..base.models import logger as models_logger
+from ..base.models import trigger_device_checks_path
 
 Node = swapper.load_model('topology', 'Node')
 Link = swapper.load_model('topology', 'Link')
 Topology = swapper.load_model('topology', 'Topology')
 DeviceNode = swapper.load_model('topology_device', 'DeviceNode')
+WifiMesh = swapper.load_model('topology_device', 'WifiMesh')
 Device = swapper.load_model('config', 'Device')
 Template = swapper.load_model('config', 'Template')
 Vpn = swapper.load_model('config', 'Template')
@@ -515,3 +516,19 @@ class TestAdmin(Base, TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         link.refresh_from_db()
         self.assertEqual(link.status, 'down')
+
+    def test_topology_admin(self):
+        """
+        Tests WifiMeshInlineAdmin is absent in TopologyAdmin
+        when OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION
+        is set to False.
+
+        Note: This test is present here because TopologyAdmin class
+        cannot be patched based on app_settings.WIFI_MESH_INTEGRATION
+        once the project is initialized.
+        """
+        topology = Topology.objects.first()
+        response = self.client.get(
+            reverse(f'{self.prefix}_topology_change', args=[topology.id])
+        )
+        self.assertNotContains(response, 'Wifi mesh')

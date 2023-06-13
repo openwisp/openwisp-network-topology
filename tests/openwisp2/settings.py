@@ -4,16 +4,18 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TESTING = 'test' in sys.argv
 
+
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'openwisp_network_topology.db',
+        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+        'NAME': os.path.join(BASE_DIR, 'openwisp_network_topology.db'),
     }
 }
+
 
 SECRET_KEY = '@q4z-^s=mv59#o=uutv4*m=h@)ik4%zp1)-k^_(!_7*x_&+ze$'
 
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     'import_export',
     'admin_auto_filters',
     'django.contrib.admin',
+    'django.forms',
     # rest framework
     'rest_framework',
     'drf_yasg',
@@ -57,6 +60,9 @@ INSTALLED_APPS = [
     # channels
     'channels',
 ]
+
+
+EXTENDED_APPS = ['django_x509', 'django_loci']
 
 AUTH_USER_MODEL = 'openwisp_users.User'
 SITE_ID = 1
@@ -85,6 +91,7 @@ ROOT_URLCONF = 'openwisp2.urls'
 ASGI_APPLICATION = 'openwisp2.asgi.application'
 
 CHANNEL_LAYERS = {'default': {'BACKEND': 'channels.layers.InMemoryChannelLayer'}}
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 LANGUAGE_CODE = 'en-gb'
 TIME_ZONE = 'UTC'
@@ -108,7 +115,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'openwisp_utils.admin_theme.context_processor.menu_items',
+                'openwisp_utils.admin_theme.context_processor.menu_groups',
             ],
         },
     }
@@ -184,6 +191,37 @@ if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
         }
     )
 
+# Avoid adding unnecessary dependency to speedup tests.
+if not TESTING or (TESTING and os.environ.get('WIFI_MESH', False)):
+    OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION = True
+    INSTALLED_APPS.insert(
+        INSTALLED_APPS.index('openwisp_controller.connection'),
+        'openwisp_controller.geo',
+    )
+    openwisp_ipam_index = INSTALLED_APPS.index('openwisp_ipam')
+    INSTALLED_APPS.insert(openwisp_ipam_index, 'leaflet')
+    INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.check')
+    INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.device')
+    INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.monitoring')
+    TIMESERIES_DATABASE = {
+        'BACKEND': 'openwisp_monitoring.db.backends.influxdb',
+        'USER': 'openwisp',
+        'PASSWORD': 'openwisp',
+        'NAME': 'openwisp2',
+        'HOST': os.getenv('INFLUXDB_HOST', 'localhost'),
+        'PORT': '8086',
+    }
+    OPENWISP_MONITORING_MAC_VENDOR_DETECTION = False
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': 'redis://localhost/9',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            },
+        }
+    }
+
 if os.environ.get('SAMPLE_APP', False):
     INSTALLED_APPS.remove('openwisp_network_topology')
     INSTALLED_APPS.remove('openwisp_network_topology.integrations.device')
@@ -197,9 +235,10 @@ if os.environ.get('SAMPLE_APP', False):
     TOPOLOGY_SNAPSHOT_MODEL = 'sample_network_topology.Snapshot'
     TOPOLOGY_TOPOLOGY_MODEL = 'sample_network_topology.Topology'
     TOPOLOGY_DEVICE_DEVICENODE_MODEL = 'sample_integration_device.DeviceNode'
+    TOPOLOGY_DEVICE_WIFIMESH_MODEL = 'sample_integration_device.WifiMesh'
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:
-    from local_settings import *
+    from .local_settings import *
 except ImportError:
     pass

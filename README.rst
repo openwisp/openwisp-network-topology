@@ -166,7 +166,11 @@ Install sqlite:
 
 .. code-block:: shell
 
-    sudo apt-get install sqlite3 libsqlite3-dev
+    sudo apt install -y sqlite3 libsqlite3-dev
+    # Install system dependencies for spatialite which is required
+    # to run tests for openwisp-network-topology integrations with
+    # openwisp-controller and openwisp-monitoring.
+    sudo apt install libspatialite-dev libsqlite3-mod-spatialite
 
 Install your forked repo:
 
@@ -175,6 +179,14 @@ Install your forked repo:
     git clone git://github.com/<your_fork>/openwisp-network-topology
     cd openwisp-network-topology/
     python setup.py develop
+
+Start InfluxDB and Redis using Docker
+(required by the test project to run tests for
+`WiFi Mesh Integration <#openwisp_network_topology_wifi_mesh_integration>`_):
+
+.. code-block:: shell
+
+    docker-compose up -d influxdb redis
 
 Install test requirements:
 
@@ -196,7 +208,14 @@ Run tests with:
 
 .. code-block:: shell
 
+    # Running tests without setting the "WIFI_MESH" environment
+    # variable will not run tests for WiFi Mesh integration.
+    # This is done to avoid slowing down the test suite by adding
+    # dependencies which are only used by the integration.
     ./runtests.py
+    # You can run the tests only for WiFi mesh integration using
+    # the following command
+    WIFI_MESH=1 ./runtests.py
 
 Run qa tests:
 
@@ -446,6 +465,12 @@ This additional and optional module provides the following features:
   - the management IP address of the related device is updated straightaway
   - if OpenWISP Monitoring is enabled, the device checks are triggered (e.g.: ping)
 
+- if `OpenWISP Monitoring <https://github.com/openwisp/openwisp-monitoring>`_
+  is installed and enabled, the system can automatically create topology
+  for the WiFi Mesh (802.11s) interfaces using the monitoring data provided by the agent.
+  You can enable this by setting `OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION
+  <#openwisp_network_topology_wifi_mesh_integration>`_ to ``True``.
+
 This integration makes the whole system a lot faster in detecting important events in the network.
 
 In order to use this module simply add
@@ -463,6 +488,31 @@ In order to use this module simply add
         'openwisp_users',
         'rest_framework',
     ]
+
+If you have enabled WiFI Mesh integration, you will also need to update the
+``CELERY_BEAT_SCHEDULE`` as follow:
+
+.. code-block:: python
+
+    CELERY_BEAT_SCHEDULE = {
+        'create_mesh_topology': {
+            # This task generates the mesh topology from monitoring data
+            'task': 'openwisp_network_topology.integrations.device.tasks.create_mesh_topology',
+            # Execute this task every 5 minutes
+            'schedule': timedelta(minutes=5),
+            'args': (
+                # List of organization UUIDs. The mesh topology will be
+                # created only for devices belonging these organizations.
+                [
+                    '4e002f97-eb01-4371-a4a8-857faa22fe5c',
+                    'be88d4c4-599a-4ca2-a1c0-3839b4fdc315'
+                ],
+                # The task won't use monitoring data reported
+                # before this time (in seconds)
+                6 * 60 # 6 minutes
+            ),
+        },
+    }
 
 If you are enabling this integration on a pre-existing system, use the
 `create_device_nodes <#create-device-nodes>`_ management command to create
@@ -585,6 +635,25 @@ example value: ``https://mytopology.myapp.com``.
 When enabled, the API `endpoints <#list-of-endpoints>`_ will only allow authenticated users
 who have the necessary permissions to access the objects which
 belong to the organizations the user manages.
+
+``OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
++--------------+---------------+
+| **type**:    |   ``boolean`` |
++--------------+---------------+
+| **default**: |   ``False``   |
++--------------+---------------+
+
+When enabled, network topology objects will be automatically created and
+updated based on the WiFi mesh interfaces peer information supplied
+by the monitoring agent.
+
+**Note:** The network topology objects are created using the device monitoring data
+collected by OpenWISP Monitoring. Thus, it requires
+`integration with OpenWISP Controller and OpenWISP Monitoring
+<#integration-with-openwisp-controller-and-openwisp-monitoring>`_ to be enabled
+in the Django project.
 
 Rest API
 --------
@@ -1070,6 +1139,7 @@ Once you have created the models, add the following to your ``settings.py``:
     TOPOLOGY_TOPOLOGY_MODEL = 'sample_network_topology.Topology'
     # if you use the integration with OpenWISP Controller and/or OpenWISP Monitoring
     TOPOLOGY_DEVICE_DEVICENODE_MODEL = 'sample_integration_device.DeviceNode'
+    TOPOLOGY_DEVICE_WIFIMESH_MODEL = 'sample_integration_device.WifiMesh'
 
 Substitute ``sample_network_topology`` with the name you chose in step 1.
 

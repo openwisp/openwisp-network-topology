@@ -46,5 +46,31 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={'abstract': False, 'unique_together': {('node', 'device')}},
-        )
+        ),
+        migrations.CreateModel(
+            name='WifiMesh',
+            fields=[
+                (
+                    'id',
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ('mesh_id', models.CharField(max_length=32, verbose_name='Mesh ID')),
+                ('is_test', models.BooleanField(default=True)),
+                (
+                    'topology',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.TOPOLOGY_TOPOLOGY_MODEL,
+                    ),
+                ),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
     ]

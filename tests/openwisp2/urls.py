@@ -26,7 +26,8 @@ urlpatterns += [
 ]
 
 urlpatterns += staticfiles_urlpatterns()
-
+if 'openwisp_monitoring.monitoring' in settings.INSTALLED_APPS:
+    urlpatterns.append(path('', include('openwisp_monitoring.urls')))
 
 if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
