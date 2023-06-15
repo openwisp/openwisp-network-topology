@@ -66,7 +66,7 @@ jobs:
 
       - name: Install openwisp-network-topology
         run: |
-          pip install -e .
+          pip install -U -e .
           pip install ${{ matrix.django-version }}
 
       - name: QA checks
