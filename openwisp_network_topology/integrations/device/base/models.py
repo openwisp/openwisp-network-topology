@@ -109,14 +109,7 @@ class AbstractDeviceNode(UUIDModel):
         ip_addresses = []
         for ip in allowed_ips:
             try:
-                network = ip_network(ip)
-                if network.prefixlen == network._max_prefixlen:
-                    # In python 3.7, hosts method is not returning any ip
-                    # if subnet mask is 32, resolved in future python releases
-                    # https://bugs.python.org/issue28577
-                    ip_addresses.append(str(network.network_address))
-                else:
-                    ip_addresses.extend([str(host) for host in ip_network(ip).hosts()])
+                ip_addresses.extend([str(host) for host in ip_network(ip).hosts()])
             except ValueError:
                 # invalid IP address
                 continue

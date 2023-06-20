@@ -16,4 +16,4 @@ class WifiMeshInlineAdmin(admin.StackedInline):
 
 
 if app_settings.WIFI_MESH_INTEGRATION:
-    TopologyAdmin.inlines = TopologyAdmin.inlines + [WifiMeshInlineAdmin]
+    TopologyAdmin.inlines = list(TopologyAdmin.inlines) + [WifiMeshInlineAdmin]

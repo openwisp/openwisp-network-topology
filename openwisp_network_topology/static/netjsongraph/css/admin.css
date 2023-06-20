@@ -31,3 +31,13 @@ input[type='text'].readonly {
 .submit-row .visualizelink:focus {
     background: #576a7c;
 }
+
+/*
+The CSS for "hidden" class in Django >= 4.1 sets
+"display: none !important". This hides the
+"sideBarHandle" button. Thus, we unset the display
+property below.
+*/
+.njg-sideBar.hidden {
+    display: unset !important;
+}
