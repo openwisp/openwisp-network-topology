@@ -266,8 +266,14 @@ class TestWifiMeshIntegration(TopologyTestMixin, TransactionTestCase):
         """
         admin = self._create_admin()
         self.client.force_login(admin)
-        topology = self._create_topology()
-        response = self.client.get(
-            reverse(f'{self.prefix}_topology_change', args=[topology.id])
-        )
-        self.assertContains(response, 'Wifi mesh')
+
+        with self.subTest('Test add form'):
+            response = self.client.get(reverse(f'{self.prefix}_topology_add'))
+            self.assertContains(response, 'Wifi mesh')
+
+        with self.subTest('Test change form'):
+            topology = self._create_topology()
+            response = self.client.get(
+                reverse(f'{self.prefix}_topology_change', args=[topology.id])
+            )
+            self.assertContains(response, 'Wifi mesh')

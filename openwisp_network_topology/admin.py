@@ -104,6 +104,14 @@ class TopologyAdmin(
     receive_url_baseurl = app_settings.TOPOLOGY_API_BASEURL
     change_form_template = 'admin/topology/topology/change_form.html'
 
+    def get_fields(self, request, obj=None):
+        fields = list(super().get_fields(request, obj))
+        if not obj:
+            # Receive URL cannot be created without an object.
+            # Hence, remove the "receive_url" field.
+            fields.remove('receive_url')
+        return fields
+
     def get_actions(self, request):
         """
         move delete action to last position
