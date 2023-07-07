@@ -1,8 +1,8 @@
 {% load i18n %}
 
 <script>
-    loadNetJsonGraph = (el='body', url='{{ graph_url }}') => {
-        const history_url = '{{ history_url }}';
+    loadNetJsonGraph = (el='body', url='{{ graph_url }}?include_unpublished=true') => {
+        const history_url = '{{ history_url }}?include_unpublished=true';
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${wsProtocol}//${window.location.host}/ws/network-topology/topology/${getTopologyIdFromUrl()}/`;
         const socket = new WebSocket(wsUrl);

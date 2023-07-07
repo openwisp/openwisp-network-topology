@@ -129,6 +129,14 @@ class TestTopologyGraphVisualizer(
         self.web_driver.find_element(By.CSS_SELECTOR, 'input.visualizelink').click()
         self._assert_topology_graph()
 
+    def test_unpublished_topology_admin_view_graph_visualizer(self):
+        self.topology_model.objects.update(published=False)
+        path = reverse(f'{self.prefix}_topology_change', args=[self.topology.pk])
+        self.login(username=self.admin_username, password=self.admin_password)
+        self.open(path)
+        self.web_driver.find_element(By.CSS_SELECTOR, 'input.visualizelink').click()
+        self._assert_topology_graph()
+
     def test_topology_non_admin_view_graph_visualizer(self):
         path = reverse('topology_list')
         self.login(username=self.admin_username, password=self.admin_password)
