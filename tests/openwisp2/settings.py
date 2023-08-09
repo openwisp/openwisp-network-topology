@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'openwisp_network_topology.integrations.device',
     'openwisp_users',
     # admin
+    'nested_admin',
     'import_export',
     'admin_auto_filters',
     'django.contrib.admin',

@@ -100,6 +100,7 @@ Available features
     - CNML 1.0
     - OpenVPN
     - Wireguard
+    - ZeroTier
     - additional formats can be added by
       `writing custom netdiff parsers <https://github.com/openwisp/netdiff#parsers>`_
 * **network topology visualizer** based on
@@ -457,8 +458,8 @@ Integration with OpenWISP Controller and OpenWISP Monitoring
 
 If you use `OpenWISP Controller <https://github.com/openwisp/openwisp-controller>`_
 or `OpenWISP Monitoring <https://github.com/openwisp/openwisp-monitoring>`_
-and you use OpenVPN or Wireguard for the management VPN, you can use the integration
-available in ``openwisp_network_topology.integrations.device``.
+and you use OpenVPN, Wireguard or ZeroTier for the management VPN, you can use
+the integration available in ``openwisp_network_topology.integrations.device``.
 
 This additional and optional module provides the following features:
 

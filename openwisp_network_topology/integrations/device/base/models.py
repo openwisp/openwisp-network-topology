@@ -36,6 +36,9 @@ class AbstractDeviceNode(UUIDModel):
         'netdiff.WireguardParser': {
             'auto_create': 'auto_create_wireguard',
         },
+        'netdiff.ZeroTierParser': {
+            'auto_create': 'auto_create_zerotier',
+        },
         'netdiff.NetJsonParser': {
             'auto_create': 'auto_create_netjsongraph',
         },
@@ -114,6 +117,34 @@ class AbstractDeviceNode(UUIDModel):
                 # invalid IP address
                 continue
         device_filter = models.Q(config__vpnclient__ip__ip_address__in=ip_addresses)
+        if node.organization_id:
+            device_filter &= models.Q(organization_id=node.organization_id)
+        device = (
+            Device.objects.only(
+                'id', 'name', 'last_ip', 'management_ip', 'organization_id'
+            )
+            .filter(device_filter)
+            .first()
+        )
+        if not device:
+            return
+        return cls.save_device_node(device, node)
+
+    @classmethod
+    def auto_create_zerotier(cls, node):
+        """
+        Implementation of the integration between
+        controller and network-topology modules
+        when using ZeroTier (using the `member_id`)
+        """
+        member_id = node.properties.get('address')
+        if not member_id:
+            return
+
+        Device = load_model('config', 'Device')
+        device_filter = models.Q(
+            config__vpnclient__zt_identity_secret__startswith=member_id
+        )
         if node.organization_id:
             device_filter &= models.Q(organization_id=node.organization_id)
         device = (
