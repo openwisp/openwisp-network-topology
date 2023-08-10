@@ -298,11 +298,12 @@ Sending data for topology with RECEIVE strategy
 
    **Note:** The topology receive URL is shown only after the topology object is created.
 
-2. Create a script (eg: ``/opt/send-topology.sh``) which sends the topology
-   data using ``POST``, in the example script below we are sending the
-   status log data of OpenVPN but the same code can be applied to other
+2. Create a script (eg: ``/opt/send-topology.sh``) to send the topology
+   data using a ``POST`` request. In the example script below, we demonstrate sending the
+   status log data of **OpenVPN**. However, you can adapt the same code for other
    formats by replacing ``cat /var/log/openvpn/tun0.stats`` with the
-   actual command which returns the network topology output:
+   appropriate command that returns the network topology output. For instance,
+   use ``wg show all dump`` for **Wireguard**, and ``zerotier-cli peers -j`` for **ZeroTier**.
 
 .. code-block:: shell
 
@@ -332,6 +333,9 @@ Sending data for topology with RECEIVE strategy
     ## Add the following line and save
 
     echo */5 * * * * /opt/send-topology.sh
+
+**Note:** When using **ZeroTier**, ensure that you use ``sudo crontab -e`` to edit the **root's crontab**.
+This is necessary because the `zerotier-cli peers` command requires root privileges to interact with the kernel.
 
 4. Once the steps above are completed, you should see nodes and links
    being created automatically, you can see the network topology graph
