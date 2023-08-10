@@ -12,6 +12,7 @@ from openwisp_controller.config.tests.utils import (
     CreateConfigTemplateMixin,
     TestVpnX509Mixin,
     TestWireguardVpnMixin,
+    TestZeroTierVpnMixin,
 )
 from openwisp_ipam.tests import CreateModelsMixin as SubnetIpamMixin
 
@@ -38,6 +39,7 @@ Cert = swapper.load_model('pki', 'Cert')
 class Base(
     TestVpnX509Mixin,
     TestWireguardVpnMixin,
+    TestZeroTierVpnMixin,
     SubnetIpamMixin,
     CreateConfigTemplateMixin,
     CreateGraphObjectsMixin,
@@ -45,6 +47,8 @@ class Base(
 ):
     topology_model = Topology
     node_model = Node
+    _ZT_SERVICE_REQUESTS = 'openwisp_controller.config.api.zerotier_service.requests'
+    _ZT_GENERATE_IDENTITY_SUBPROCESS = 'openwisp_controller.config.base.vpn.subprocess'
 
     def _init_test_node(
         self,
@@ -94,12 +98,57 @@ class Base(
             node.save()
         return node
 
+    def _init_zerotier_test_node(
+        self, topology, addresses=None, label='test', member_id=None, create=True
+    ):
+        if not addresses:
+            addresses = [self._TEST_ZT_MEMBER_CONFIG['address']]
+        node = Node(
+            organization=topology.organization,
+            topology=topology,
+            label=label,
+            addresses=addresses,
+            # zt peer address is `memeber_id`
+            properties={'address': member_id},
+        )
+        if create:
+            node.full_clean()
+            node.save()
+        return node
+
     def _create_wireguard_test_env(self, parser):
         org = self._get_org()
         device, _, _ = self._create_wireguard_vpn_template()
         device.organization = org
         topology = self._create_topology(organization=org, parser=parser)
         return topology, device
+
+    @mock.patch(_ZT_GENERATE_IDENTITY_SUBPROCESS)
+    @mock.patch(_ZT_SERVICE_REQUESTS)
+    def _create_zerotier_test_env(self, mock_requests, mock_subprocess, parser):
+        mock_requests.get.side_effect = [
+            # For node status
+            self._get_mock_response(200, response=self._TEST_ZT_NODE_CONFIG)
+        ]
+        mock_requests.post.side_effect = [
+            # For create network
+            self._get_mock_response(200),
+            # For controller network join
+            self._get_mock_response(200),
+            # For controller auth and ip assignment
+            self._get_mock_response(200),
+            # For member auth and ip assignment
+            self._get_mock_response(200),
+        ]
+        mock_stdout = mock.MagicMock()
+        mock_stdout.stdout.decode.return_value = self._TEST_ZT_MEMBER_CONFIG['identity']
+        mock_subprocess.run.return_value = mock_stdout
+        org = self._get_org()
+        device, _, _ = self._create_zerotier_vpn_template()
+        device.organization = org
+        topology = self._create_topology(organization=org, parser=parser)
+        member_id = device.config.vpnclient_set.first().member_id
+        return topology, device, member_id
 
     def _create_test_env(self, parser):
         organization = self._get_org()
@@ -197,6 +246,47 @@ class TestControllerIntegration(Base, TransactionTestCase):
                 link.save(update_fields=['status'])
             except KeyError:
                 self.fail('KeyError raised')
+
+    def test_auto_create_zerotier(self):
+        topology, device, member_id = self._create_zerotier_test_env(
+            parser='netdiff.ZeroTierParser'
+        )
+        self.assertEqual(DeviceNode.objects.count(), 0)
+        with self.subTest('assert number of queries'):
+            with self.assertNumQueries(15):
+                node = self._init_zerotier_test_node(topology, member_id=member_id)
+        self.assertEqual(DeviceNode.objects.count(), 1)
+        device_node = DeviceNode.objects.first()
+        self.assertEqual(device_node.device, device)
+        self.assertEqual(device_node.node, node)
+
+        with self.subTest('not run on save'):
+            with mock.patch.object(transaction, 'on_commit') as on_commit:
+                node.save()
+                on_commit.assert_not_called()
+
+    def test_auto_create_zerotier_failures(self):
+        topology, device, member_id = self._create_zerotier_test_env(
+            parser='netdiff.ZeroTierParser'
+        )
+
+        with self.subTest('member_id not present'):
+            self._init_zerotier_test_node(topology)
+            self.assertFalse(DeviceNode.objects.exists())
+
+        with self.subTest('member_id does not exist'):
+            self._init_zerotier_test_node(topology, member_id='non_existent_id')
+            self.assertFalse(DeviceNode.objects.exists())
+
+        with self.subTest('exception during save'):
+            with mock.patch.object(
+                DeviceNode, 'save', side_effect=Exception('test')
+            ) as save:
+                with mock.patch.object(models_logger, 'exception') as logger_exception:
+                    self._init_zerotier_test_node(topology, member_id=member_id)
+                    save.assert_called_once()
+                    logger_exception.assert_called_once()
+                    self.assertEqual(DeviceNode.objects.count(), 0)
 
     def test_filter_by_link(self):
         topology, device, cert = self._create_test_env(parser='netdiff.OpenvpnParser')
