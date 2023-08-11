@@ -200,6 +200,7 @@ if not TESTING or (TESTING and os.environ.get('WIFI_MESH', False)):
     )
     openwisp_ipam_index = INSTALLED_APPS.index('openwisp_ipam')
     INSTALLED_APPS.insert(openwisp_ipam_index, 'leaflet')
+    INSTALLED_APPS.insert(openwisp_ipam_index, 'nested_admin')
     INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.check')
     INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.device')
     INSTALLED_APPS.insert(openwisp_ipam_index, 'openwisp_monitoring.monitoring')
