@@ -298,12 +298,11 @@ Sending data for topology with RECEIVE strategy
 
    **Note:** The topology receive URL is shown only after the topology object is created.
 
-2. Create a script (eg: ``/opt/send-topology.sh``) to send the topology
-   data using a ``POST`` request. In the example script below, we demonstrate sending the
-   status log data of **OpenVPN**. However, you can adapt the same code for other
+2. Create a script (eg: ``/opt/send-topology.sh``) which sends the topology
+   data using ``POST``, in the example script below we are sending the
+   status log data of OpenVPN but the same code can be applied to other
    formats by replacing ``cat /var/log/openvpn/tun0.stats`` with the
-   appropriate command that returns the network topology output. For instance,
-   use ``wg show all dump`` for **Wireguard**, and ``zerotier-cli peers -j`` for **ZeroTier**.
+   actual command which returns the network topology output:
 
 .. code-block:: shell
 
@@ -334,9 +333,6 @@ Sending data for topology with RECEIVE strategy
 
     echo */5 * * * * /opt/send-topology.sh
 
-**Note:** When using **ZeroTier**, ensure that you use ``sudo crontab -e`` to edit the **root's crontab**.
-This is necessary because the `zerotier-cli peers` command requires root privileges to interact with the kernel.
-
 4. Once the steps above are completed, you should see nodes and links
    being created automatically, you can see the network topology graph
    from the admin page of the topology change page
@@ -344,6 +340,92 @@ This is necessary because the `zerotier-cli peers` command requires root privile
    right part of the page)
    or, alternatively, a non-admin visualizer page is also available at
    the URL ``/topology/topology/<TOPOLOGY-UUID>/``.
+
+Sending data for ZeroTier topology with RECEIVE strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Follow the procedure described below to setup ZeroTier topology with RECEIVE strategy.
+
+**Note:** In this example, the **Shared systemwide (no organization)**
+option is used for the ZeroTier topology organization. You are free to
+opt for any organization, as long as both the topology and the device share
+the same organization, assuming the `OpenWISP controller integration
+<#integration-with-openwisp-controller-and-openwisp-monitoring>`_ feature is enabled.
+
+1. Create topology for ZeroTier
+###############################
+
+1. Visit ``admin/topology/topology/add`` to add a new topology.
+
+2. We will set the **Label** of this topology to ``ZeroTier`` and
+   select the topology **Format** from the dropdown as ``ZeroTier``.
+
+3. Select the strategy as ``RECEIVE`` from the dropdown.
+
+.. image:: https://raw.githubusercontent.com/openwisp/openwisp-network-topology/docs/docs/zerotier-tutorial/topology-1.png
+   :alt: ZeroTier topology configuration example 1
+
+4. Let use default **Expiration time** ``0`` and make sure **Published** option is checked.
+
+5. After clicking on the **Save and continue editing** button, a topology receive URL is generated.
+   Make sure you copy that URL for later use in the topology script.
+
+.. image:: https://raw.githubusercontent.com/openwisp/openwisp-network-topology/docs/docs/zerotier-tutorial/topology-2.png
+   :alt: ZeroTier topology configuration example 2
+
+2. Create a script for sending ZeroTier topology data
+#####################################################
+
+1. Now, create a script (e.g: ``/opt/send-zt-topology.sh``) that sends
+   the ZeroTier topology data using a POST request. In the example script below,
+   we are sending the ZeroTier self-hosted controller peers data:
+
+.. code-block:: shell
+
+ #!/bin/bash
+ # command to fetch zerotier controller peers data in json format
+ COMMAND="zerotier-cli peers -j"
+ UUID="<TOPOLOGY-UUID-HERE>"
+ KEY="<TOPOLOGY-KEY-HERE>"
+ OPENWISP_URL="https://<OPENWISP_DOMAIN_HERE>"
+ $COMMAND |
+     # Upload the topology data to OpenWISP
+     curl -X POST \
+         --data-binary @- \
+         --header "Content-Type: text/plain" \
+         $OPENWISP_URL/api/v1/network-topology/topology/$UUID/receive/?key=$KEY
+
+2. Add the ``/opt/send-zt-topology.sh`` script created in the previous step
+   to the root crontab, here's an example which sends the topology data every **5 minutes**:
+
+.. code-block:: shell
+
+    # flag script as executable
+    chmod +x /opt/send-zt-topology.sh
+
+.. code-block:: shell
+
+    # open rootcrontab
+    sudo crontab -e
+
+    ## Add the following line and save
+
+    echo */5 * * * * /opt/send-zt-topology.sh
+
+**Note:** When using the **ZeroTier** topology, ensure that
+you use ``sudo crontab -e`` to edit the **root crontab**. This step
+is essential because the ``zerotier-cli peers -j`` command requires **root privileges**
+for kernel interaction, without which the command will not function correctly.
+
+3. Once the steps above are completed, you should see nodes and links
+   being created automatically, you can see the network topology graph
+   from the admin page of the topology change page (you have to click on
+   the **View topology graph** button in the upper right part of the page)
+   or, alternatively, a non-admin visualizer page is also available at
+   the URL ``/topology/topology/<TOPOLOGY-UUID>/``.
+
+   .. image:: https://raw.githubusercontent.com/openwisp/openwisp-network-topology/docs/docs/zerotier-tutorial/topology-graph.png
+    :alt: ZeroTier topology graph example 1
 
 Management Commands
 -------------------
