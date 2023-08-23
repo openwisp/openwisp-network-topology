@@ -142,9 +142,7 @@ class AbstractDeviceNode(UUIDModel):
             return
 
         Device = load_model('config', 'Device')
-        device_filter = models.Q(
-            config__vpnclient__zt_identity_secret__startswith=member_id
-        )
+        device_filter = models.Q(config__vpnclient__secret__startswith=member_id)
         if node.organization_id:
             device_filter &= models.Q(organization_id=node.organization_id)
         device = (
