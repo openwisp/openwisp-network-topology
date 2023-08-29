@@ -135,14 +135,16 @@ class AbstractDeviceNode(UUIDModel):
         """
         Implementation of the integration between
         controller and network-topology modules
-        when using ZeroTier (using the `member_id`)
+        when using ZeroTier (using the `zerotier_member_id`)
         """
-        member_id = node.properties.get('address')
-        if not member_id:
+        zerotier_member_id = node.properties.get('address')
+        if not zerotier_member_id:
             return
 
         Device = load_model('config', 'Device')
-        device_filter = models.Q(config__vpnclient__secret__startswith=member_id)
+        device_filter = models.Q(
+            config__vpnclient__secret__startswith=zerotier_member_id
+        )
         if node.organization_id:
             device_filter &= models.Q(organization_id=node.organization_id)
         device = (

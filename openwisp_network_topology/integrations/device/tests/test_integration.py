@@ -99,7 +99,7 @@ class Base(
         return node
 
     def _init_zerotier_test_node(
-        self, topology, addresses=None, label='test', member_id=None, create=True
+        self, topology, addresses=None, label='test', zt_member_id=None, create=True
     ):
         if not addresses:
             addresses = [self._TEST_ZT_MEMBER_CONFIG['address']]
@@ -108,8 +108,8 @@ class Base(
             topology=topology,
             label=label,
             addresses=addresses,
-            # zt peer address is `memeber_id`
-            properties={'address': member_id},
+            # zt peer address is `zt_memeber_id`
+            properties={'address': zt_member_id},
         )
         if create:
             node.full_clean()
@@ -147,8 +147,8 @@ class Base(
         device, _, _ = self._create_zerotier_vpn_template()
         device.organization = org
         topology = self._create_topology(organization=org, parser=parser)
-        member_id = device.config.vpnclient_set.first().member_id
-        return topology, device, member_id
+        zerotier_member_id = device.config.vpnclient_set.first().zerotier_member_id
+        return topology, device, zerotier_member_id
 
     def _create_test_env(self, parser):
         organization = self._get_org()
@@ -248,13 +248,15 @@ class TestControllerIntegration(Base, TransactionTestCase):
                 self.fail('KeyError raised')
 
     def test_auto_create_zerotier(self):
-        topology, device, member_id = self._create_zerotier_test_env(
+        topology, device, zerotier_member_id = self._create_zerotier_test_env(
             parser='netdiff.ZeroTierParser'
         )
         self.assertEqual(DeviceNode.objects.count(), 0)
         with self.subTest('assert number of queries'):
             with self.assertNumQueries(15):
-                node = self._init_zerotier_test_node(topology, member_id=member_id)
+                node = self._init_zerotier_test_node(
+                    topology, zt_member_id=zerotier_member_id
+                )
         self.assertEqual(DeviceNode.objects.count(), 1)
         device_node = DeviceNode.objects.first()
         self.assertEqual(device_node.device, device)
@@ -266,16 +268,16 @@ class TestControllerIntegration(Base, TransactionTestCase):
                 on_commit.assert_not_called()
 
     def test_auto_create_zerotier_failures(self):
-        topology, device, member_id = self._create_zerotier_test_env(
+        topology, device, zerotier_member_id = self._create_zerotier_test_env(
             parser='netdiff.ZeroTierParser'
         )
 
-        with self.subTest('member_id not present'):
+        with self.subTest('zerotier_member_id not present'):
             self._init_zerotier_test_node(topology)
             self.assertFalse(DeviceNode.objects.exists())
 
-        with self.subTest('member_id does not exist'):
-            self._init_zerotier_test_node(topology, member_id='non_existent_id')
+        with self.subTest('zerotier_member_id does not exist'):
+            self._init_zerotier_test_node(topology, zt_member_id='non_existent_id')
             self.assertFalse(DeviceNode.objects.exists())
 
         with self.subTest('exception during save'):
@@ -283,7 +285,9 @@ class TestControllerIntegration(Base, TransactionTestCase):
                 DeviceNode, 'save', side_effect=Exception('test')
             ) as save:
                 with mock.patch.object(models_logger, 'exception') as logger_exception:
-                    self._init_zerotier_test_node(topology, member_id=member_id)
+                    self._init_zerotier_test_node(
+                        topology, zt_member_id=zerotier_member_id
+                    )
                     save.assert_called_once()
                     logger_exception.assert_called_once()
                     self.assertEqual(DeviceNode.objects.count(), 0)
