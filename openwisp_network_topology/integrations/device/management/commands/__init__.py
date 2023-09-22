@@ -12,6 +12,7 @@ class BaseCreateDeviceNodeCommand(BaseCommand):
         queryset = Node.objects.select_related('topology').filter(
             Q(topology__parser='netdiff.OpenvpnParser')
             | Q(topology__parser='netdiff.WireguardParser')
+            | Q(topology__parser='netdiff.ZeroTierParser')
         )
         for node in queryset.iterator():
             DeviceNode.auto_create(node)

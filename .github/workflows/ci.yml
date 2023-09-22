@@ -66,6 +66,8 @@ jobs:
       - name: Install test dependencies
         run: |
           pip install -U -r requirements-test.txt
+          pip install --force-reinstall \
+          git+https://github.com/openwisp/openwisp-controller/@issue-606/zerotier-member-auth-ip-assign
 
       - name: Install openwisp-network-topology
         run: |
