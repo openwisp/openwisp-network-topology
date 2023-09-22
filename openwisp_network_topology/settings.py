@@ -31,6 +31,7 @@ DEFAULT_PARSERS = [
     ('netdiff.CnmlParser', 'CNML 1.0'),
     ('netdiff.OpenvpnParser', 'OpenVPN'),
     ('netdiff.WireguardParser', 'Wireguard'),
+    ('netdiff.ZeroTierParser', 'ZeroTier'),
 ]
 
 PARSERS = DEFAULT_PARSERS + get_settings_value('PARSERS', [])

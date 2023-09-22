@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                     ('netdiff.CnmlParser', 'CNML 1.0'),
                     ('netdiff.OpenvpnParser', 'OpenVPN'),
                     ('netdiff.WireguardParser', 'Wireguard'),
+                    ('netdiff.ZeroTierParser', 'ZeroTier'),
                 ],
                 help_text='Select topology format',
                 max_length=128,
