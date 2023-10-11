@@ -5,11 +5,9 @@ on:
   push:
     branches:
       - master
-      - gsoc23
   pull_request:
     branches:
       - master
-      - gsoc23
 
 jobs:
   build:
@@ -66,7 +64,7 @@ jobs:
       - name: Install test dependencies
         run: |
           pip install -U -r requirements-test.txt
-          pip install --force-reinstall https://github.com/openwisp/openwisp-controller/tarball/gsoc23
+          pip install --force-reinstall https://github.com/openwisp/openwisp-controller/tarball/master
 
       - name: Install openwisp-network-topology
         run: |
