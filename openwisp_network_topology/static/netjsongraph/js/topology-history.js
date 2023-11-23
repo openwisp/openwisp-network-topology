@@ -8,7 +8,7 @@ window.initTopologyHistory = function ($) {
     datepicker.datepicker('setDate', today);
     datepicker.change(function () {
         var date = datepicker.val().split('/').reverse().join('-'),
-            url = apiUrl + '?date=' + date;
+            url = apiUrl + '&date=' + date;
         // load latest data when looking currentDate
         if (datepicker.datepicker('getDate').getTime() === today.getTime()) {
             url = window.__njg_default_url__;
