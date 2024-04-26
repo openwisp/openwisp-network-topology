@@ -1,6 +1,8 @@
 Installation instructions
 -------------------------
 
+.. include:: /partials/developers-docs-warning.rst
+
 Install stable version from pypi
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

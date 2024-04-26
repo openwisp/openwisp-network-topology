@@ -1,6 +1,8 @@
 Extending openwisp-network-topology
 -----------------------------------
 
+.. include:: /partials/developers-docs-warning.rst
+
 One of the core values of the OpenWISP project is `Software Reusability <http://openwisp.io/docs/general/values.html#software-reusability-means-long-term-sustainability>`_,
 for this reason *openwisp-network-topology* provides a set of base classes
 which can be imported, extended and reused to create derivative apps.

@@ -1,6 +1,8 @@
 Overriding visualizer templates
 -------------------------------
 
+.. include:: /partials/developers-docs-warning.rst
+
 Follow these steps to override and customise the visualizer's default templates:
 
 * create a directory in your django project and put its full path in ``TEMPLATES['DIRS']``,
