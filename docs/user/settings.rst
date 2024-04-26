@@ -116,8 +116,8 @@ When enabled, the API `endpoints <#list-of-endpoints>`_ will only allow authenti
 who have the necessary permissions to access the objects which
 belong to the organizations the user manages.
 
-``OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +--------------+---------------+
 | **type**:    |   ``boolean`` |

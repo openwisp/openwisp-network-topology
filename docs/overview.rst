@@ -15,8 +15,7 @@ and
 it
 `makes the monitoring system faster in detecting change to the network <#integration-with-openwisp-controller-and-openwisp-monitoring>`_.
 
-Available features
-------------------
+**Available features**
 
 * **network topology collector** supporting different formats:
     - NetJSON NetworkGraph
@@ -45,8 +44,9 @@ Available features
 .. toctree::
    :maxdepth: 1
 
-   ./quickstart.rst
-   ./strategies.rst
-   ./integration-with-controller-and-monitoring.rst
-   ./settings.rst
-   ./rest-api.rst
+   ./user/quickstart.rst
+   ./user/strategies.rst
+   ./user/integration-with-controller-and-monitoring.rst
+   ./user/settings.rst
+   ./user/rest-api.rst
+   ./developer/developer-docs.rst

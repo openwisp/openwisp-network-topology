@@ -56,7 +56,7 @@ Install your forked repo:
 
 Start InfluxDB and Redis using Docker
 (required by the test project to run tests for
-`WiFi Mesh Integration <#openwisp_network_topology_wifi_mesh_integration>`_):
+:ref:`WiFi Mesh Integration <OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION>`):
 
 .. code-block:: shell
 

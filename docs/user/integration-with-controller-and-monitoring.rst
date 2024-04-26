@@ -16,8 +16,8 @@ This additional and optional module provides the following features:
 - if `OpenWISP Monitoring <https://github.com/openwisp/openwisp-monitoring>`_
   is installed and enabled, the system can automatically create topology
   for the WiFi Mesh (802.11s) interfaces using the monitoring data provided by the agent.
-  You can enable this by setting `OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION
-  <#openwisp_network_topology_wifi_mesh_integration>`_ to ``True``.
+  You can enable this by setting :ref:`OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION
+  <openwisp_network_topology_wifi_mesh_integration>` to ``True``.
 
 This integration makes the whole system a lot faster in detecting important events in the network.
 
