@@ -1,4 +1,5 @@
 import swapper
+from django.utils.translation import gettext_lazy as _
 
 Node = swapper.load_model('topology', 'Node')
 Link = swapper.load_model('topology', 'Link')
@@ -107,6 +108,7 @@ def link_get_queryset(cls, qs):
 
 
 Node.get_name = get_name
+Node.get_name.short_description = _('label')
 Node.get_organization_id = node_get_organization_id
 Node.get_queryset = node_get_queryset
 Link.get_queryset = link_get_queryset
