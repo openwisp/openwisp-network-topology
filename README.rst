@@ -1,108 +1,82 @@
-=========================
 openwisp-network-topology
 =========================
 
 .. image:: https://github.com/openwisp/openwisp-network-topology/workflows/OpenWISP%20Network%20Topology%20CI%20Build/badge.svg?branch=master
-   :target: https://github.com/openwisp/openwisp-network-topology/actions?query=OpenWISP+Network+Topology+CI+Build
-   :alt: CI build status
+    :target: https://github.com/openwisp/openwisp-network-topology/actions?query=OpenWISP+Network+Topology+CI+Build
+    :alt: CI build status
 
 .. image:: https://coveralls.io/repos/github/openwisp/openwisp-network-topology/badge.svg
-   :target: https://coveralls.io/github/openwisp/openwisp-network-topology
-   :alt: Test Coverage
+    :target: https://coveralls.io/github/openwisp/openwisp-network-topology
+    :alt: Test Coverage
 
 .. image:: https://img.shields.io/librariesio/github/openwisp/openwisp-network-topology
-   :target: https://libraries.io/github/openwisp/openwisp-network-topology#repository_dependencies
-   :alt: Dependency monitoring
+    :target: https://libraries.io/github/openwisp/openwisp-network-topology#repository_dependencies
+    :alt: Dependency monitoring
 
 .. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
-   :target: https://gitter.im/openwisp/general
-   :alt: chat
+    :target: https://gitter.im/openwisp/general
+    :alt: chat
 
 .. image:: https://badge.fury.io/py/openwisp-network-topology.svg
-   :target: http://badge.fury.io/py/openwisp-network-topology
-   :alt: Pypi Version
+    :target: http://badge.fury.io/py/openwisp-network-topology
+    :alt: Pypi Version
 
 .. image:: https://pepy.tech/badge/openwisp-network-topology
-   :target: https://pepy.tech/project/openwisp-network-topology
-   :alt: downloads
+    :target: https://pepy.tech/project/openwisp-network-topology
+    :alt: downloads
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://pypi.org/project/black/
-   :alt: code style: black
+    :target: https://pypi.org/project/black/
+    :alt: code style: black
 
 .. image:: https://github.com/openwisp/openwisp-network-topology/raw/docs/docs/demo_network_topology.gif
-   :alt: Features Highlights
+    :alt: Features Highlights
 
-**Need a quick overview?** `Try the OpenWISP Demo <https://openwisp.org/demo.html>`_.
-
-OpenWISP Network Topology is a network topology collector and visualizer
-web application and API, it allows to collect network topology data from different
-networking software (dynamic mesh routing protocols, OpenVPN), store it,
-visualize it, edit its details, it also provides hooks (a.k.a
-`Django signals <https://docs.djangoproject.com/en/3.1/topics/signals/>`_)
-to execute code when the status of a link changes.
-
-When used in conjunction with
-`OpenWISP Controller <https://github.com/openwisp/openwisp-controller>`_
-and
-`OpenWISP Monitoring <https://github.com/openwisp/openwisp-monitoring>`_,
-it
-`makes the monitoring system faster in detecting change to the network <#integration-with-openwisp-controller-and-openwisp-monitoring>`_.
-
-OpenWISP is not only an application designed for end users, but can also be
-used as a framework on which custom network automation solutions can be built
-on top of its building blocks.
-
-Other popular building blocks that are part of the OpenWISP ecosystem are:
-
-- `openwisp-controller <https://github.com/openwisp/openwisp-controller>`_:
-  network and WiFi controller: provisioning, configuration management,
-  x509 PKI management and more; works on OpenWRT, but designed to work also on other systems.
-- `openwisp-monitoring <https://github.com/openwisp/openwisp-monitoring>`_:
-  provides device status monitoring, collection of metrics, charts, alerts,
-  possibility to define custom checks
-- `openwisp-firmware-upgrader <https://github.com/openwisp/openwisp-firmware-upgrader>`_:
-  automated firmware upgrades (single device or mass network upgrades)
-- `openwisp-radius <https://github.com/openwisp/openwisp-radius>`_:
-  based on FreeRADIUS, allows to implement network access authentication systems like
-  802.1x WPA2 Enterprise, captive portal authentication, Hotspot 2.0 (802.11u)
-- `openwisp-ipam <https://github.com/openwisp/openwisp-ipam>`_:
-  it allows to manage the IP address space of networks
-
-**For a more complete overview of the OpenWISP modules and architecture**,
-see the
-`OpenWISP Architecture Overview
-<https://openwisp.io/docs/general/architecture.html>`_.
-
-.. image:: https://raw.githubusercontent.com/openwisp/openwisp2-docs/master/assets/design/openwisp-logo-black.svg
-  :target: http://openwisp.org
-  :alt: OpenWISP
+**Need a quick overview?** `Try the OpenWISP Demo
+<https://openwisp.org/demo.html>`_.
 
 **Want to help OpenWISP?** `Find out how to help us grow here
 <http://openwisp.io/docs/general/help-us.html>`_.
 
-------------
+----
 
-.. contents:: **Table of Contents**:
-   :backlinks: none
-   :depth: 3
+OpenWISP Network Topology is a network topology collector and visualizer
+web application and API, it allows to collect network topology data from
+different networking software (dynamic mesh routing protocols, OpenVPN),
+store it, visualize it, edit its details, it also provides hooks (a.k.a
+`Django signals <https://docs.djangoproject.com/en/3.1/topics/signals/>`_)
+to execute code when the status of a link changes.
 
-------------
+For a complete overview of features, refer to the `Network Topology:
+Features
+<https://openwisp.io/docs/__new__/dev/network-topology/user/intro.html>`_
+section of the OpenWISP documentation.
+
+Documentation
+-------------
+
+- `Developer documentation
+  <https://openwisp.io/docs/__new__/dev/network-topology/developer/>`_
+- `User documentation
+  <https://openwisp.io/docs/__new__/dev/network-topology/>`_
 
 Contributing
 ------------
 
-Please refer to the `OpenWISP contributing guidelines <http://openwisp.io/docs/developer/contributing.html>`_.
+Please refer to the `OpenWISP contributing guidelines
+<http://openwisp.io/docs/developer/contributing.html>`_.
 
 Changelog
 ---------
 
-See `CHANGES <https://github.com/openwisp/openwisp-network-topology/blob/master/CHANGES.rst>`_.
+See `CHANGES
+<https://github.com/openwisp/openwisp-network-topology/blob/master/CHANGES.rst>`_.
 
 License
 -------
 
-See `LICENSE <https://github.com/openwisp/openwisp-network-topology/blob/master/LICENSE>`_.
+See `LICENSE
+<https://github.com/openwisp/openwisp-network-topology/blob/master/LICENSE>`_.
 
 This projects bundles third-party javascript libraries in its source code:
 

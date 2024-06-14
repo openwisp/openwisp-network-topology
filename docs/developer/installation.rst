@@ -1,73 +1,61 @@
-Installation instructions
--------------------------
+Installation Instructions
+=========================
 
-.. include:: /partials/developers-docs-warning.rst
+.. include:: ../partials/developer-docs.rst
 
-Install stable version from pypi
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Installing for Development
+--------------------------
 
-Install from pypi:
-
-.. code-block:: shell
-
-    pip install openwisp-network-topology
-
-Install development version
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Install tarball:
-
-.. code-block:: shell
-
-    pip install https://github.com/openwisp/openwisp-network-topology/tarball/master
-
-Alternatively you can install via pip using git:
-
-.. code-block:: shell
-
-    pip install -e git+git://github.com/openwisp/openwisp-network-topology#egg=openwisp-network-topology
-
-If you want to contribute, install your cloned fork:
-
-.. code-block:: shell
-
-    git clone git@github.com:<your_fork>/openwisp-network-topology.git
-    cd openwisp-network-topology
-    python setup.py develop
-
-Installing for development
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Install sqlite:
+Install the system dependencies:
 
 .. code-block:: shell
 
     sudo apt install -y sqlite3 libsqlite3-dev
     # Install system dependencies for spatialite which is required
     # to run tests for openwisp-network-topology integrations with
-    # openwisp-controller and openwisp-monitoring.
+    # openwisp-network-topology and openwisp-monitoring.
     sudo apt install libspatialite-dev libsqlite3-mod-spatialite
 
-Install your forked repo:
+Fork and clone the forked repository:
 
 .. code-block:: shell
 
     git clone git://github.com/<your_fork>/openwisp-network-topology
-    cd openwisp-network-topology/
-    python setup.py develop
 
-Start InfluxDB and Redis using Docker
-(required by the test project to run tests for
-:ref:`WiFi Mesh Integration <OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION>`):
+Navigate into the cloned repository:
+
+.. code-block:: shell
+
+    cd openwisp-network-topology/
+
+Start InfluxDB and Redis using Docker (required by the test project to run
+tests for :ref:`WiFi Mesh Integration
+<OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION>`):
 
 .. code-block:: shell
 
     docker-compose up -d influxdb redis
 
-Install test requirements:
+Setup and activate a virtual-environment (we'll be using `virtualenv
+<https://pypi.org/project/virtualenv/>`_):
 
 .. code-block:: shell
 
+    python -m virtualenv env
+    source env/bin/activate
+
+Make sure that your base python packages are up to date before moving to
+the next step:
+
+.. code-block:: shell
+
+    pip install -U pip wheel setuptools
+
+Install development dependencies:
+
+.. code-block:: shell
+
+    pip install -e .
     pip install -r requirements-test.txt
 
 Create database:
@@ -98,3 +86,30 @@ Run qa tests:
 .. code-block:: shell
 
     ./run-qa-checks
+
+Alternative Sources
+-------------------
+
+Pypi
+~~~~
+
+To install the latest stable version from pypi:
+
+.. code-block:: shell
+
+    pip install openwisp-network-topology
+
+Github
+~~~~~~
+
+To install the latest development version tarball via HTTPs:
+
+.. code-block:: shell
+
+    pip install https://github.com/openwisp/openwisp-network-topology/tarball/master
+
+Alternatively you can use the git protocol:
+
+.. code-block:: shell
+
+    pip install -e git+git://github.com/openwisp/openwisp-network-topology#egg=openwisp_network-topology
