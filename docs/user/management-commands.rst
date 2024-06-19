@@ -89,7 +89,7 @@ django-netjsongraph
 
 This management command can be used to create the initial ``DeviceNode``
 relationships when the :doc:`integration with OpenWISP Controller
-<controller-monitoring-integration>` is enabled in a pre-existing system
+<integrations>` is enabled in a pre-existing system
 which already has some devices and topology objects in its database.
 
 .. code-block:: shell

@@ -82,7 +82,7 @@ been removed:
 
 For more information about how to work with django projects and django
 apps, please refer to the `django documentation
-<https://docs.djangoproject.com/en/dev/intro/tutorial01/>`_.
+<https://docs.djangoproject.com/en/4.2/intro/tutorial01/>`_.
 
 2. Install ``openwisp-network-topology``
 ----------------------------------------
@@ -165,7 +165,7 @@ You have to replicate and adapt that code in your project.
 
 For more information regarding the concept of ``AppConfig`` please refer
 to the `"Applications" section in the django documentation
-<https://docs.djangoproject.com/en/dev/ref/applications/>`_.
+<https://docs.djangoproject.com/en/4.2/ref/applications/>`_.
 
 7. Create your Custom Models
 ----------------------------
@@ -178,7 +178,7 @@ You have to replicate and adapt that code in your project.
 
 **Note**: for doubts regarding how to use, extend or develop models please
 refer to the `"Models" section in the django documentation
-<https://docs.djangoproject.com/en/dev/topics/db/models/>`_.
+<https://docs.djangoproject.com/en/4.2/topics/db/models/>`_.
 
 8. Add Swapper Configurations
 -----------------------------
@@ -211,7 +211,7 @@ Create and apply database migrations:
 
 For more information, refer to the `"Migrations" section in the django
 documentation
-<https://docs.djangoproject.com/en/dev/topics/migrations/>`_.
+<https://docs.djangoproject.com/en/4.2/topics/migrations/>`_.
 
 10. Create the Admin
 --------------------
@@ -225,7 +225,7 @@ are described below.
 **Note**: for more information regarding how the django admin works, or
 how it can be customized, please refer to `"The django admin site" section
 in the django documentation
-<https://docs.djangoproject.com/en/dev/ref/contrib/admin/>`_.
+<https://docs.djangoproject.com/en/4.2/ref/contrib/admin/>`_.
 
 1. Monkey Patching
 ~~~~~~~~~~~~~~~~~~
@@ -315,7 +315,7 @@ Please read and replicate according to your project needs:
 
 For more information about URL configuration in django, please refer to
 the `"URL dispatcher" section in the django documentation
-<https://docs.djangoproject.com/en/dev/topics/http/urls/>`_.
+<https://docs.djangoproject.com/en/4.2/topics/http/urls/>`_.
 
 12. Setup API URLs
 ------------------
@@ -374,7 +374,7 @@ Substitute ``sample_network_topology`` with the name you chose in step 1.
 
 For more information about automated tests in django, please refer to
 `"Testing in Django"
-<https://docs.djangoproject.com/en/dev/topics/testing/>`_.
+<https://docs.djangoproject.com/en/4.2/topics/testing/>`_.
 
 Other Base Classes that can be Inherited and Extended
 -----------------------------------------------------

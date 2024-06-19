@@ -16,7 +16,7 @@ templates:
 
 More information about the syntax used in django templates can be found in
 the `django templates documentation
-<https://docs.djangoproject.com/en/dev/ref/templates/>`_.
+<https://docs.djangoproject.com/en/4.2/ref/templates/>`_.
 
 Example: Overriding the ``<script>`` Tag
 ----------------------------------------

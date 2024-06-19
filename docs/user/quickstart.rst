@@ -104,7 +104,7 @@ RECEIVE strategy.
     used for the ZeroTier topology organization. You are free to opt for
     any organization, as long as both the topology and the device share
     the same organization, assuming the :doc:`OpenWISP controller
-    integration <controller-monitoring-integration>` feature is enabled.
+    integration <integrations>` feature is enabled.
 
 1. Create Topology for ZeroTier
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

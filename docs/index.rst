@@ -11,7 +11,7 @@ to execute code when the status of a link changes.
 When used in conjunction with :doc:`OpenWISP Controller
 </controller/index>` and :doc:`OpenWISP Monitoring </monitoring/index>`,
 it :doc:`makes the monitoring system faster in detecting change to the
-network <./user/controller-monitoring-integration>`.
+network <./user/integrations>`.
 
 For a comprehensive overview of features, please refer to the
 :doc:`user/intro` page.
@@ -23,7 +23,7 @@ For a comprehensive overview of features, please refer to the
     ./user/intro.rst
     ./user/quickstart.rst
     ./user/strategies.rst
-    ./user/controller-monitoring-integration.rst
+    ./user/integrations.rst
     ./user/rest-api.rst
     ./user/settings.rst
     ./user/management-commands.rst

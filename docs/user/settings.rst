@@ -112,8 +112,8 @@ access the objects which belong to the organizations the user manages.
 
 .. _openwisp_network_topology_wifi_mesh_integration:
 
-OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION
------------------------------------------------
+``OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION``
+---------------------------------------------------
 
 ============ ===========
 **type**:    ``boolean``
@@ -129,5 +129,5 @@ monitoring agent.
     The network topology objects are created using the device monitoring
     data collected by OpenWISP Monitoring. Thus, it requires
     :doc:`integration with OpenWISP Controller and OpenWISP Monitoring
-    <controller-monitoring-integration>` to be enabled in the Django
+    <integrations>` to be enabled in the Django
     project.

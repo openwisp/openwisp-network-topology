@@ -1,5 +1,5 @@
-Integration with OpenWISP Controller and OpenWISP Monitoring
-============================================================
+Integrations with other OpenWISP modules
+========================================
 
 If you use :doc:`OpenWISP Controller </controller/index>` or
 :doc:`OpenWISP Monitoring </monitoring/index>` and you use OpenVPN,
@@ -24,6 +24,8 @@ This additional and optional module provides the following features:
 
 This integration makes the whole system a lot faster in detecting
 important events in the network.
+
+.. include:: /partials/settings-note.rst
 
 In order to use this module simply add
 ``openwisp_network_topology.integrations.device`` to ``INSTALLED_APPS``:
