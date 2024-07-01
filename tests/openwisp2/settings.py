@@ -223,7 +223,7 @@ if not TESTING or (TESTING and os.environ.get('WIFI_MESH', False)):
 if os.environ.get('SAMPLE_APP', False):
     INSTALLED_APPS.remove('openwisp_network_topology')
     INSTALLED_APPS.remove('openwisp_network_topology.integrations.device')
-    EXTENDED_APPS = ['openwisp_network_topology']
+    EXTENDED_APPS.append('openwisp_network_topology')
     INSTALLED_APPS += [
         'openwisp2.sample_network_topology',
         'openwisp2.sample_integration_device',
