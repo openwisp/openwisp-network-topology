@@ -166,6 +166,10 @@ class TopologyAdmin(
             )
         self.message_user(request, '{0} {1}'.format(prefix, suffix), level=level)
 
+    @admin.action(
+        description=_('Update selected topologies (FETCH strategy only)'),
+        permissions=['change'],
+    )
     def update_selected(self, request, queryset):
         items = list(queryset)
         failed = []
@@ -196,21 +200,15 @@ class TopologyAdmin(
             message = _("ignored (not using FETCH strategy)")
             self._message(request, total_ignored, message, level=messages.WARNING)
 
-    update_selected.short_description = _(
-        'Update selected topologies (FETCH strategy only)'
-    )
-
+    @admin.action(description=_('Publish selected topologies'), permissions=['change'])
     def publish_selected(self, request, queryset):
         rows_updated = queryset.update(published=True)
         self._message(request, rows_updated, _('successfully published'))
 
-    publish_selected.short_description = _('Publish selected topologies')
-
+    @admin.action(description=_('Unpublish selected items'), permissions=['change'])
     def unpublish_selected(self, request, queryset):
         rows_updated = queryset.update(published=False)
         self._message(request, rows_updated, _('successfully unpublished'))
-
-    unpublish_selected.short_description = _('Unpublish selected items')
 
     def visualize_view(self, request, pk):
         graph_url, history_url = self.get_graph_urls(request, pk)

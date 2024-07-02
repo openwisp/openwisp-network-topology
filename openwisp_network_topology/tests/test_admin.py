@@ -1,4 +1,5 @@
 import re
+from unittest.mock import patch
 
 import responses
 import swapper
@@ -8,7 +9,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from openwisp_users.tests.utils import TestMultitenantAdminMixin, TestOrganizationMixin
-from openwisp_utils.tests import capture_any_output
+from openwisp_utils.tests import AdminActionPermTestMixin, capture_any_output
 
 from ..admin import TopologyAdmin
 from .utils import CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin
@@ -280,7 +281,11 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
 
 
 class TestMultitenantAdmin(
-    CreateGraphObjectsMixin, TestMultitenantAdminMixin, TestOrganizationMixin, TestCase
+    AdminActionPermTestMixin,
+    CreateGraphObjectsMixin,
+    TestMultitenantAdminMixin,
+    TestOrganizationMixin,
+    TestCase,
 ):
     app_label = 'topology'
     topology_model = Topology
@@ -434,4 +439,47 @@ class TestMultitenantAdmin(
             url=self._get_autocomplete_view_path(self.app_label, 'link', 'topology'),
             visible=[data['t1'].label, t_special.label],
             hidden=[data['t2'].label, data['t3_inactive'].label],
+        )
+
+    @patch.object(Topology, 'update')
+    def test_update_selected_action_perms(self, *args):
+        org = self._get_org()
+        user = self._create_user(is_staff=True)
+        self._create_org_user(user=user, organization=org, is_admin=True)
+        topology = self._create_topology(organization=org)
+        self._test_action_permission(
+            path=reverse(f'admin:{self.app_label}_topology_changelist'),
+            action='update_selected',
+            user=user,
+            obj=topology,
+            message='1 topology was successfully updated',
+            required_perms=['change'],
+        )
+
+    def test_publish_selected_action_perms(self):
+        org = self._get_org()
+        user = self._create_user(is_staff=True)
+        self._create_org_user(user=user, organization=org, is_admin=True)
+        topology = self._create_topology(organization=org)
+        self._test_action_permission(
+            path=reverse(f'admin:{self.app_label}_topology_changelist'),
+            action='publish_selected',
+            user=user,
+            obj=topology,
+            message='1 topology was successfully published',
+            required_perms=['change'],
+        )
+
+    def test_unpublish_selected_action_perms(self):
+        org = self._get_org()
+        user = self._create_user(is_staff=True)
+        self._create_org_user(user=user, organization=org, is_admin=True)
+        topology = self._create_topology(organization=org)
+        self._test_action_permission(
+            path=reverse(f'admin:{self.app_label}_topology_changelist'),
+            action='unpublish_selected',
+            user=user,
+            obj=topology,
+            message='1 topology was successfully unpublished',
+            required_perms=['change'],
         )
