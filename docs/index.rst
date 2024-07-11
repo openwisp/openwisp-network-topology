@@ -1,6 +1,9 @@
 Network Topology
 ================
 
+**Source code**: `github.com/openwisp/openwisp-network-topology
+<https://github.com/openwisp/openwisp-network-topology>`_.
+
 OpenWISP Network Topology is a network topology collector and visualizer
 web application and API, it allows to collect network topology data from
 different networking software (dynamic mesh routing protocols, OpenVPN),
