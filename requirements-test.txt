@@ -1,5 +1,5 @@
 responses~=0.25.3
-pytest-asyncio~=0.21.0
+pytest-asyncio~=0.23.7
 pytest-django~=4.8.0
 freezegun~=1.1.0
 # Needed to test integrations
