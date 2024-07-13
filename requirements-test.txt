@@ -1,4 +1,4 @@
-responses~=0.23.1
+responses~=0.25.3
 pytest-asyncio~=0.21.0
 pytest-django~=4.5.2
 freezegun~=1.1.0
