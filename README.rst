@@ -49,16 +49,16 @@ to execute code when the status of a link changes.
 
 For a complete overview of features, refer to the `Network Topology:
 Features
-<https://openwisp.io/docs/__new__/dev/network-topology/user/intro.html>`_
+<https://openwisp.io/docs/dev/network-topology/user/intro.html>`_
 section of the OpenWISP documentation.
 
 Documentation
 -------------
 
 - `Developer documentation
-  <https://openwisp.io/docs/__new__/dev/network-topology/developer/>`_
+  <https://openwisp.io/docs/dev/network-topology/developer/>`_
 - `User documentation
-  <https://openwisp.io/docs/__new__/dev/network-topology/>`_
+  <https://openwisp.io/docs/dev/network-topology/>`_
 
 Contributing
 ------------
