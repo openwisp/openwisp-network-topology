@@ -1,6 +1,10 @@
 Rest API
 ========
 
+.. contents:: **Table of contents**:
+    :depth: 1
+    :local:
+
 .. _network_topology_live_documentation:
 
 Live Documentation

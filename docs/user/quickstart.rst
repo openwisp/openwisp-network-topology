@@ -8,6 +8,10 @@ application or received in POST API requests, therefore after deploying
 the application, additional steps are required to make the data collection
 and visualization work, read on to find out how.
 
+.. contents:: **Table of contents**:
+    :depth: 1
+    :local:
+
 Creating a Topology
 -------------------
 

@@ -3,6 +3,10 @@ Installation Instructions
 
 .. include:: ../partials/developer-docs.rst
 
+.. contents:: **Table of contents**:
+    :depth: 2
+    :local:
+
 Installing for Development
 --------------------------
 
@@ -66,7 +70,7 @@ Create database:
     ./manage.py migrate
     ./manage.py createsuperuser
 
-You can access the admin interface at http://127.0.0.1:8000/admin/.
+You can access the admin interface at ``http://127.0.0.1:8000/admin/``.
 
 Run tests with:
 

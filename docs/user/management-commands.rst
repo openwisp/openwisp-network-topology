@@ -1,6 +1,10 @@
 Management Commands
 ===================
 
+.. contents:: **Table of contents**:
+    :depth: 2
+    :local:
+
 ``update_topology``
 -------------------
 
