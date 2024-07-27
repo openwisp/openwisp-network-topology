@@ -129,5 +129,4 @@ monitoring agent.
     The network topology objects are created using the device monitoring
     data collected by OpenWISP Monitoring. Thus, it requires
     :doc:`integration with OpenWISP Controller and OpenWISP Monitoring
-    <integrations>` to be enabled in the Django
-    project.
+    <integrations>` to be enabled in the Django project.

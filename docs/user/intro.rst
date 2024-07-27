@@ -28,5 +28,5 @@ visualizing, and monitoring network topologies. Key features include:
 - **topology history**: allows saving daily snapshots of each topology
   that can be viewed in the frontend
 - **faster monitoring**: :doc:`integrates with OpenWISP Controller and
-  OpenWISP Monitoring <integrations>` for faster
-  detection of critical events in the network
+  OpenWISP Monitoring <integrations>` for faster detection of critical
+  events in the network
