@@ -6,7 +6,6 @@ from openwisp_network_topology.migrations import migrate_addresses
 
 
 class Migration(migrations.Migration):
-
     dependencies = [('topology', '0007_create_new_address_field')]
 
     operations = [

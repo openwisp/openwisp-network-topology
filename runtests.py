@@ -21,9 +21,9 @@ if __name__ == '__main__':
         args.extend(['--tag', 'wifi_mesh'])
     else:
         args.extend(['--exclude-tag', 'wifi_mesh'])
-execute_from_command_line(args)
-sys.exit(
-    pytest.main(
-        [os.path.join('openwisp_network_topology', 'tests', 'test_websockets.py')]
+    execute_from_command_line(args)
+    sys.exit(
+        pytest.main(
+            [os.path.join('openwisp_network_topology', 'tests', 'test_websockets.py')]
+        )
     )
-)

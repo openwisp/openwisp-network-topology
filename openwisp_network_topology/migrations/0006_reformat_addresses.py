@@ -18,7 +18,6 @@ def reformat_address_backward(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [('topology', '0005_default_operator_permission')]
 
     operations = [

@@ -1,11 +1,11 @@
 import swapper
+from openwisp_ipam.tests import CreateModelsMixin as SubnetIpamMixin
+
 from openwisp_controller.config.tests.utils import (
     CreateConfigTemplateMixin,
     TestVpnX509Mixin,
     TestWireguardVpnMixin,
 )
-from openwisp_ipam.tests import CreateModelsMixin as SubnetIpamMixin
-
 from openwisp_network_topology.tests.utils import CreateGraphObjectsMixin
 from openwisp_users.tests.utils import TestOrganizationMixin
 

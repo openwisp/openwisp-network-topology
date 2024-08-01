@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'openwisp_controller.pki',
     'openwisp_controller.config',
     'openwisp_controller.connection',
+    'openwisp_controller.geo',
     'openwisp_notifications',
     'openwisp_ipam',
     'reversion',
@@ -194,10 +195,6 @@ if not TESTING and any(['shell' in sys.argv, 'shell_plus' in sys.argv]):
 # Avoid adding unnecessary dependency to speedup tests.
 if not TESTING or (TESTING and os.environ.get('WIFI_MESH', False)):
     OPENWISP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION = True
-    INSTALLED_APPS.insert(
-        INSTALLED_APPS.index('openwisp_controller.connection'),
-        'openwisp_controller.geo',
-    )
     openwisp_ipam_index = INSTALLED_APPS.index('openwisp_ipam')
     INSTALLED_APPS.insert(openwisp_ipam_index, 'leaflet')
     INSTALLED_APPS.insert(openwisp_ipam_index, 'nested_admin')
@@ -226,7 +223,7 @@ if not TESTING or (TESTING and os.environ.get('WIFI_MESH', False)):
 if os.environ.get('SAMPLE_APP', False):
     INSTALLED_APPS.remove('openwisp_network_topology')
     INSTALLED_APPS.remove('openwisp_network_topology.integrations.device')
-    EXTENDED_APPS = ['openwisp_network_topology']
+    EXTENDED_APPS.append('openwisp_network_topology')
     INSTALLED_APPS += [
         'openwisp2.sample_network_topology',
         'openwisp2.sample_integration_device',

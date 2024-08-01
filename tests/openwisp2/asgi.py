@@ -5,11 +5,12 @@ from django.conf import settings
 if 'openwisp_controller.geo' in settings.INSTALLED_APPS:
     from openwisp_controller.routing import get_routes as get_controller_routes
 else:
-    from openwisp_controller.connection.channels.routing import (
-        get_routes as get_connection_routes,
-    )
     from openwisp_notifications.websockets.routing import (
         get_routes as get_notification_routes,
+    )
+
+    from openwisp_controller.connection.channels.routing import (
+        get_routes as get_connection_routes,
     )
 
     def get_controller_routes():

@@ -8,7 +8,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.TOPOLOGY_TOPOLOGY_MODEL),
         ('topology_device', '0001_initial'),
