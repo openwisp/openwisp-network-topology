@@ -11,7 +11,6 @@ from swapper import get_model_name
 
 
 class Migration(migrations.Migration):
-
     dependencies = [('topology', '0001_initial')]
 
     operations = [

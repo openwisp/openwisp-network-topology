@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [('topology', '0003_link_status_and_openvpn_parser')]
 
     operations = [

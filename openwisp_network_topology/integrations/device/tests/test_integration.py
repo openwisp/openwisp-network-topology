@@ -8,14 +8,14 @@ from django.db import transaction
 from django.test import TransactionTestCase
 from django.urls import reverse
 from django.utils.module_loading import import_string
+from openwisp_ipam.tests import CreateModelsMixin as SubnetIpamMixin
+
 from openwisp_controller.config.tests.utils import (
     CreateConfigTemplateMixin,
     TestVpnX509Mixin,
     TestWireguardVpnMixin,
     TestZeroTierVpnMixin,
 )
-from openwisp_ipam.tests import CreateModelsMixin as SubnetIpamMixin
-
 from openwisp_network_topology.tests.utils import CreateGraphObjectsMixin
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.admin_theme.dashboard import DASHBOARD_CHARTS, DASHBOARD_TEMPLATES

@@ -35,7 +35,6 @@ Link = swapper.load_model('topology', 'Link')
 
 
 class RequireAuthentication(APIView):
-
     if app_settings.TOPOLOGY_API_AUTH_REQUIRED:
         authentication_classes = [
             SessionAuthentication,

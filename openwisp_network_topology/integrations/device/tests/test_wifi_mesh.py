@@ -175,7 +175,7 @@ class TestWifiMeshIntegration(TopologyTestMixin, TransactionTestCase):
         )
         # Change mesh_id reported in the monitoring data
         mesh_data = deepcopy(SIMPLE_MESH_DATA)
-        for (device, interfaces) in zip(devices, mesh_data.values()):
+        for device, interfaces in zip(devices, mesh_data.values()):
             interfaces[0]['wireless']['ssid'] = 'New Mesh'
             response = self.client.post(
                 '{0}?key={1}&time={2}'.format(

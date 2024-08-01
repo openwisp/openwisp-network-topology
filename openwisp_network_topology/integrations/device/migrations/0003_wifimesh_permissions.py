@@ -35,7 +35,6 @@ def assign_permissions_to_groups(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.TOPOLOGY_TOPOLOGY_MODEL),
         ('topology_device', '0002_wifimesh'),

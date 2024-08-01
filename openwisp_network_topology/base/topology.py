@@ -28,7 +28,6 @@ STRATEGIES = (('fetch', _('FETCH')), ('receive', _('RECEIVE')))
 
 
 class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
-
     label = models.CharField(_('label'), max_length=64)
     parser = models.CharField(
         _('format'),

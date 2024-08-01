@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [('topology', '0006_reformat_addresses')]
 
     operations = [
