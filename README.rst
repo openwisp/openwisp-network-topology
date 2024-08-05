@@ -54,9 +54,9 @@ section of the OpenWISP documentation.
 Documentation
 -------------
 
+- `Usage documentation <https://openwisp.io/docs/dev/network-topology/>`_
 - `Developer documentation
   <https://openwisp.io/docs/dev/network-topology/developer/>`_
-- `User documentation <https://openwisp.io/docs/dev/network-topology/>`_
 
 Contributing
 ------------
