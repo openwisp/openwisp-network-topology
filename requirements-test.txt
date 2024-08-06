@@ -6,5 +6,5 @@ freezegun~=1.5.1
 openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/master
 openwisp-controller @ https://github.com/openwisp/openwisp-controller/tarball/master
 openwisp-utils[qa,selenium] @ https://github.com/openwisp/openwisp-utils/tarball/master
-redis~=5.0.7
+redis~=5.0.8
 django_redis~=5.4.0
