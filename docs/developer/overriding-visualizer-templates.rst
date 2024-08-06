@@ -23,8 +23,8 @@ Example: Overriding the ``<script>`` Tag
 
 Here's a step by step guide on how to change the javascript options passed
 to `netjsongraph.js <https://github.com/openwisp/netjsongraph.js>`_,
-remember to replace ``<project_path>`` with the absolute filesytem path of
-your project.
+remember to replace ``<project_path>`` with the absolute file system path
+of your project.
 
 **Step 1**: create a directory in
 ``<project_path>/templates/netjsongraph``
@@ -43,7 +43,7 @@ setting so that it looks like the following example:
     ]
 
 **Step 3**: create a new file named ``netjsongraph-script.html`` in the
-new ``<project_path>/templates/netjsongraph/`` directory, eg:
+new ``<project_path>/templates/netjsongraph/`` directory, e.g.:
 
 .. code-block:: html
 

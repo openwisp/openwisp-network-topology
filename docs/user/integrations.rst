@@ -33,7 +33,7 @@ In order to use this module simply add
 .. code-block:: python
 
     INSTALLED_APPS = [
-        # other apps (eg: openwisp-controller, openwisp-monitoring)
+        # other apps (e.g.: openwisp-controller, openwisp-monitoring)
         "openwisp_network_topology",
         "openwisp_network_topology.integrations.device",
         "openwisp_users.accounts",
@@ -68,6 +68,6 @@ the ``CELERY_BEAT_SCHEDULE`` as follow:
         },
     }
 
-If you are enabling this integration on a pre-existing system, use the
+If you are enabling this integration on a preexisting system, use the
 :ref:`create_device_nodes <network_topology_create_device_nodes>`
 management command to create the relationship between devices and nodes.

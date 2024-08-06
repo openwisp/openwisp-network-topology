@@ -18,7 +18,7 @@ graph:
     ./manage.py update_topology
 
 The management command accepts a ``--label`` argument that will be used to
-search in topology labels, eg:
+search in topology labels, e.g.:
 
 .. code-block::
 
@@ -47,7 +47,7 @@ in future:
     ./manage.py save_snapshot
 
 The management command accepts a ``--label`` argument that will be used to
-search in topology labels, eg:
+search in topology labels, e.g.:
 
 .. code-block::
 
@@ -67,7 +67,7 @@ instance:
 
 The management command accepts an argument ``--backup``, that you can pass
 to give the location of the backup files, by default it looks in the
-``tests/`` directory, eg:
+``tests/`` directory, e.g.:
 
 .. code-block::
 
@@ -76,7 +76,7 @@ to give the location of the backup files, by default it looks in the
 The management command accepts another argument ``--organization``, if you
 want to import data to a specific organization, you can give its UUID for
 the same, by default the data is added to the first found organization,
-eg:
+e.g.:
 
 .. code-block::
 
@@ -93,7 +93,7 @@ django-netjsongraph
 
 This management command can be used to create the initial ``DeviceNode``
 relationships when the :doc:`integration with OpenWISP Controller
-<integrations>` is enabled in a pre-existing system which already has some
+<integrations>` is enabled in a preexisting system which already has some
 devices and topology objects in its database.
 
 .. code-block:: shell

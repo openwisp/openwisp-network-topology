@@ -85,7 +85,7 @@ Run tests with:
     # the following command
     WIFI_MESH=1 ./runtests.py
 
-Run qa tests:
+Run QA tests:
 
 .. code-block:: shell
 
@@ -97,7 +97,7 @@ Alternative Sources
 Pypi
 ~~~~
 
-To install the latest stable version from pypi:
+To install the latest Pypi:
 
 .. code-block:: shell
 

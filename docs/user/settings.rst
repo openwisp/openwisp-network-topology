@@ -22,9 +22,9 @@ Additional custom `netdiff parsers
 **default**: ``None``
 ============ ========
 
-String representing python module to import on initialization.
+String representing Python module to import on initialization.
 
-Useful for loading django signals or to define custom behaviour.
+Useful for loading Django signals or to define custom behavior.
 
 ``OPENWISP_NETWORK_TOPOLOGY_TIMEOUT``
 -------------------------------------
@@ -81,7 +81,7 @@ user's preferences.
 **default**: ``None``
 ============ ==========
 
-Use the ``urlconf`` option to change receive api url to point to another
+Use the ``urlconf`` option to change receive API URL to point to another
 module, example, ``myapp.urls``.
 
 ``OPENWISP_NETWORK_TOPOLOGY_API_BASEURL``
@@ -92,11 +92,10 @@ module, example, ``myapp.urls``.
 **default**: ``None``
 ============ ==========
 
-If you have a seperate instance of openwisp-network-topology on a
-different domain, you can use this option to change the base of the url,
-this will enable you to point all the API urls to your
-openwisp-network-topology API server's domain, example value:
-``https://mytopology.myapp.com``.
+If you have a separate instance of the OpenWISP Network Topology API on a
+different domain, you can use this option to change the base of the URL,
+this will enable you to point all the API URLs to your API server's
+domain, example value: ``https://api.myservice.com``.
 
 ``OPENWISP_NETWORK_TOPOLOGY_API_AUTH_REQUIRED``
 -----------------------------------------------

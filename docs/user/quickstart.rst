@@ -1,5 +1,5 @@
-Quickstart Guide
-================
+Quick Start Guide
+=================
 
 This module works by periodically collecting the network topology graph
 data of the :ref:`supported networking software or formats
@@ -53,7 +53,7 @@ Sending Data for Topology with RECEIVE Strategy
        The topology receive URL is shown only after the topology object is
        created.
 
-2. Create a script (eg: ``/opt/send-topology.sh``) which sends the
+2. Create a script (e.g.: ``/opt/send-topology.sh``) which sends the
    topology data using ``POST``, in the example script below we are
    sending the status log data of OpenVPN but the same code can be applied
    to other formats by replacing ``cat /var/log/openvpn/tun0.stats`` with

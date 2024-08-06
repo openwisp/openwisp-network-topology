@@ -299,7 +299,7 @@ resort to monkey patching, you can proceed as follows:
 11. Create Root URL Configuration
 ---------------------------------
 
-The following can be used to register all the urls in your
+The following can be used to register all the URLs in your
     ``urls.py``.
 
 Please read and replicate according to your project needs:
@@ -392,8 +392,7 @@ customization.
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Extending the views is only required when you want to make changes in the
-behaviour of the API. Please refer to
-`sample_network_topology/api/views.py
+behavior of the API. Please refer to `sample_network_topology/api/views.py
 <https://github.com/openwisp/openwisp-network-topology/tree/master/tests/openwisp2/sample_network_topology/api/views.py>`_
 and replicate it in your application.
 
