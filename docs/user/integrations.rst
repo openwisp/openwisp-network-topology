@@ -28,45 +28,39 @@ important events in the network.
 .. include:: /partials/settings-note.rst
 
 In order to use this module simply add
-``openwisp_network_topology.integrations.device`` to ``INSTALLED_APPS``:
+``openwisp_network_topology.integrations.device`` to ``INSTALLED_APPS`` in
+the Django project settings, e.g.:
 
 .. code-block:: python
 
-    INSTALLED_APPS = [
-        # other apps (e.g.: openwisp-controller, openwisp-monitoring)
-        "openwisp_network_topology",
-        "openwisp_network_topology.integrations.device",
-        "openwisp_users.accounts",
-        "allauth",
-        "allauth.account",
-        "openwisp_users",
-        "rest_framework",
-    ]
+    INSTALLED_APPS.append("openwisp_network_topology.integrations.device")
 
 If you have enabled WiFI Mesh integration, you will also need to update
 the ``CELERY_BEAT_SCHEDULE`` as follow:
 
 .. code-block:: python
 
-    CELERY_BEAT_SCHEDULE = {
-        "create_mesh_topology": {
-            # This task generates the mesh topology from monitoring data
-            "task": "openwisp_network_topology.integrations.device.tasks.create_mesh_topology",
-            # Execute this task every 5 minutes
-            "schedule": timedelta(minutes=5),
-            "args": (
-                # List of organization UUIDs. The mesh topology will be
-                # created only for devices belonging these organizations.
-                [
-                    "4e002f97-eb01-4371-a4a8-857faa22fe5c",
-                    "be88d4c4-599a-4ca2-a1c0-3839b4fdc315",
-                ],
-                # The task won't use monitoring data reported
-                # before this time (in seconds)
-                6 * 60,  # 6 minutes
-            ),
-        },
-    }
+    CELERY_BEAT_SCHEDULE.update(
+        {
+            "create_mesh_topology": {
+                # This task generates the mesh topology from monitoring data
+                "task": "openwisp_network_topology.integrations.device.tasks.create_mesh_topology",
+                # Execute this task every 5 minutes
+                "schedule": timedelta(minutes=5),
+                "args": (
+                    # List of organization UUIDs. The mesh topology will be
+                    # created only for devices belonging these organizations.
+                    [
+                        "4e002f97-eb01-4371-a4a8-857faa22fe5c",
+                        "be88d4c4-599a-4ca2-a1c0-3839b4fdc315",
+                    ],
+                    # The task won't use monitoring data reported
+                    # before this time (in seconds)
+                    6 * 60,  # 6 minutes
+                ),
+            },
+        }
+    )
 
 If you are enabling this integration on a preexisting system, use the
 :ref:`create_device_nodes <network_topology_create_device_nodes>`
