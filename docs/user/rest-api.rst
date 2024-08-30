@@ -69,9 +69,9 @@ You can use multiple filters in one request, e.g.:
 
 .. note::
 
-    By default, ``/api/v1/network-topology/topology/`` does not
-    include unpublished topologies. If you want to include unpublished
-    topologies in the response, use ``?include_unpublished=true`` filter as
+    By default, ``/api/v1/network-topology/topology/`` does not include
+    unpublished topologies. If you want to include unpublished topologies
+    in the response, use ``?include_unpublished=true`` filter as
     following:
 
     .. code-block:: text
@@ -94,10 +94,10 @@ Detail of a Topology
 
 .. note::
 
-    By default, ``/api/v1/network-topology/topology/{id}/`` will
-    return ``HTTP 404 Not Found`` for unpublished topologies. If you want to
-    retrieve an unpublished topology, use ``?include_unpublished=true`` filter
-    as following:
+    By default, ``/api/v1/network-topology/topology/{id}/`` will return
+    ``HTTP 404 Not Found`` for unpublished topologies. If you want to
+    retrieve an unpublished topology, use ``?include_unpublished=true``
+    filter as following:
 
 .. code-block:: text
 

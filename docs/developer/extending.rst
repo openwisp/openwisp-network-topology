@@ -232,9 +232,9 @@ are described below.
 
 .. note::
 
-    For more information regarding how the django admin works, or
-    how it can be customized, please refer to `"The django admin site" section
-    in the django documentation
+    For more information regarding how the django admin works, or how it
+    can be customized, please refer to `"The django admin site" section in
+    the django documentation
     <https://docs.djangoproject.com/en/4.2/ref/contrib/admin/>`_.
 
 1. Monkey Patching
