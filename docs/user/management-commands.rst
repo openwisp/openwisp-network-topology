@@ -82,9 +82,11 @@ e.g.:
 
     ./manage.py upgrade_from_django_netjsongraph --organization 900856da-c89a-412d-8fee-45a9c763ca0b
 
-**Note**: you can follow the `tutorial to migrate database from
-django-netjsongraph
-<https://github.com/openwisp/django-netjsongraph/blob/master/README.rst>`_.
+.. note::
+
+    you can follow the `tutorial to migrate database from
+    django-netjsongraph
+    <https://github.com/openwisp/django-netjsongraph/blob/master/README.rst>`_.
 
 .. _network_topology_create_device_nodes:
 

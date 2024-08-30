@@ -67,14 +67,16 @@ You can use multiple filters in one request, e.g.:
 
     /api/v1/network-topology/topology/?organization=371791ec-e3fe-4c9a-8972-3e8b882416f6&strategy=fetch
 
-**Note**: By default, ``/api/v1/network-topology/topology/`` does not
-include unpublished topologies. If you want to include unpublished
-topologies in the response, use ``?include_unpublished=true`` filter as
-following:
+.. note::
 
-.. code-block:: text
+    By default, ``/api/v1/network-topology/topology/`` does not
+    include unpublished topologies. If you want to include unpublished
+    topologies in the response, use ``?include_unpublished=true`` filter as
+    following:
 
-    GET /api/v1/network-topology/topology/?include_unpublished=true
+    .. code-block:: text
+
+        GET /api/v1/network-topology/topology/?include_unpublished=true
 
 Create Topology
 ~~~~~~~~~~~~~~~
@@ -90,10 +92,12 @@ Detail of a Topology
 
     GET /api/v1/network-topology/topology/{id}/
 
-**Note**: By default, ``/api/v1/network-topology/topology/{id}/`` will
-return ``HTTP 404 Not Found`` for unpublished topologies. If you want to
-retrieve an unpublished topology, use ``?include_unpublished=true`` filter
-as following:
+.. note::
+
+    By default, ``/api/v1/network-topology/topology/{id}/`` will
+    return ``HTTP 404 Not Found`` for unpublished topologies. If you want to
+    retrieve an unpublished topology, use ``?include_unpublished=true`` filter
+    as following:
 
 .. code-block:: text
 
