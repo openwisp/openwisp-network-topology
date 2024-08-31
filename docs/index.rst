@@ -10,7 +10,7 @@ OpenWISP Network Topology is a network topology collector and visualizer
 web application and API, it allows to collect network topology data from
 different networking software (dynamic mesh routing protocols, OpenVPN),
 store it, visualize it, edit its details, it also provides hooks (a.k.a
-`Django signals <https://docs.djangoproject.com/en/3.1/topics/signals/>`_)
+`Django signals <https://docs.djangoproject.com/en/4.2/topics/signals/>`_)
 to execute code when the status of a link changes.
 
 When used in conjunction with :doc:`OpenWISP Controller
