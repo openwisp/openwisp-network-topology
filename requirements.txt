@@ -1,5 +1,5 @@
-openwisp-users @ https://github.com/openwisp/openwisp-users/tarball/master
-netdiff @ https://github.com/openwisp/netdiff/tarball/master
+openwisp-users~=1.1.0
+netdiff~=1.1.0
 jsonfield~=3.1.0
-django-flat-json-widget @ https://github.com/openwisp/django-flat-json-widget/tarball/master
-openwisp-utils[celery] @ https://github.com/openwisp/openwisp-utils/tarball/master
+django-flat-json-widget~=0.3.1
+openwisp-utils[celery]~=1.1.1
