@@ -1,10 +1,47 @@
 Changelog
 =========
 
-Version 1.1.0 [Unreleased]
+Version 1.1.0 [2024-11-22]
 --------------------------
 
-WIP
+Features
+~~~~~~~~
+
+- Added integration with `OpenWISP Monitoring to generate WiFi mesh
+  network topology
+  <https://openwisp.io/docs/dev/network-topology/user/integrations.html>`_.
+- Added WireGuard topology parser and integration with OpenWISP Controller
+- Added ZeroTier topology parser and integration with OpenWISP Controller
+- Implemented real-time updates for topologies
+- Added autocomplete support for filters in the admin interface
+- Added filters to the REST API.
+
+Changes
+~~~~~~~
+
+- Moved REST API topology collection database writes to a background
+  worker
+- Hid the "receive_url" field in ``TopologyAdmin`` when adding a topology
+
+Dependencies
+++++++++++++
+
+- Bumped ``openwisp-users~=1.1.0``
+- Bumped ``netdiff~=1.1.0``
+- Bumped ``django-flat-json-widget~=0.3.0``
+- Bumped ``openwisp-utils[celery]~=1.1.0``
+- Added support for Django ``4.1.x`` and ``4.2.x``
+- Added support for Python ``3.10``
+- Dropped support for Python ``3.7``
+- Dropped support for Django ``3.0.x`` and ``3.1.x``
+
+Bugfixes
+~~~~~~~~
+
+- Fixed visualizer issues in both admin and non-admin interfaces
+- Fixed changing status of link from admin page
+- Resolved graph visualizer issue for unpublished topologies in admin
+- User need to have required model permissions to perform admin actions
 
 Version 1.0.0 [2022-05-06]
 --------------------------
