@@ -42,6 +42,7 @@ class BaseAdmin(TimeStampedEditableAdmin):
         css = {
             'all': [
                 'netjsongraph/css/src/netjsongraph.css',
+                'netjsongraph/css/src/netjsongraph-theme.css',
                 'netjsongraph/css/lib/jquery-ui.min.css',
                 'netjsongraph/css/style.css',
                 'netjsongraph/css/admin.css',

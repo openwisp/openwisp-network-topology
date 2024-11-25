@@ -106,34 +106,6 @@
                     }
                 }
             },
-
-            onLoad: () => {
-                const gui = graph.utils.getGUI(graph);
-                gui.init();
-                if (graph.config.metadata) {
-                    gui.createAboutContainer(graph);
-                    gui.sideBar.classList.add("hidden");
-                    graph.utils.updateMetadata.call(graph);
-                }
-
-                graph.config.onClickElement = (type, data) => {
-                    switcher.classList.add('open');
-                    let nodeLinkData;
-                    if (type === 'node') {
-                        nodeLinkData = graph.utils.nodeInfo(data);
-                    } else {
-                        nodeLinkData = graph.utils.linkInfo(data);
-                    }
-                    gui.getNodeLinkInfo(type, nodeLinkData);
-                    gui.sideBar.classList.remove('hidden');
-                };
-
-                document.querySelector('.sideBarHandle').addEventListener('click', () => {
-                    switcher.classList.toggle('open');
-                });
-
-                graph.utils.hideLoading();
-            },
         });
 
         const overlay = document.querySelector(el);
