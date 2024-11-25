@@ -85,7 +85,7 @@ class TestTopologyGraphVisualizer(
         )
         sidebar.click()
         WebDriverWait(self.web_driver, 2).until(
-            EC.visibility_of_element_located((By.CLASS_NAME, 'njg-aboutContainer'))
+            EC.visibility_of_element_located((By.CLASS_NAME, 'njg-metaInfoContainer'))
         )
         try:
             # Check the visibility of the topology graph
