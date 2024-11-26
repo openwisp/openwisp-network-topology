@@ -1,6 +1,17 @@
 Changelog
 =========
 
+Version 1.1.1 [2024-11-26]
+--------------------------
+
+Bugfixes
+~~~~~~~~
+
+- Fixed websocket connection to use
+  ``OPENWISP_NETWORK_TOPOLOGY_API_BASEURL``.
+- Upgraded the ``netjsongraph.js`` library to include a patch for sending
+  credentials in fetch requests.
+
 Version 1.1.0 [2024-11-22]
 --------------------------
 
