@@ -48,15 +48,15 @@ store it, visualize it, edit its details, it also provides hooks (a.k.a
 to execute code when the status of a link changes.
 
 For a complete overview of features, refer to the `Network Topology:
-Features <https://openwisp.io/docs/dev/network-topology/user/intro.html>`_
+Features <https://openwisp.io/docs/stable/network-topology/user/intro.html>`_
 section of the OpenWISP documentation.
 
 Documentation
 -------------
 
-- `Usage documentation <https://openwisp.io/docs/dev/network-topology/>`_
+- `Usage documentation <https://openwisp.io/docs/stable/network-topology/>`_
 - `Developer documentation
-  <https://openwisp.io/docs/dev/network-topology/developer/>`_
+  <https://openwisp.io/docs/stable/network-topology/developer/>`_
 
 Contributing
 ------------

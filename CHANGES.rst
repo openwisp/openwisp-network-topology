@@ -20,7 +20,7 @@ Features
 
 - Added integration with `OpenWISP Monitoring to generate WiFi mesh
   network topology
-  <https://openwisp.io/docs/dev/network-topology/user/integrations.html>`_.
+  <https://openwisp.io/docs/stable/network-topology/user/integrations.html>`_.
 - Added WireGuard topology parser and integration with OpenWISP Controller
 - Added ZeroTier topology parser and integration with OpenWISP Controller
 - Implemented real-time updates for topologies
