@@ -3,8 +3,8 @@ pytest-asyncio~=0.24.0
 pytest-django~=4.9.0
 freezegun~=1.5.1
 # Needed to test integrations
-openwisp-monitoring~=1.1.1
-openwisp-controller~=1.1.0
-openwisp-utils[qa,selenium]~=1.1.1
+openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/1.2
+openwisp-controller @ https://github.com/openwisp/openwisp-controller/tarball/1.2
+openwisp-utils[qa,selenium] @ https://github.com/openwisp/openwisp-utils/tarball/1.2
 redis~=5.2.0
 django_redis~=5.4.0
