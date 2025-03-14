@@ -86,8 +86,8 @@ jobs:
         if: ${{ !cancelled() && steps.deps.conclusion == 'success' }}
         run: |
           coverage run runtests.py --parallel
-          WIFI_MESH=1 coverage run runtests.py --parallel
-          SAMPLE_APP=1 coverage run ./runtests.py --parallel
+          WIFI_MESH=1 coverage run runtests.py --parallel --exclude-tag=selenium_tests
+          SAMPLE_APP=1 coverage run ./runtests.py --parallel --exclude-tag=selenium_tests
           coverage combine
           coverage xml
         env:
