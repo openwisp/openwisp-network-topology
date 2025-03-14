@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from swapper import load_model
 
 from openwisp_users.tests.utils import TestOrganizationMixin
-from openwisp_utils.test_selenium_mixins import SeleniumTestMixin
+from openwisp_utils.tests import SeleniumTestMixin
 
 from .utils import CreateGraphObjectsMixin, LoadMixin
 
