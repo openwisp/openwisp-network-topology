@@ -1,6 +1,6 @@
 responses~=0.25.7
 pytest-asyncio~=0.24.0
-pytest-django~=4.9.0
+pytest-django~=4.10.0
 freezegun~=1.5.1
 # Needed to test integrations
 openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/1.2
