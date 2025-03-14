@@ -45,6 +45,19 @@ jobs:
           cache-dependency-path: |
             **/requirements*.txt
 
+      - name: Cache APT packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-${{ runner.os }}-${{ hashFiles('.github/workflows/ci.yml') }}
+          restore-keys: |
+            apt-${{ runner.os }}-
+
+      - name: Disable man page auto-update
+        run: |
+          echo 'set man-db/auto-update false' | sudo debconf-communicate >/dev/null
+          sudo dpkg-reconfigure man-db
+
       - name: Install Dependencies
         id: deps
         run: |
@@ -62,8 +75,9 @@ jobs:
           pip install -U -r requirements-test.txt
           pip install ${{ matrix.django-version }}
 
-          # start influxdb
-          docker compose up -d influxdb
+      - name: Start InfluxDB
+        if: ${{ !cancelled() && steps.deps.conclusion == 'success' }}
+        run: docker compose up -d influxdb
 
       - name: QA checks
         run: ./run-qa-checks
@@ -76,6 +90,13 @@ jobs:
           SAMPLE_APP=1 coverage run ./runtests.py --parallel
           coverage combine
           coverage xml
+        env:
+          SELENIUM_HEADLESS: 1
+          GECKO_LOG: 1
+
+      - name: Show gecko web driver log on failures
+        if: ${{ failure() }}
+        run: cat geckodriver.log
 
       - name: Upload Coverage
         if: ${{ success() }}
