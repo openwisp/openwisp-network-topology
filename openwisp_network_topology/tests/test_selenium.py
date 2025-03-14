@@ -57,24 +57,9 @@ class TestTopologyGraphVisualizer(
         # Clear the web driver console logs after each test
         self.get_browser_logs()
 
-    # def _get_console_errors(self, console_logs=[]):
-    #     console_errors = []
-    #     exclude_socket_icon_errors = [
-    #         'WebSocket handshake',
-    #         'favicon.ico - Failed to load resource:',
-    #     ]
-    #     for log in console_logs:
-    #         error_message = log['message']
-    #         error_level = log['level']
-    #         if error_level == 'SEVERE' and any(
-    #             [err in error_message for err in exclude_socket_icon_errors]
-    #         ):
-    #             continue
-    #         console_errors.append(log)
-    #     return console_errors
-
-    def _assert_topology_graph(self):
-        self.hide_loading_overlay('loadingContainer')
+    def _assert_topology_graph(self, hide_loading_overlay=True):
+        if hide_loading_overlay:
+            self.hide_loading_overlay('loadingContainer')
         self.find_element(By.CLASS_NAME, 'sideBarHandle').click()
         self.wait_for_visibility(By.CLASS_NAME, 'njg-metaInfoContainer')
         self.wait_for_visibility(By.XPATH, '//div[1]/canvas')
@@ -151,7 +136,7 @@ class TestTopologyGraphVisualizer(
         # Open the visualizer again and make sure no JS errors
         # are thrown when the visualizer is closed again
         self.find_element(By.CSS_SELECTOR, 'input.visualizelink').click()
-        self._assert_topology_graph()
+        self._assert_topology_graph(hide_loading_overlay=False)
         self.find_element(By.CLASS_NAME, 'closeBtn').click()
         console_logs = self.get_browser_logs()
         self.assertEqual(console_logs, [])
