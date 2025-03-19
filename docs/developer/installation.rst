@@ -38,7 +38,7 @@ tests for :ref:`WiFi Mesh Integration
 
 .. code-block:: shell
 
-    docker-compose up -d influxdb redis
+    docker compose up -d influxdb redis
 
 Setup and activate a virtual-environment (we'll be using `virtualenv
 <https://pypi.org/project/virtualenv/>`_):
