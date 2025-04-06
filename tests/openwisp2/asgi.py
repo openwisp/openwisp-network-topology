@@ -1,6 +1,7 @@
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.conf import settings
+from django.core.asgi import get_asgi_application
 
 if 'openwisp_controller.geo' in settings.INSTALLED_APPS:
     from openwisp_controller.routing import get_routes as get_controller_routes
@@ -27,5 +28,6 @@ application = ProtocolTypeRouter(
                 + get_controller_routes()
             )
         ),
+        'http': get_asgi_application(),
     }
 )

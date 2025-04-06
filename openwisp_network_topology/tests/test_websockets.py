@@ -59,12 +59,10 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         )
         t = await database_sync_to_async(self._create_topology)(organization=org)
         if view_perm:
-            topology_view_permission = await database_sync_to_async(
-                Permission.objects.get
-            )(codename='view_topology')
-            await database_sync_to_async(test_user.user_permissions.add)(
-                topology_view_permission
+            topology_view_permission = await Permission.objects.aget(
+                codename='view_topology'
             )
+            await test_user.user_permissions.aadd(topology_view_permission)
         await database_sync_to_async(client.force_login)(test_user)
         communicator = await self._get_communicator(client, t.pk)
         connected, _ = await communicator.connect()
@@ -134,7 +132,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         response = await communicator.receive_json_from()
         assert response['topology'] is not None
         assert response['topology'] == expected_response
-        await database_sync_to_async(node.delete)()
+        await node.adelete()
         expected_response = await database_sync_to_async(topo.json)()
         response = await communicator.receive_json_from()
         assert response['topology'] is not None
@@ -164,12 +162,12 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         assert response['topology'] == expected_response
         link.status = 'down'
         await database_sync_to_async(link.full_clean)()
-        await database_sync_to_async(link.save)()
+        await link.asave()
         expected_response = await database_sync_to_async(topo.json)()
         response = await communicator.receive_json_from()
         assert response['topology'] is not None
         assert response['topology'] == expected_response
-        await database_sync_to_async(link.delete)()
+        await link.adelete()
         expected_response = await database_sync_to_async(topo.json)()
         response = await communicator.receive_json_from()
         assert response['topology'] is not None
@@ -184,7 +182,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         assert connected is True
         topo.name = 'test'
         await database_sync_to_async(topo.full_clean)()
-        await database_sync_to_async(topo.save)()
+        await topo.asave()
         expected_response = await database_sync_to_async(topo.json)()
         response = await communicator.receive_json_from()
         assert response['topology'] is not None
