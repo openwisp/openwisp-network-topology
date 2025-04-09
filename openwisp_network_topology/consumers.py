@@ -40,7 +40,6 @@ class TopologyConsumer(WebsocketConsumer):
 
     def disconnect(self, close_code):
         self.close()
-        pass
 
     def send_topology_update(self, event):
         self.send(
