@@ -14,14 +14,14 @@ def create_default_permissions(apps, schema_editor):
 
 def assign_permissions_to_groups(apps, schema_editor):
     create_default_permissions(apps, schema_editor)
-    operators_and_admin_can_change = ['link', 'node']
-    operators_read_only_admins_manage = ['topology']
-    manage_operations = ['add', 'change', 'delete']
-    Group = apps.get_model('openwisp_users', 'Group')
+    operators_and_admin_can_change = ["link", "node"]
+    operators_read_only_admins_manage = ["topology"]
+    manage_operations = ["add", "change", "delete"]
+    Group = apps.get_model("openwisp_users", "Group")
 
     try:
-        admin = Group.objects.get(name='Administrator')
-        operator = Group.objects.get(name='Operator')
+        admin = Group.objects.get(name="Administrator")
+        operator = Group.objects.get(name="Operator")
     # consider failures custom cases
     # that do not have to be dealt with
     except Group.DoesNotExist:
@@ -30,7 +30,7 @@ def assign_permissions_to_groups(apps, schema_editor):
     for model_name in operators_and_admin_can_change:
         for operation in manage_operations:
             permission = Permission.objects.get(
-                codename='{}_{}'.format(operation, model_name)
+                codename="{}_{}".format(operation, model_name)
             )
             admin.permissions.add(permission.pk)
             operator.permissions.add(permission.pk)
@@ -50,8 +50,8 @@ def assign_permissions_to_groups(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        dependency(*split(settings.AUTH_USER_MODEL), version='0004_default_groups'),
-        ('sample_network_topology', '0003_add_user_defined_properties_field'),
+        dependency(*split(settings.AUTH_USER_MODEL), version="0004_default_groups"),
+        ("sample_network_topology", "0003_add_user_defined_properties_field"),
     ]
     operations = [
         migrations.RunPython(

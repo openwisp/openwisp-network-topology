@@ -24,12 +24,12 @@ from openwisp_network_topology.tests.test_visualizer import (
 
 
 class TestAdmin(BaseTestAdmin):
-    module = 'openwisp2.sample_network_topology'
-    app_label = 'sample_network_topology'
+    module = "openwisp2.sample_network_topology"
+    app_label = "sample_network_topology"
 
 
 class TestMultitenantAdmin(BaseTestMultitenantAdmin):
-    app_label = 'sample_network_topology'
+    app_label = "sample_network_topology"
 
 
 class TestApi(BaseTestApi):

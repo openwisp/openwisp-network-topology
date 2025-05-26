@@ -5,8 +5,8 @@ from openwisp_network_topology.admin import TopologyAdmin
 
 from . import settings as app_settings
 
-WifiMesh = load_model('topology_device', 'WifiMesh')
-Topology = load_model('topology', 'Topology')
+WifiMesh = load_model("topology_device", "WifiMesh")
+Topology = load_model("topology", "Topology")
 
 
 class WifiMeshInlineAdmin(admin.StackedInline):

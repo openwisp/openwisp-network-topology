@@ -9,13 +9,13 @@ class TextParser(JSONParser):
     Dummy TextParser accepting any text (used in ReceiveTopologyView)
     """
 
-    media_type = 'text/plain'
+    media_type = "text/plain"
 
     def parse(self, stream, media_type=None, parser_context=None):
         parser_context = parser_context or {}
-        encoding = parser_context.get('encoding', settings.DEFAULT_CHARSET)
+        encoding = parser_context.get("encoding", settings.DEFAULT_CHARSET)
 
         try:
             return stream.read().decode(encoding)
         except ValidationError as e:  # pragma: nocover
-            raise ParseError('text/plain parse error - %s' % str(e))
+            raise ParseError("text/plain parse error - %s" % str(e))

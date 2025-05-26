@@ -4,7 +4,7 @@ from . import migrate_openvpn_ids_0012
 
 
 class Migration(migrations.Migration):
-    dependencies = [('topology', '0011_fix_link_properties')]
+    dependencies = [("topology", "0011_fix_link_properties")]
 
     operations = [
         migrations.RunPython(

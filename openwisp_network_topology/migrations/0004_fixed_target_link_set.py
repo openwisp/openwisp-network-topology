@@ -5,16 +5,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [('topology', '0003_link_status_and_openvpn_parser')]
+    dependencies = [("topology", "0003_link_status_and_openvpn_parser")]
 
     operations = [
         migrations.AlterField(
-            model_name='link',
-            name='target',
+            model_name="link",
+            name="target",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name='target_link_set',
-                to='topology.Node',
+                related_name="target_link_set",
+                to="topology.Node",
             ),
         )
     ]

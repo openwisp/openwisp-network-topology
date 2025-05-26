@@ -8,38 +8,38 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    dependencies = [('sample_network_topology', '0001_initial')]
+    dependencies = [("sample_network_topology", "0001_initial")]
 
     operations = [
         migrations.AlterField(
-            model_name='link',
-            name='properties',
+            model_name="link",
+            name="properties",
             field=jsonfield.fields.JSONField(
                 blank=True,
                 default=dict,
                 dump_kwargs={
-                    'cls': rest_framework.utils.encoders.JSONEncoder,
-                    'indent': 4,
+                    "cls": rest_framework.utils.encoders.JSONEncoder,
+                    "indent": 4,
                 },
-                load_kwargs={'object_pairs_hook': collections.OrderedDict},
+                load_kwargs={"object_pairs_hook": collections.OrderedDict},
             ),
         ),
         migrations.AlterField(
-            model_name='node',
-            name='addresses',
+            model_name="node",
+            name="addresses",
             field=jsonfield.fields.JSONField(blank=True, default=[]),
         ),
         migrations.AlterField(
-            model_name='node',
-            name='properties',
+            model_name="node",
+            name="properties",
             field=jsonfield.fields.JSONField(
                 blank=True,
                 default=dict,
                 dump_kwargs={
-                    'cls': rest_framework.utils.encoders.JSONEncoder,
-                    'indent': 4,
+                    "cls": rest_framework.utils.encoders.JSONEncoder,
+                    "indent": 4,
                 },
-                load_kwargs={'object_pairs_hook': collections.OrderedDict},
+                load_kwargs={"object_pairs_hook": collections.OrderedDict},
             ),
         ),
     ]

@@ -22,15 +22,15 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        dependency(*split(settings.AUTH_USER_MODEL), version='0004_default_groups'),
+        dependency(*split(settings.AUTH_USER_MODEL), version="0004_default_groups"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Topology',
+            name="Topology",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -39,139 +39,139 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    'created',
+                    "created",
                     model_utils.fields.AutoCreatedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='created',
+                        verbose_name="created",
                     ),
                 ),
                 (
-                    'modified',
+                    "modified",
                     model_utils.fields.AutoLastModifiedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='modified',
+                        verbose_name="modified",
                     ),
                 ),
-                ('label', models.CharField(max_length=64, verbose_name='label')),
+                ("label", models.CharField(max_length=64, verbose_name="label")),
                 (
-                    'parser',
+                    "parser",
                     models.CharField(
                         choices=[
-                            ('netdiff.OlsrParser', 'OLSRd (txtinfo/jsoninfo)'),
+                            ("netdiff.OlsrParser", "OLSRd (txtinfo/jsoninfo)"),
                             (
-                                'netdiff.BatmanParser',
-                                'batman-advanced (jsondoc/txtinfo)',
+                                "netdiff.BatmanParser",
+                                "batman-advanced (jsondoc/txtinfo)",
                             ),
-                            ('netdiff.BmxParser', 'BMX6 (q6m)'),
-                            ('netdiff.NetJsonParser', 'NetJSON NetworkGraph'),
-                            ('netdiff.CnmlParser', 'CNML 1.0'),
-                            ('netdiff.OpenvpnParser', 'OpenVPN'),
-                            ('netdiff.WireguardParser', 'Wireguard'),
-                            ('netdiff.ZeroTierParser', 'ZeroTier'),
+                            ("netdiff.BmxParser", "BMX6 (q6m)"),
+                            ("netdiff.NetJsonParser", "NetJSON NetworkGraph"),
+                            ("netdiff.CnmlParser", "CNML 1.0"),
+                            ("netdiff.OpenvpnParser", "OpenVPN"),
+                            ("netdiff.WireguardParser", "Wireguard"),
+                            ("netdiff.ZeroTierParser", "ZeroTier"),
                         ],
-                        help_text='Select topology format',
+                        help_text="Select topology format",
                         max_length=128,
-                        verbose_name='format',
+                        verbose_name="format",
                     ),
                 ),
                 (
-                    'strategy',
+                    "strategy",
                     models.CharField(
-                        choices=[('fetch', 'FETCH'), ('receive', 'RECEIVE')],
+                        choices=[("fetch", "FETCH"), ("receive", "RECEIVE")],
                         db_index=True,
-                        default='fetch',
+                        default="fetch",
                         max_length=16,
-                        verbose_name='strategy',
+                        verbose_name="strategy",
                     ),
                 ),
                 (
-                    'url',
+                    "url",
                     models.URLField(
                         blank=True,
-                        help_text='Topology data will be fetched from this URL (FETCH strategy)',
-                        verbose_name='url',
+                        help_text="Topology data will be fetched from this URL (FETCH strategy)",
+                        verbose_name="url",
                     ),
                 ),
                 (
-                    'key',
+                    "key",
                     openwisp_utils.base.KeyField(
                         blank=True,
                         default=openwisp_utils.utils.get_random_key,
-                        help_text='key needed to update topology from nodes ',
+                        help_text="key needed to update topology from nodes ",
                         max_length=64,
                         validators=[
                             django.core.validators.RegexValidator(
-                                re.compile('^[^\\s/\\.]+$'),
-                                code='invalid',
-                                message='This value must not contain spaces, dots or slashes.',
+                                re.compile("^[^\\s/\\.]+$"),
+                                code="invalid",
+                                message="This value must not contain spaces, dots or slashes.",
                             )
                         ],
-                        verbose_name='key',
+                        verbose_name="key",
                     ),
                 ),
                 (
-                    'expiration_time',
+                    "expiration_time",
                     models.PositiveIntegerField(
                         default=0,
                         help_text=(
                             '"Expiration Time" in seconds: setting this to 0 will immediately '
-                            'mark missing links as down; a value higher than 0 will delay marking '
+                            "mark missing links as down; a value higher than 0 will delay marking "
                             'missing links as down until the "modified" field of a link is '
                             'older than "Expiration Time"'
                         ),
-                        verbose_name='expiration time',
+                        verbose_name="expiration time",
                     ),
                 ),
                 (
-                    'published',
+                    "published",
                     models.BooleanField(
                         default=True,
                         help_text="Unpublished topologies won't be updated or shown in the visualizer",
-                        verbose_name='published',
+                        verbose_name="published",
                     ),
                 ),
                 (
-                    'protocol',
+                    "protocol",
                     models.CharField(
-                        blank=True, max_length=64, verbose_name='protocol'
+                        blank=True, max_length=64, verbose_name="protocol"
                     ),
                 ),
                 (
-                    'version',
-                    models.CharField(blank=True, max_length=24, verbose_name='version'),
+                    "version",
+                    models.CharField(blank=True, max_length=24, verbose_name="version"),
                 ),
                 (
-                    'revision',
+                    "revision",
                     models.CharField(
-                        blank=True, max_length=64, verbose_name='revision'
+                        blank=True, max_length=64, verbose_name="revision"
                     ),
                 ),
                 (
-                    'metric',
-                    models.CharField(blank=True, max_length=24, verbose_name='metric'),
+                    "metric",
+                    models.CharField(blank=True, max_length=24, verbose_name="metric"),
                 ),
-                ('details', models.CharField(blank=True, max_length=64, null=True)),
+                ("details", models.CharField(blank=True, max_length=64, null=True)),
                 (
-                    'organization',
+                    "organization",
                     models.ForeignKey(
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
-                        to=get_model_name('openwisp_users', 'Organization'),
-                        verbose_name='organization',
+                        to=get_model_name("openwisp_users", "Organization"),
+                        verbose_name="organization",
                     ),
                 ),
             ],
-            options={'verbose_name_plural': 'topologies', 'abstract': False},
+            options={"verbose_name_plural": "topologies", "abstract": False},
             bases=(openwisp_users.mixins.ValidateOrgMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='Snapshot',
+            name="Snapshot",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -180,40 +180,40 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    'created',
+                    "created",
                     model_utils.fields.AutoCreatedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='created',
+                        verbose_name="created",
                     ),
                 ),
                 (
-                    'modified',
+                    "modified",
                     model_utils.fields.AutoLastModifiedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='modified',
+                        verbose_name="modified",
                     ),
                 ),
-                ('data', models.TextField()),
-                ('date', models.DateField(auto_now=True)),
-                ('details', models.CharField(blank=True, max_length=64, null=True)),
+                ("data", models.TextField()),
+                ("date", models.DateField(auto_now=True)),
+                ("details", models.CharField(blank=True, max_length=64, null=True)),
                 (
-                    'topology',
+                    "topology",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='sample_network_topology.Topology',
+                        to="sample_network_topology.Topology",
                     ),
                 ),
             ],
-            options={'verbose_name_plural': 'snapshots', 'abstract': False},
+            options={"verbose_name_plural": "snapshots", "abstract": False},
             bases=(openwisp_users.mixins.ValidateOrgMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='Node',
+            name="Node",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -222,59 +222,59 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    'created',
+                    "created",
                     model_utils.fields.AutoCreatedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='created',
+                        verbose_name="created",
                     ),
                 ),
                 (
-                    'modified',
+                    "modified",
                     model_utils.fields.AutoLastModifiedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='modified',
+                        verbose_name="modified",
                     ),
                 ),
-                ('label', models.CharField(blank=True, max_length=64)),
-                ('addresses', jsonfield.fields.JSONField(default=[])),
+                ("label", models.CharField(blank=True, max_length=64)),
+                ("addresses", jsonfield.fields.JSONField(default=[])),
                 (
-                    'properties',
+                    "properties",
                     jsonfield.fields.JSONField(
                         blank=True,
                         default=dict,
-                        dump_kwargs={'indent': 4},
-                        load_kwargs={'object_pairs_hook': collections.OrderedDict},
+                        dump_kwargs={"indent": 4},
+                        load_kwargs={"object_pairs_hook": collections.OrderedDict},
                     ),
                 ),
-                ('details', models.CharField(blank=True, max_length=64, null=True)),
+                ("details", models.CharField(blank=True, max_length=64, null=True)),
                 (
-                    'organization',
+                    "organization",
                     models.ForeignKey(
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
-                        to=get_model_name('openwisp_users', 'Organization'),
-                        verbose_name='organization',
+                        to=get_model_name("openwisp_users", "Organization"),
+                        verbose_name="organization",
                     ),
                 ),
                 (
-                    'topology',
+                    "topology",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='sample_network_topology.Topology',
+                        to="sample_network_topology.Topology",
                     ),
                 ),
             ],
-            options={'abstract': False},
+            options={"abstract": False},
             bases=(openwisp_users.mixins.ValidateOrgMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='Link',
+            name="Link",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -283,78 +283,78 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    'created',
+                    "created",
                     model_utils.fields.AutoCreatedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='created',
+                        verbose_name="created",
                     ),
                 ),
                 (
-                    'modified',
+                    "modified",
                     model_utils.fields.AutoLastModifiedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='modified',
+                        verbose_name="modified",
                     ),
                 ),
-                ('cost', models.FloatField()),
-                ('cost_text', models.CharField(blank=True, max_length=24)),
+                ("cost", models.FloatField()),
+                ("cost_text", models.CharField(blank=True, max_length=24)),
                 (
-                    'status',
+                    "status",
                     model_utils.fields.StatusField(
-                        choices=[('up', 'up'), ('down', 'down')],
-                        default='up',
+                        choices=[("up", "up"), ("down", "down")],
+                        default="up",
                         max_length=100,
                         no_check_for_status=True,
                     ),
                 ),
                 (
-                    'properties',
+                    "properties",
                     jsonfield.fields.JSONField(
                         blank=True,
                         default=dict,
-                        dump_kwargs={'indent': 4},
-                        load_kwargs={'object_pairs_hook': collections.OrderedDict},
+                        dump_kwargs={"indent": 4},
+                        load_kwargs={"object_pairs_hook": collections.OrderedDict},
                     ),
                 ),
-                ('status_changed', models.DateTimeField(auto_now=True)),
-                ('details', models.CharField(blank=True, max_length=64, null=True)),
+                ("status_changed", models.DateTimeField(auto_now=True)),
+                ("details", models.CharField(blank=True, max_length=64, null=True)),
                 (
-                    'organization',
+                    "organization",
                     models.ForeignKey(
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
-                        to=get_model_name('openwisp_users', 'Organization'),
-                        verbose_name='organization',
+                        to=get_model_name("openwisp_users", "Organization"),
+                        verbose_name="organization",
                     ),
                 ),
                 (
-                    'source',
+                    "source",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name='source_link_set',
-                        to='sample_network_topology.Node',
+                        related_name="source_link_set",
+                        to="sample_network_topology.Node",
                     ),
                 ),
                 (
-                    'target',
+                    "target",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name='target_link_set',
-                        to='sample_network_topology.Node',
+                        related_name="target_link_set",
+                        to="sample_network_topology.Node",
                     ),
                 ),
                 (
-                    'topology',
+                    "topology",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='sample_network_topology.Topology',
+                        to="sample_network_topology.Topology",
                     ),
                 ),
             ],
-            options={'abstract': False},
+            options={"abstract": False},
             bases=(openwisp_users.mixins.ValidateOrgMixin, models.Model),
         ),
     ]

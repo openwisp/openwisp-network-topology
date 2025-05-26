@@ -11,25 +11,25 @@ from .tasks import create_device_node_relation, trigger_device_updates
 
 
 class OpenwispTopologyDeviceConfig(AppConfig):
-    name = 'openwisp_network_topology.integrations.device'
-    label = 'topology_device'
-    verbose_name = _('Topology Device Integration')
+    name = "openwisp_network_topology.integrations.device"
+    label = "topology_device"
+    verbose_name = _("Topology Device Integration")
 
     def ready(self):
         self.connect_signals()
         self.override_node_label()
 
     def connect_signals(self):
-        Node = swapper.load_model('topology', 'Node')
-        Link = swapper.load_model('topology', 'Link')
+        Node = swapper.load_model("topology", "Node")
+        Link = swapper.load_model("topology", "Link")
 
         post_save.connect(
-            self.create_device_rel, sender=Node, dispatch_uid='node_to_device_rel'
+            self.create_device_rel, sender=Node, dispatch_uid="node_to_device_rel"
         )
         link_status_changed.connect(
             self.link_status_changed_receiver,
             sender=Link,
-            dispatch_uid='controller_integration_link_status_chaged',
+            dispatch_uid="controller_integration_link_status_chaged",
         )
 
     @classmethod
@@ -43,4 +43,4 @@ class OpenwispTopologyDeviceConfig(AppConfig):
         transaction.on_commit(lambda: trigger_device_updates.delay(link.pk))
 
     def override_node_label(self):
-        import_module('openwisp_network_topology.integrations.device.overrides')
+        import_module("openwisp_network_topology.integrations.device.overrides")

@@ -12,15 +12,15 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.CONFIG_DEVICE_MODEL),
-        ('sample_network_topology', '0002_json_properties'),
+        ("sample_network_topology", "0002_json_properties"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DeviceNode',
+            name="DeviceNode",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -28,29 +28,29 @@ class Migration(migrations.Migration):
                         serialize=False,
                     ),
                 ),
-                ('is_test', models.BooleanField(default=True)),
+                ("is_test", models.BooleanField(default=True)),
                 (
-                    'device',
+                    "device",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         to=settings.CONFIG_DEVICE_MODEL,
                     ),
                 ),
                 (
-                    'node',
+                    "node",
                     models.OneToOneField(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='sample_network_topology.Node',
+                        to="sample_network_topology.Node",
                     ),
                 ),
             ],
-            options={'abstract': False, 'unique_together': {('node', 'device')}},
+            options={"abstract": False, "unique_together": {("node", "device")}},
         ),
         migrations.CreateModel(
-            name='WifiMesh',
+            name="WifiMesh",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -58,10 +58,10 @@ class Migration(migrations.Migration):
                         serialize=False,
                     ),
                 ),
-                ('mesh_id', models.CharField(max_length=32, verbose_name='Mesh ID')),
-                ('is_test', models.BooleanField(default=True)),
+                ("mesh_id", models.CharField(max_length=32, verbose_name="Mesh ID")),
+                ("is_test", models.BooleanField(default=True)),
                 (
-                    'topology',
+                    "topology",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         to=settings.TOPOLOGY_TOPOLOGY_MODEL,
@@ -69,7 +69,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

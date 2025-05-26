@@ -11,14 +11,14 @@ from swapper import get_model_name
 
 
 class Migration(migrations.Migration):
-    dependencies = [('topology', '0001_initial')]
+    dependencies = [("topology", "0001_initial")]
 
     operations = [
         migrations.CreateModel(
-            name='Snapshot',
+            name="Snapshot",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -27,39 +27,39 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    'created',
+                    "created",
                     model_utils.fields.AutoCreatedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='created',
+                        verbose_name="created",
                     ),
                 ),
                 (
-                    'modified',
+                    "modified",
                     model_utils.fields.AutoLastModifiedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='modified',
+                        verbose_name="modified",
                     ),
                 ),
-                ('data', models.TextField()),
-                ('date', models.DateField(auto_now=True)),
+                ("data", models.TextField()),
+                ("date", models.DateField(auto_now=True)),
                 (
-                    'organization',
+                    "organization",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to=get_model_name('openwisp_users', 'Organization'),
-                        verbose_name='organization',
+                        to=get_model_name("openwisp_users", "Organization"),
+                        verbose_name="organization",
                     ),
                 ),
                 (
-                    'topology',
+                    "topology",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='topology.Topology',
+                        to="topology.Topology",
                     ),
                 ),
             ],
-            options={'abstract': False, 'verbose_name_plural': 'snapshots'},
+            options={"abstract": False, "verbose_name_plural": "snapshots"},
         )
     ]

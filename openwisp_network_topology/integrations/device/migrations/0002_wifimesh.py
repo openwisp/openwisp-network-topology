@@ -10,15 +10,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.TOPOLOGY_TOPOLOGY_MODEL),
-        ('topology_device', '0001_initial'),
+        ("topology_device", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='WifiMesh',
+            name="WifiMesh",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -26,9 +26,9 @@ class Migration(migrations.Migration):
                         serialize=False,
                     ),
                 ),
-                ('mesh_id', models.CharField(max_length=32, verbose_name='Mesh ID')),
+                ("mesh_id", models.CharField(max_length=32, verbose_name="Mesh ID")),
                 (
-                    'topology',
+                    "topology",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         to=settings.TOPOLOGY_TOPOLOGY_MODEL,
@@ -36,8 +36,8 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                'abstract': False,
-                'swappable': 'TOPOLOGY_DEVICE_WIFIMESH_MODEL',
+                "abstract": False,
+                "swappable": "TOPOLOGY_DEVICE_WIFIMESH_MODEL",
             },
         ),
     ]

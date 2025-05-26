@@ -8,37 +8,37 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    dependencies = [('sample_network_topology', '0002_json_properties')]
+    dependencies = [("sample_network_topology", "0002_json_properties")]
 
     operations = [
         migrations.AddField(
-            model_name='link',
-            name='user_properties',
+            model_name="link",
+            name="user_properties",
             field=jsonfield.fields.JSONField(
                 blank=True,
                 default=dict,
                 dump_kwargs={
-                    'cls': rest_framework.utils.encoders.JSONEncoder,
-                    'indent': 4,
+                    "cls": rest_framework.utils.encoders.JSONEncoder,
+                    "indent": 4,
                 },
-                help_text='If you need to add additional data to this link use this field',
-                load_kwargs={'object_pairs_hook': collections.OrderedDict},
-                verbose_name='user defined properties',
+                help_text="If you need to add additional data to this link use this field",
+                load_kwargs={"object_pairs_hook": collections.OrderedDict},
+                verbose_name="user defined properties",
             ),
         ),
         migrations.AddField(
-            model_name='node',
-            name='user_properties',
+            model_name="node",
+            name="user_properties",
             field=jsonfield.fields.JSONField(
                 blank=True,
                 default=dict,
                 dump_kwargs={
-                    'cls': rest_framework.utils.encoders.JSONEncoder,
-                    'indent': 4,
+                    "cls": rest_framework.utils.encoders.JSONEncoder,
+                    "indent": 4,
                 },
-                help_text='If you need to add additional data to this node use this field',
-                load_kwargs={'object_pairs_hook': collections.OrderedDict},
-                verbose_name='user defined properties',
+                help_text="If you need to add additional data to this node use this field",
+                load_kwargs={"object_pairs_hook": collections.OrderedDict},
+                verbose_name="user defined properties",
             ),
         ),
     ]

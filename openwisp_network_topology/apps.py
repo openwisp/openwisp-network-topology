@@ -8,9 +8,9 @@ from .settings import SIGNALS
 
 
 class OpenwispNetworkTopologyConfig(AppConfig):
-    name = 'openwisp_network_topology'
-    label = 'topology'
-    verbose_name = _('Network Topology')
+    name = "openwisp_network_topology"
+    label = "topology"
+    verbose_name = _("Network Topology")
 
     def ready(self, *args, **kwargs):
         if SIGNALS:  # pragma: nocover
@@ -24,27 +24,27 @@ class OpenwispNetworkTopologyConfig(AppConfig):
         register_menu_group(
             position=110,
             config={
-                'label': 'Network Topology',
-                'items': {
+                "label": "Network Topology",
+                "items": {
                     1: {
-                        'label': _('Topologies'),
-                        'model': get_model_name('topology', 'Topology'),
-                        'name': 'changelist',
-                        'icon': 'ow-topology',
+                        "label": _("Topologies"),
+                        "model": get_model_name("topology", "Topology"),
+                        "name": "changelist",
+                        "icon": "ow-topology",
                     },
                     2: {
-                        'label': _('Nodes'),
-                        'model': get_model_name('topology', 'Node'),
-                        'name': 'changelist',
-                        'icon': 'ow-node',
+                        "label": _("Nodes"),
+                        "model": get_model_name("topology", "Node"),
+                        "name": "changelist",
+                        "icon": "ow-node",
                     },
                     3: {
-                        'label': _('Links'),
-                        'model': get_model_name('topology', 'Link'),
-                        'name': 'changelist',
-                        'icon': 'ow-link',
+                        "label": _("Links"),
+                        "model": get_model_name("topology", "Link"),
+                        "name": "changelist",
+                        "icon": "ow-link",
                     },
                 },
-                'icon': 'ow-network-topology',
+                "icon": "ow-network-topology",
             },
         )

@@ -7,11 +7,11 @@ from swapper import load_model
 
 from . import settings as app_settings
 
-Topology = load_model('topology', 'Topology')
+Topology = load_model("topology", "Topology")
 
 
 class TopologyConsumer(WebsocketConsumer):
-    channel_layer_group = 'topology'
+    channel_layer_group = "topology"
 
     def _is_user_authorized_to_view_topology(self, user, topology_pk):
         try:
@@ -23,13 +23,13 @@ class TopologyConsumer(WebsocketConsumer):
         return user.is_superuser or (
             user.is_authenticated
             and user.is_manager(topology.organization_id)
-            and user.has_perm(f'{Topology._meta.app_label}.view_topology')
+            and user.has_perm(f"{Topology._meta.app_label}.view_topology")
         )
 
     def connect(self):
-        user, topology_pk = self.scope.get('user'), self.scope.get('url_route').get(
-            'kwargs'
-        ).get('pk')
+        user, topology_pk = self.scope.get("user"), self.scope.get("url_route").get(
+            "kwargs"
+        ).get("pk")
         if self._is_user_authorized_to_view_topology(user, topology_pk):
             async_to_sync(self.channel_layer.group_add)(
                 f"{self.channel_layer_group}-{topology_pk}", self.channel_name
@@ -45,8 +45,8 @@ class TopologyConsumer(WebsocketConsumer):
         self.send(
             text_data=json.dumps(
                 {
-                    'type': "broadcast_topology",
-                    'topology': event['data'],
+                    "type": "broadcast_topology",
+                    "topology": event["data"],
                 }
             )
         )

@@ -11,13 +11,13 @@ class AbstractSnapshot(TimeStampedEditableModel):
     """
 
     topology = models.ForeignKey(
-        swapper.get_model_name('topology', 'Topology'), on_delete=models.CASCADE
+        swapper.get_model_name("topology", "Topology"), on_delete=models.CASCADE
     )
     data = models.TextField(blank=False)
     date = models.DateField(auto_now=True)
 
     class Meta:
-        verbose_name_plural = _('snapshots')
+        verbose_name_plural = _("snapshots")
         abstract = True
 
     def __str__(self):

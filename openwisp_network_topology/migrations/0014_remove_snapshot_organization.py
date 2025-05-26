@@ -5,12 +5,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('topology', '0013_add_user_defined_properties_field'),
+        ("topology", "0013_add_user_defined_properties_field"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='snapshot',
-            name='organization',
+            model_name="snapshot",
+            name="organization",
         ),
     ]

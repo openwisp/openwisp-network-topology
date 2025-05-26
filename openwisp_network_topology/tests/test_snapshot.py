@@ -1,7 +1,7 @@
 import swapper
 from django.test import TestCase
 
-Snapshot = swapper.load_model('topology', 'Snapshot')
+Snapshot = swapper.load_model("topology", "Snapshot")
 
 
 class TestSnapshot(TestCase):

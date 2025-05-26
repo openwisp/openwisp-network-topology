@@ -11,6 +11,6 @@ Providing arguments: ['topology']
 def broadcast_topology(topology, *args, **kwargs):
     channel_layer = layers.get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        f'topology-{topology.pk}',
-        {'type': 'send_topology_update', 'data': topology.json()},
+        f"topology-{topology.pk}",
+        {"type": "send_topology_update", "data": topology.json()},
     )

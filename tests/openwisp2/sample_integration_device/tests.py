@@ -10,7 +10,7 @@ from openwisp_network_topology.integrations.device.tests.test_integration import
     TestMonitoringIntegration as BaseTestMonitoringIntegration,
 )
 
-DeviceNode = swapper.load_model('topology_device', 'DeviceNode')
+DeviceNode = swapper.load_model("topology_device", "DeviceNode")
 
 
 class TestControllerIntegration(BaseTestControllerIntegration):
@@ -23,8 +23,8 @@ class TestMonitoringIntegration(BaseTestMonitoringIntegration):
 
 
 class TestAdmin(BaseTestAdmin):
-    module = 'openwisp2.sample_network_topology'
-    app_label = 'sample_network_topology'
+    module = "openwisp2.sample_network_topology"
+    app_label = "sample_network_topology"
 
 
 del BaseTestControllerIntegration

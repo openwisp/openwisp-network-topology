@@ -8,7 +8,7 @@ from ..settings import TOPOLOGY_API_AUTH_REQUIRED, VISUALIZER_CSS
 from ..utils import get_object_or_404
 from . import GraphVisualizerUrls
 
-Topology = swapper.load_model('topology', 'Topology')
+Topology = swapper.load_model("topology", "Topology")
 
 
 class TopologyListView(View):
@@ -24,8 +24,8 @@ class TopologyListView(View):
             topologies = topologies.filter(organization__in=user.organizations_managed)
         return render(
             request,
-            'netjsongraph/list.html',
-            {'topologies': topologies, 'VISUALIZER_CSS': VISUALIZER_CSS},
+            "netjsongraph/list.html",
+            {"topologies": topologies, "VISUALIZER_CSS": VISUALIZER_CSS},
         )
 
 
@@ -41,19 +41,19 @@ class TopologyDetailView(View, GraphVisualizerUrls):
                 return auth_perm
             if not user.is_manager(topology.organization):
                 detail = _(
-                    'User is not a manager of the organization to '
-                    'which the requested resource belongs.'
+                    "User is not a manager of the organization to "
+                    "which the requested resource belongs."
                 )
                 return HttpResponseForbidden(detail)
         graph_url, history_url = self.get_graph_urls(request, pk)
         return render(
             request,
-            'netjsongraph/detail.html',
+            "netjsongraph/detail.html",
             {
-                'topology': topology,
-                'graph_url': graph_url,
-                'history_url': history_url,
-                'VISUALIZER_CSS': VISUALIZER_CSS,
+                "topology": topology,
+                "graph_url": graph_url,
+                "history_url": history_url,
+                "VISUALIZER_CSS": VISUALIZER_CSS,
             },
         )
 
@@ -62,13 +62,13 @@ def check_auth_perm(request):
     user = request.user
     app_label = Topology._meta.app_label.lower()
     model = Topology._meta.object_name.lower()
-    change_perm = f'{app_label}.change_{model}'
-    view_perm = f'{app_label}.view_{model}'
+    change_perm = f"{app_label}.change_{model}"
+    view_perm = f"{app_label}.view_{model}"
     if not user.is_authenticated:
-        return HttpResponseForbidden(_('Authentication credentials were not provided.'))
+        return HttpResponseForbidden(_("Authentication credentials were not provided."))
     if not (user.has_perm(change_perm) or user.has_perm(view_perm)):
         return HttpResponseForbidden(
-            _('You do not have permission to perform this action.')
+            _("You do not have permission to perform this action.")
         )
 
 

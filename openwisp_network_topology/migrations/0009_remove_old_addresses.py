@@ -4,6 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    dependencies = [('topology', '0008_migrate_addresses_data')]
+    dependencies = [("topology", "0008_migrate_addresses_data")]
 
-    operations = [migrations.RemoveField(model_name='node', name='addresses_old')]
+    operations = [migrations.RemoveField(model_name="node", name="addresses_old")]

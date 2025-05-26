@@ -3,7 +3,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from django.conf import settings
 from django.core.asgi import get_asgi_application
 
-if 'openwisp_controller.geo' in settings.INSTALLED_APPS:
+if "openwisp_controller.geo" in settings.INSTALLED_APPS:
     from openwisp_controller.routing import get_routes as get_controller_routes
 else:
     from openwisp_notifications.websockets.routing import (
@@ -22,12 +22,12 @@ import openwisp_network_topology.routing
 
 application = ProtocolTypeRouter(
     {
-        'websocket': AuthMiddlewareStack(
+        "websocket": AuthMiddlewareStack(
             URLRouter(
                 openwisp_network_topology.routing.websocket_urlpatterns
                 + get_controller_routes()
             )
         ),
-        'http': get_asgi_application(),
+        "http": get_asgi_application(),
     }
 )

@@ -11,16 +11,16 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        swapper.dependency('topology', 'Node'),
-        swapper.dependency('config', 'Device'),
+        swapper.dependency("topology", "Node"),
+        swapper.dependency("config", "Device"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DeviceNode',
+            name="DeviceNode",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -29,24 +29,24 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    'device',
+                    "device",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to=swapper.get_model_name('config', 'Device'),
+                        to=swapper.get_model_name("config", "Device"),
                     ),
                 ),
                 (
-                    'node',
+                    "node",
                     models.OneToOneField(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to=swapper.get_model_name('topology', 'Node'),
+                        to=swapper.get_model_name("topology", "Node"),
                     ),
                 ),
             ],
             options={
-                'abstract': False,
-                'swappable': swapper.swappable_setting('topology_device', 'DeviceNode'),
-                'unique_together': {('node', 'device')},
+                "abstract": False,
+                "swappable": swapper.swappable_setting("topology_device", "DeviceNode"),
+                "unique_together": {("node", "device")},
             },
         )
     ]

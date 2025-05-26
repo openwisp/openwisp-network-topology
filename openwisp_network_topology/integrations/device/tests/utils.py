@@ -9,9 +9,9 @@ from openwisp_controller.config.tests.utils import (
 from openwisp_network_topology.tests.utils import CreateGraphObjectsMixin
 from openwisp_users.tests.utils import TestOrganizationMixin
 
-Node = swapper.load_model('topology', 'Node')
+Node = swapper.load_model("topology", "Node")
 
-Topology = swapper.load_model('topology', 'Topology')
+Topology = swapper.load_model("topology", "Topology")
 
 
 class TopologyTestMixin(
@@ -29,18 +29,18 @@ class TopologyTestMixin(
         self,
         topology,
         addresses=None,
-        label='test',
+        label="test",
         common_name=None,
         create=True,
     ):
         if not addresses:
-            addresses = ['netjson_id']
+            addresses = ["netjson_id"]
         node = Node(
             organization=topology.organization,
             topology=topology,
             label=label,
             addresses=addresses,
-            properties={'common_name': common_name},
+            properties={"common_name": common_name},
         )
         if create:
             node.full_clean()
@@ -49,22 +49,22 @@ class TopologyTestMixin(
 
     def _init_wireguard_test_node(self, topology, addresses=[], create=True, **kwargs):
         if not addresses:
-            addresses = ['public_key']
+            addresses = ["public_key"]
         properties = {
-            'preshared_key': None,
-            'endpoint': None,
-            'latest_handsake': '0',
-            'transfer_rx': '0',
-            'transfer_tx': '0',
-            'persistent_keepalive': 'off',
-            'allowed_ips': ['10.0.0.2/32'],
+            "preshared_key": None,
+            "endpoint": None,
+            "latest_handsake": "0",
+            "transfer_rx": "0",
+            "transfer_tx": "0",
+            "persistent_keepalive": "off",
+            "allowed_ips": ["10.0.0.2/32"],
         }
         properties.update(kwargs)
-        allowed_ips = properties.get('allowed_ips')
+        allowed_ips = properties.get("allowed_ips")
         node = Node(
             organization=topology.organization,
             topology=topology,
-            label=','.join(allowed_ips),
+            label=",".join(allowed_ips),
             addresses=addresses,
             properties=properties,
         )
@@ -82,19 +82,19 @@ class TopologyTestMixin(
 
     def _create_test_env(self, parser):
         organization = self._get_org()
-        vpn = self._create_vpn(name='test VPN', organization=organization)
+        vpn = self._create_vpn(name="test VPN", organization=organization)
         self._create_template(
-            name='VPN',
-            type='vpn',
+            name="VPN",
+            type="vpn",
             vpn=vpn,
             config=vpn.auto_client(),
             default=True,
             organization=organization,
         )
-        vpn2 = self._create_vpn(name='test VPN2', ca=vpn.ca, organization=organization)
+        vpn2 = self._create_vpn(name="test VPN2", ca=vpn.ca, organization=organization)
         self._create_template(
-            name='VPN2',
-            type='vpn',
+            name="VPN2",
+            type="vpn",
             vpn=vpn2,
             config=vpn.auto_client(),
             default=True,

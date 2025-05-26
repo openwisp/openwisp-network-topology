@@ -8,8 +8,8 @@ from django.test import TestCase
 from swapper import load_model
 
 User = get_user_model()
-Organization = load_model('openwisp_users', 'Organization')
-Topology = load_model('topology', 'Topology')
+Organization = load_model("openwisp_users", "Organization")
+Topology = load_model("topology", "Topology")
 
 
 class TestUpgradeFromDjangoNetjsongraph(TestCase):
@@ -17,26 +17,26 @@ class TestUpgradeFromDjangoNetjsongraph(TestCase):
         self.assertEqual(Topology.objects.count(), 0)
         commandOutput = StringIO()
         static_path = os.path.join(
-            os.path.dirname(__file__), 'static', 'upgrader_script'
+            os.path.dirname(__file__), "static", "upgrader_script"
         )
         call_command(
-            'upgrade_from_django_netjsongraph', backup=static_path, stdout=commandOutput
+            "upgrade_from_django_netjsongraph", backup=static_path, stdout=commandOutput
         )
-        self.assertIn('Migration Process Complete!', commandOutput.getvalue())
-        os.remove(os.path.join(static_path, 'group_loaded.json'))
-        os.remove(os.path.join(static_path, 'netjsongraph_loaded.json'))
-        os.remove(os.path.join(static_path, 'user_loaded.json'))
+        self.assertIn("Migration Process Complete!", commandOutput.getvalue())
+        os.remove(os.path.join(static_path, "group_loaded.json"))
+        os.remove(os.path.join(static_path, "netjsongraph_loaded.json"))
+        os.remove(os.path.join(static_path, "user_loaded.json"))
         self.assertEqual(Topology.objects.count(), 1)
         try:
-            Topology.objects.get(label='default')
+            Topology.objects.get(label="default")
         except Topology.DoesNotExist:
             self.fail('Topology "default" not created!')
         try:
-            user = User.objects.get(username='sample')
+            user = User.objects.get(username="sample")
             group = Group.objects.filter(user=user).first()
             permissions = Permission.objects.filter(user=user).first()
-            self.assertEqual('sample', group.name)
-            self.assertEqual('add_logentry', permissions.codename)
+            self.assertEqual("sample", group.name)
+            self.assertEqual("add_logentry", permissions.codename)
         except User.DoesNotExist:
             self.fail('User "sample" not created!')
 
@@ -44,7 +44,7 @@ class TestUpgradeFromDjangoNetjsongraph(TestCase):
         commandOutput = StringIO()
         with self.assertRaises(FileNotFoundError):
             call_command(
-                'upgrade_from_django_netjsongraph',
+                "upgrade_from_django_netjsongraph",
                 backup=os.path.join(os.path.dirname(__file__)),
                 stdout=commandOutput,
             )
@@ -53,8 +53,8 @@ class TestUpgradeFromDjangoNetjsongraph(TestCase):
         commandOutput = StringIO()
         with self.assertRaises(Organization.DoesNotExist):
             call_command(
-                'upgrade_from_django_netjsongraph',
-                backup=os.path.join(os.path.dirname(__file__), 'static'),
-                organization='00000000-0000-0000-0000-000000000000',
+                "upgrade_from_django_netjsongraph",
+                backup=os.path.join(os.path.dirname(__file__), "static"),
+                organization="00000000-0000-0000-0000-000000000000",
                 stdout=commandOutput,
             )

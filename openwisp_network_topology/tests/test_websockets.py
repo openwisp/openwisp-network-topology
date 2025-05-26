@@ -14,9 +14,9 @@ from openwisp_users.tests.utils import TestOrganizationMixin
 from .. import settings as app_settings
 from .utils import CreateGraphObjectsMixin
 
-Topology = load_model('topology', 'Topology')
-Node = load_model('topology', 'Node')
-Link = load_model('topology', 'Link')
+Topology = load_model("topology", "Topology")
+Node = load_model("topology", "Node")
+Link = load_model("topology", "Link")
 
 
 @pytest.mark.asyncio
@@ -25,17 +25,17 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
     node_model = Node
     link_model = Link
     topology_model = Topology
-    application = import_string(getattr(settings, 'ASGI_APPLICATION'))
+    application = import_string(getattr(settings, "ASGI_APPLICATION"))
 
     async def _get_communicator(self, admin_client, topology_id):
-        session_id = admin_client.cookies['sessionid'].value
+        session_id = admin_client.cookies["sessionid"].value
         communicator = WebsocketCommunicator(
             self.application,
-            path=f'ws/network-topology/topology/{topology_id}/',
+            path=f"ws/network-topology/topology/{topology_id}/",
             headers=[
                 (
-                    b'cookie',
-                    f'sessionid={session_id}'.encode('ascii'),
+                    b"cookie",
+                    f"sessionid={session_id}".encode("ascii"),
                 )
             ],
         )
@@ -52,7 +52,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
     async def _assert_connection_org_manager(self, client, view_perm=True, conn=True):
         org = await database_sync_to_async(self._create_org)()
         test_user = await database_sync_to_async(self._create_user)(
-            username='test-user-org-manager', email='test@orgmanger.com', is_staff=True
+            username="test-user-org-manager", email="test@orgmanger.com", is_staff=True
         )
         await database_sync_to_async(self._create_org_user)(
             is_admin=True, user=test_user, organization=org
@@ -60,7 +60,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         t = await database_sync_to_async(self._create_topology)(organization=org)
         if view_perm:
             topology_view_permission = await Permission.objects.aget(
-                codename='view_topology'
+                codename="view_topology"
             )
             await test_user.user_permissions.aadd(topology_view_permission)
         await database_sync_to_async(client.force_login)(test_user)
@@ -70,7 +70,7 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         await communicator.disconnect()
 
     async def _assert_connection_unauth_user(self, client, conn=True):
-        client.cookies['sessionid'] = 'unauthenticated_user'
+        client.cookies["sessionid"] = "unauthenticated_user"
         org = await database_sync_to_async(self._create_org)()
         t = await database_sync_to_async(self._create_topology)(organization=org)
         communicator = await self._get_communicator(client, t.pk)
@@ -90,15 +90,15 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
     async def test_consumer_connection_unauth_user(self, client):
         await self._assert_connection_unauth_user(client, conn=False)
 
-    @patch.object(app_settings, 'TOPOLOGY_API_AUTH_REQUIRED', False)
+    @patch.object(app_settings, "TOPOLOGY_API_AUTH_REQUIRED", False)
     async def test_consumer_connection_auth_disabled_superuser(self, admin_client):
         await self._assert_connection_superuser(admin_client)
 
-    @patch.object(app_settings, 'TOPOLOGY_API_AUTH_REQUIRED', False)
+    @patch.object(app_settings, "TOPOLOGY_API_AUTH_REQUIRED", False)
     async def test_consumer_connection_auth_disabled_org_manager(self, client):
         await self._assert_connection_org_manager(client)
 
-    @patch.object(app_settings, 'TOPOLOGY_API_AUTH_REQUIRED', False)
+    @patch.object(app_settings, "TOPOLOGY_API_AUTH_REQUIRED", False)
     async def test_consumer_connection_auth_disabled_unauth_user(self, client):
         await self._assert_connection_unauth_user(client)
 
@@ -123,20 +123,20 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         )
         response = await communicator.receive_json_from()
         expected_response = await database_sync_to_async(topo.json)()
-        assert response['topology'] is not None
-        assert response['topology'] == expected_response
-        node.label = 'test'
+        assert response["topology"] is not None
+        assert response["topology"] == expected_response
+        node.label = "test"
         await database_sync_to_async(node.full_clean)()
         await database_sync_to_async(node.save)()
         expected_response = await database_sync_to_async(topo.json)()
         response = await communicator.receive_json_from()
-        assert response['topology'] is not None
-        assert response['topology'] == expected_response
+        assert response["topology"] is not None
+        assert response["topology"] == expected_response
         await node.adelete()
         expected_response = await database_sync_to_async(topo.json)()
         response = await communicator.receive_json_from()
-        assert response['topology'] is not None
-        assert response['topology'] == expected_response
+        assert response["topology"] is not None
+        assert response["topology"] == expected_response
         await communicator.disconnect()
 
     async def test_link_topology_update(self, admin_user, admin_client):
@@ -146,11 +146,11 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         connected, _ = await communicator.connect()
         assert connected is True
         node1 = await database_sync_to_async(self._create_node)(
-            topology=topo, label='node-0', organization=org
+            topology=topo, label="node-0", organization=org
         )
         response = await communicator.receive_json_from()
         node2 = await database_sync_to_async(self._create_node)(
-            topology=topo, label='node-1', organization=org
+            topology=topo, label="node-1", organization=org
         )
         response = await communicator.receive_json_from()
         link = await database_sync_to_async(self._create_link)(
@@ -158,20 +158,20 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         )
         response = await communicator.receive_json_from()
         expected_response = await database_sync_to_async(topo.json)()
-        assert response['topology'] is not None
-        assert response['topology'] == expected_response
-        link.status = 'down'
+        assert response["topology"] is not None
+        assert response["topology"] == expected_response
+        link.status = "down"
         await database_sync_to_async(link.full_clean)()
         await link.asave()
         expected_response = await database_sync_to_async(topo.json)()
         response = await communicator.receive_json_from()
-        assert response['topology'] is not None
-        assert response['topology'] == expected_response
+        assert response["topology"] is not None
+        assert response["topology"] == expected_response
         await link.adelete()
         expected_response = await database_sync_to_async(topo.json)()
         response = await communicator.receive_json_from()
-        assert response['topology'] is not None
-        assert response['topology'] == expected_response
+        assert response["topology"] is not None
+        assert response["topology"] == expected_response
         await communicator.disconnect()
 
     async def test_topology_properties_update(self, admin_user, admin_client):
@@ -180,11 +180,11 @@ class TestTopologySockets(CreateGraphObjectsMixin, TestOrganizationMixin):
         communicator = await self._get_communicator(admin_client, topo.pk)
         connected, _ = await communicator.connect()
         assert connected is True
-        topo.name = 'test'
+        topo.name = "test"
         await database_sync_to_async(topo.full_clean)()
         await topo.asave()
         expected_response = await database_sync_to_async(topo.json)()
         response = await communicator.receive_json_from()
-        assert response['topology'] is not None
-        assert response['topology'] == expected_response
+        assert response["topology"] is not None
+        assert response["topology"] == expected_response
         await communicator.disconnect()

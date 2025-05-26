@@ -28,10 +28,10 @@ from .serializers import (
 )
 
 logger = logging.getLogger(__name__)
-Snapshot = swapper.load_model('topology', 'Snapshot')
-Topology = swapper.load_model('topology', 'Topology')
-Node = swapper.load_model('topology', 'Node')
-Link = swapper.load_model('topology', 'Link')
+Snapshot = swapper.load_model("topology", "Snapshot")
+Topology = swapper.load_model("topology", "Topology")
+Node = swapper.load_model("topology", "Node")
+Link = swapper.load_model("topology", "Link")
 
 
 class RequireAuthentication(APIView):
@@ -50,14 +50,14 @@ class RequireAuthentication(APIView):
 
 class ListViewPagination(pagination.PageNumberPagination):
     page_size = 10
-    page_size_query_param = 'page_size'
+    page_size_query_param = "page_size"
     max_page_size = 100
 
 
 class UnpublishedTopologyFilterMixin:
     def get_queryset(self):
         qs = super().get_queryset()
-        if self.request.query_params.get('include_unpublished'):
+        if self.request.query_params.get("include_unpublished"):
             return qs
         return qs.filter(published=True)
 
@@ -74,7 +74,7 @@ class NetworkCollectionView(
     """
 
     serializer_class = NetworkGraphSerializer
-    queryset = Topology.objects.select_related('organization')
+    queryset = Topology.objects.select_related("organization")
     filter_backends = (DjangoFilterBackend,)
     filterset_class = NetworkCollectionFilter
 
@@ -102,7 +102,7 @@ class NetworkGraphView(
     """
 
     serializer_class = NetworkGraphUpdateSerializer
-    queryset = Topology.objects.select_related('organization')
+    queryset = Topology.objects.select_related("organization")
 
 
 class ReceiveTopologyView(APIView):
@@ -118,24 +118,24 @@ class ReceiveTopologyView(APIView):
     parser_classes = (TextParser,)
 
     def _validate_request(self, request, topology):
-        key = request.query_params.get('key')
+        key = request.query_params.get("key")
         # wrong content type: 415
-        if request.content_type != 'text/plain':
+        if request.content_type != "text/plain":
             return Response(
-                {'detail': _('expected content type "text/plain"')}, status=415
+                {"detail": _('expected content type "text/plain"')}, status=415
             )
         # missing key: 400
         if not key:
             return Response(
-                {'detail': _('missing required "key" parameter')}, status=400
+                {"detail": _('missing required "key" parameter')}, status=400
             )
         # wrong key 403
         if topology.key != key:
-            return Response({'detail': _('wrong key')}, status=403)
+            return Response({"detail": _("wrong key")}, status=403)
         return
 
     def post(self, request, pk, format=None):
-        topology = get_object_or_404(self.model, pk, strategy='receive')
+        topology = get_object_or_404(self.model, pk, strategy="receive")
         validation_response = self._validate_request(request, topology)
         if validation_response:
             return validation_response
@@ -143,13 +143,13 @@ class ReceiveTopologyView(APIView):
             topology.receive(request.data)
         except NetdiffException as e:
             error = _(
-                'Supplied data not recognized as %s, '
+                "Supplied data not recognized as %s, "
                 'got exception of type "%s" '
                 'with message "%s"'
             ) % (topology.get_parser_display(), e.__class__.__name__, e)
-            return Response({'detail': error}, status=400)
-        success_message = _('data received successfully')
-        return Response({'detail': success_message})
+            return Response({"detail": error}, status=400)
+        success_message = _("data received successfully")
+        return Response({"detail": success_message})
 
 
 class NetworkGraphHistoryView(RequireAuthentication):
@@ -165,28 +165,28 @@ class NetworkGraphHistoryView(RequireAuthentication):
     def get(self, request, pk, format=None):
         topology = get_object_or_404(self.topology_model, pk)
         self.check_object_permissions(request, topology)
-        date = request.query_params.get('date')
+        date = request.query_params.get("date")
         options = dict(topology=topology, date=date)
         # missing date: 400
         if not date:
             return Response(
-                {'detail': _('missing required "date" parameter')}, status=400
+                {"detail": _('missing required "date" parameter')}, status=400
             )
         try:
             s = self.snapshot_model.objects.get(**options)
             return Response(json.loads(s.data))
         except self.snapshot_model.DoesNotExist:
             return Response(
-                {'detail': _('no snapshot found for this date')}, status=404
+                {"detail": _("no snapshot found for this date")}, status=404
             )
         except ValidationError:
-            return Response({'detail': _('invalid date supplied')}, status=403)
+            return Response({"detail": _("invalid date supplied")}, status=403)
 
 
 class NodeListCreateView(
     ProtectedAPIMixin, FilterByOrganizationManaged, generics.ListCreateAPIView
 ):
-    queryset = Node.objects.order_by('-created')
+    queryset = Node.objects.order_by("-created")
     serializer_class = NodeSerializer
     pagination_class = ListViewPagination
     filter_backends = (DjangoFilterBackend,)
@@ -198,7 +198,7 @@ class NodeDetailView(
     FilterByOrganizationManaged,
     generics.RetrieveUpdateDestroyAPIView,
 ):
-    queryset = Node.objects.all().select_related('topology')
+    queryset = Node.objects.all().select_related("topology")
     serializer_class = NodeSerializer
 
 
@@ -206,10 +206,10 @@ class LinkListCreateView(
     ProtectedAPIMixin, FilterByOrganizationManaged, generics.ListCreateAPIView
 ):
     queryset = Link.objects.select_related(
-        'topology',
-        'source',
-        'target',
-    ).order_by('-created')
+        "topology",
+        "source",
+        "target",
+    ).order_by("-created")
     serializer_class = LinkSerializer
     pagination_class = ListViewPagination
     filter_backends = (DjangoFilterBackend,)
@@ -222,9 +222,9 @@ class LinkDetailView(
     generics.RetrieveUpdateDestroyAPIView,
 ):
     queryset = Link.objects.select_related(
-        'topology',
-        'source',
-        'target',
+        "topology",
+        "source",
+        "target",
     )
     serializer_class = LinkSerializer
 

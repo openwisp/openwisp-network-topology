@@ -20,7 +20,7 @@ def handle_update_topology(topology_pk, diff):
         diff (str):
         A dict containing the network topology diff.
     """
-    Topology = load_model('topology', 'Topology')
+    Topology = load_model("topology", "Topology")
     try:
         topology = Topology.objects.get(pk=topology_pk)
     except ObjectDoesNotExist as e:
