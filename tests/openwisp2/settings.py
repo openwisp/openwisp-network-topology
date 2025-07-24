@@ -13,6 +13,9 @@ DATABASES = {
     "default": {
         "ENGINE": "openwisp_utils.db.backends.spatialite",
         "NAME": os.path.join(BASE_DIR, "openwisp_network_topology.db"),
+        "TEST": {
+            "NAME": os.path.join(BASE_DIR, "test_openwisp_network_topology.db"),
+        },
     }
 }
 
