@@ -13,12 +13,13 @@ DATABASES = {
     "default": {
         "ENGINE": "openwisp_utils.db.backends.spatialite",
         "NAME": os.path.join(BASE_DIR, "openwisp_network_topology.db"),
-        "TEST": {
-            "NAME": os.path.join(BASE_DIR, "test_openwisp_network_topology.db"),
-        },
     }
 }
 
+if TESTING and "--exclude-tag=no_parallel" not in sys.argv:
+    DATABASES["default"]["TEST"] = {
+        "NAME": os.path.join(BASE_DIR, "openwisp_network_topology_tests.db"),
+    }
 
 SECRET_KEY = "@q4z-^s=mv59#o=uutv4*m=h@)ik4%zp1)-k^_(!_7*x_&+ze$"
 

@@ -96,9 +96,14 @@ jobs:
       - name: Tests
         if: ${{ !cancelled() && steps.deps.conclusion == 'success' }}
         run: |
-          coverage run runtests.py --parallel
-          WIFI_MESH=1 coverage run runtests.py --parallel --exclude-tag=selenium_tests
-          SAMPLE_APP=1 coverage run ./runtests.py --parallel --exclude-tag=selenium_tests
+          coverage run runtests.py --parallel --exclude-tag=no_parallel
+          WIFI_MESH=1 coverage run runtests.py --parallel \
+            --exclude-tag=no_parallel \
+            --exclude-tag=selenium_tests
+          SAMPLE_APP=1 coverage run ./runtests.py --parallel \
+            --exclude-tag=no_parallel \
+            --exclude-tag=selenium_tests
+          coverage run runtests.py --tag=no_parallel
           coverage combine
           coverage xml
         env:

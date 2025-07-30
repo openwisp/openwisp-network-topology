@@ -25,6 +25,7 @@ Topology = load_model("topology", "Topology")
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
 @tag("selenium_tests")
+@tag("no_parallel")
 class TestRealTime(
     TestOrganizationMixin,
     CreateGraphObjectsMixin,
@@ -89,7 +90,7 @@ class TestRealTime(
         self.web_driver.execute_script("window.open('');")
         self.web_driver.switch_to.window(self.web_driver.window_handles[-1])
         self.web_driver.get(current_url)
-        self.web_driver.find_element("name", "_continue").click()
+        self.find_element("name", "_continue").click()
         self.web_driver.switch_to.window(self.web_driver.window_handles[0])
 
     async def test_real_time_link_status_update(self):
