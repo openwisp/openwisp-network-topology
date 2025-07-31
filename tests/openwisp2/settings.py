@@ -97,6 +97,7 @@ ROOT_URLCONF = "openwisp2.urls"
 
 ASGI_APPLICATION = "openwisp2.asgi.application"
 
+# Needed to test UI updates via websockets
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",

@@ -105,6 +105,7 @@ class TestRealTime(
         assert (
             json.loads(message["topology"])["links"][0]["properties"]["status"] == "up"
         )
+        self._snooze()
         self.assertEqual(
             self.web_driver.execute_script("return graph.data;")["links"][0][
                 "properties"
