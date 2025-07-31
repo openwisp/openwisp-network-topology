@@ -38,6 +38,7 @@ class TestRealTime(
     link_model = Link
     topology_model = Topology
     application = import_string(getattr(settings, "ASGI_APPLICATION"))
+    browser = "chromium"
 
     @property
     def prefix(self):
@@ -91,6 +92,7 @@ class TestRealTime(
         self.web_driver.switch_to.window(self.web_driver.window_handles[-1])
         self.web_driver.get(current_url)
         self.find_element("name", "_continue").click()
+        self.web_driver.close()
         self.web_driver.switch_to.window(self.web_driver.window_handles[0])
 
     async def test_real_time_link_status_update(self):
@@ -165,6 +167,7 @@ class TestRealTime(
             len(self.web_driver.execute_script("return graph.data;")["nodes"]),
             2,
         )
+        await communicator.disconnect()
 
     async def test_node_link_update(self):
         new_link = copy(self.link)
@@ -198,3 +201,4 @@ class TestRealTime(
             len(self.web_driver.execute_script("return graph.data;")["links"]),
             1,
         )
+        await communicator.disconnect()
