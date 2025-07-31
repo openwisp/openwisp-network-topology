@@ -71,7 +71,7 @@ class TestRealTime(
 
     def _snooze(self):
         """Allows a bit of time for the UI to update, reduces flakyness"""
-        sleep(0.2)
+        sleep(0.25)
 
     async def _get_communicator(self, admin_client, topology_id):
         session_id = admin_client.cookies["sessionid"].value
