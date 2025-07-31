@@ -97,7 +97,12 @@ ROOT_URLCONF = "openwisp2.urls"
 
 ASGI_APPLICATION = "openwisp2.asgi.application"
 
-CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": ["redis://localhost/9"]},
+    }
+}
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 LANGUAGE_CODE = "en-gb"
