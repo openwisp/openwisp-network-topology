@@ -190,3 +190,47 @@ class TestRealTime(
             1,
         )
         await communicator.disconnect()
+
+    async def test_non_admin_visualizer(self):
+        # preparation
+        communicator = await self._get_communicator(self.admin_client, self.topology.pk)
+        connected, _ = await communicator.connect()
+        assert connected is True
+        path = reverse("topology_detail", kwargs={"pk": self.topology.pk})
+        self.login()
+        self.open(path, html_container=".djnjg-overlay")
+        # changing the status of a link will change it in the browser graph too
+        self.link.status = "down"
+        await database_sync_to_async(self.link.save)()
+        message = await communicator.receive_json_from()
+        assert (
+            json.loads(message["topology"])["links"][0]["properties"]["status"]
+            == "down"
+        )
+        self._snooze()
+        self.assertEqual(
+            self.web_driver.execute_script("return graph.data;")["links"][0][
+                "properties"
+            ]["status"],
+            "down",
+        )
+        # removing a link from the DB will remove it from the UI
+        await database_sync_to_async(self.link.delete)()
+        message = await communicator.receive_json_from()
+        self.assertEqual(len(json.loads(message["topology"])["links"]), 0)
+        self._snooze()
+        self.assertEqual(
+            len(self.web_driver.execute_script("return graph.data;")["links"]),
+            0,
+        )
+        # creating a new node will add it to the UI
+        new_node = copy(self.node1)
+        new_node.pk = None
+        await database_sync_to_async(new_node.save)()
+        message = await communicator.receive_json_from()
+        self.assertEqual(len(json.loads(message["topology"])["nodes"]), 3)
+        self._snooze()
+        self.assertEqual(
+            len(self.web_driver.execute_script("return graph.data;")["nodes"]),
+            3,
+        )
