@@ -1,5 +1,4 @@
 import json
-from copy import copy
 from time import sleep
 
 import pytest
@@ -40,6 +39,7 @@ class TestRealTime(
     link_model = Link
     topology_model = Topology
     application = import_string(getattr(settings, "ASGI_APPLICATION"))
+    browser = "chrome"
 
     def setUp(self):
         org = self._create_org()
@@ -68,10 +68,46 @@ class TestRealTime(
             topology=self.topology,
             status="up",
         )
+        self.org = org
+
+    async def _prepare(self, admin=True):
+        communicator = await self._get_communicator(self.admin_client, self.topology.pk)
+        connected, _ = await communicator.connect()
+        assert connected is True
+        if admin:
+            path = reverse(f"{self.prefix}_topology_change", args=[self.topology.pk])
+        else:
+            path = reverse("topology_detail", kwargs={"pk": self.topology.pk})
+        self.login()
+        if admin:
+            self.open(path)
+            self.find_element(By.CSS_SELECTOR, "input.visualizelink").click()
+        else:
+            # non admin visualizer doesn't need clicking to show the graph
+            self.open(path, html_container=".djnjg-overlay")
+        return communicator
 
     def _snooze(self):
         """Allows a bit of time for the UI to update, reduces flakyness"""
         sleep(0.25)
+
+    def _create_node3(self):
+        self.node3 = self._create_node(
+            label="node3",
+            addresses=["192.168.0.3"],
+            topology=self.topology,
+            organization=self.org,
+        )
+
+    def _assert_no_js_errors(self):
+        browser_logs = []
+        for log in self.get_browser_logs():
+            # ignore random 403 errors
+            if log["level"] == "SEVERE" and "403" in log["message"]:
+                continue
+            else:
+                browser_logs.append(log)
+        self.assertEqual(browser_logs, [])
 
     async def _get_communicator(self, admin_client, topology_id):
         session_id = admin_client.cookies["sessionid"].value
@@ -91,13 +127,7 @@ class TestRealTime(
         # preparation
         self.link.status = "down"
         await database_sync_to_async(self.link.save)()
-        communicator = await self._get_communicator(self.admin_client, self.topology.pk)
-        connected, _ = await communicator.connect()
-        assert connected is True
-        path = reverse(f"{self.prefix}_topology_change", args=[self.topology.pk])
-        self.login()
-        self.open(path)
-        self.find_element(By.CSS_SELECTOR, "input.visualizelink").click()
+        communicator = await self._prepare()
         # changing the status of a link will change it in the browser graph too
         self.link.status = "up"
         await database_sync_to_async(self.link.save)()
@@ -127,33 +157,28 @@ class TestRealTime(
             ]["status"],
             "down",
         )
+        self._assert_no_js_errors()
         await communicator.disconnect()
 
     async def test_node_status_update(self):
         # preparation
-        communicator = await self._get_communicator(self.admin_client, self.topology.pk)
-        connected, _ = await communicator.connect()
-        assert connected is True
-        path = reverse(f"{self.prefix}_topology_change", args=[self.topology.pk])
-        self.login()
-        self.open(path)
-        self.find_element(By.CSS_SELECTOR, "input.visualizelink").click()
+        communicator = await self._prepare()
         # saving a new node will add it to the UI
-        new_node = copy(self.node1)
-        new_node.pk = None
-        await database_sync_to_async(new_node.save)()
+        await database_sync_to_async(self._create_node3)()
         message = await communicator.receive_json_from()
         self.assertEqual(len(json.loads(message["topology"])["nodes"]), 3)
         self._snooze()
+        self._assert_no_js_errors()
         self.assertEqual(
             len(self.web_driver.execute_script("return graph.data;")["nodes"]),
             3,
         )
         # deleting the node from the DB will remove it from the UI
-        await database_sync_to_async(new_node.delete)()
+        await database_sync_to_async(self.node3.delete)()
         message = await communicator.receive_json_from()
         self.assertEqual(len(json.loads(message["topology"])["nodes"]), 2)
         self._snooze()
+        self._assert_no_js_errors()
         self.assertEqual(
             len(self.web_driver.execute_script("return graph.data;")["nodes"]),
             2,
@@ -162,29 +187,23 @@ class TestRealTime(
 
     async def test_node_link_update(self):
         # preparation
-        communicator = await self._get_communicator(self.admin_client, self.topology.pk)
-        connected, _ = await communicator.connect()
-        assert connected is True
-        path = reverse(f"{self.prefix}_topology_change", args=[self.topology.pk])
-        self.login()
-        self.open(path)
-        self.find_element(By.CSS_SELECTOR, "input.visualizelink").click()
+        communicator = await self._prepare()
         # deleting the link from the DB will remove it from the UI
         await database_sync_to_async(self.link.delete)()
         message = await communicator.receive_json_from()
         self.assertEqual(len(json.loads(message["topology"])["links"]), 0)
         self._snooze()
+        self._assert_no_js_errors()
         self.assertEqual(
             len(self.web_driver.execute_script("return graph.data;")["links"]),
             0,
         )
         # adding a link will add it to the UI
-        new_link = copy(self.link)
-        new_link.pk = None
-        await database_sync_to_async(new_link.save)()
+        await database_sync_to_async(self.link.save)()
         message = await communicator.receive_json_from()
         self.assertEqual(len(json.loads(message["topology"])["links"]), 1)
         self._snooze()
+        self._assert_no_js_errors()
         self.assertEqual(
             len(self.web_driver.execute_script("return graph.data;")["links"]),
             1,
@@ -193,44 +212,44 @@ class TestRealTime(
 
     async def test_non_admin_visualizer(self):
         # preparation
-        communicator = await self._get_communicator(self.admin_client, self.topology.pk)
-        connected, _ = await communicator.connect()
-        assert connected is True
-        path = reverse("topology_detail", kwargs={"pk": self.topology.pk})
-        self.login()
-        self.open(path, html_container=".djnjg-overlay")
+        communicator = await self._prepare(admin=False)
         # changing the status of a link will change it in the browser graph too
-        self.link.status = "down"
-        await database_sync_to_async(self.link.save)()
-        message = await communicator.receive_json_from()
-        assert (
-            json.loads(message["topology"])["links"][0]["properties"]["status"]
-            == "down"
-        )
-        self._snooze()
-        self.assertEqual(
-            self.web_driver.execute_script("return graph.data;")["links"][0][
-                "properties"
-            ]["status"],
-            "down",
-        )
+        with self.subTest("change link status"):
+            self.link.status = "down"
+            await database_sync_to_async(self.link.save)()
+            message = await communicator.receive_json_from()
+            assert (
+                json.loads(message["topology"])["links"][0]["properties"]["status"]
+                == "down"
+            )
+            self._snooze()
+            self._assert_no_js_errors()
+            self.assertEqual(
+                self.web_driver.execute_script("return graph.data;")["links"][0][
+                    "properties"
+                ]["status"],
+                "down",
+            )
         # removing a link from the DB will remove it from the UI
-        await database_sync_to_async(self.link.delete)()
-        message = await communicator.receive_json_from()
-        self.assertEqual(len(json.loads(message["topology"])["links"]), 0)
-        self._snooze()
-        self.assertEqual(
-            len(self.web_driver.execute_script("return graph.data;")["links"]),
-            0,
-        )
+        with self.subTest("remove link"):
+            await database_sync_to_async(self.link.delete)()
+            message = await communicator.receive_json_from()
+            self.assertEqual(len(json.loads(message["topology"])["links"]), 0)
+            self._snooze()
+            self._assert_no_js_errors()
+            self.assertEqual(
+                len(self.web_driver.execute_script("return graph.data;")["links"]),
+                0,
+            )
         # creating a new node will add it to the UI
-        new_node = copy(self.node1)
-        new_node.pk = None
-        await database_sync_to_async(new_node.save)()
-        message = await communicator.receive_json_from()
-        self.assertEqual(len(json.loads(message["topology"])["nodes"]), 3)
-        self._snooze()
-        self.assertEqual(
-            len(self.web_driver.execute_script("return graph.data;")["nodes"]),
-            3,
-        )
+        with self.subTest("add node"):
+            await database_sync_to_async(self._create_node3)()
+            message = await communicator.receive_json_from()
+            self.assertEqual(len(json.loads(message["topology"])["nodes"]), 3)
+            self._assert_no_js_errors()
+            self._snooze()
+            self.assertEqual(
+                len(self.web_driver.execute_script("return graph.data;")["nodes"]),
+                3,
+            )
+        await communicator.disconnect()
