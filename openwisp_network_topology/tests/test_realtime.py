@@ -40,6 +40,7 @@ class TestRealTime(
     topology_model = Topology
     application = import_string(getattr(settings, "ASGI_APPLICATION"))
     browser = "chrome"
+    maxDiff = None
 
     def setUp(self):
         org = self._create_org()
