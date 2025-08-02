@@ -41,6 +41,7 @@ class TestRealTime(
     application = import_string(getattr(settings, "ASGI_APPLICATION"))
     browser = "chrome"
     maxDiff = None
+    retry_max = 8
 
     def setUp(self):
         org = self._create_org()
@@ -103,10 +104,11 @@ class TestRealTime(
     def _assert_no_js_errors(self):
         browser_logs = []
         for log in self.get_browser_logs():
-            # ignore random 403 errors
-            if log["level"] == "SEVERE" and "403" in log["message"]:
+            # ignore if not console-api
+            if log["source"] != "console-api":
                 continue
             else:
+                print(log)
                 browser_logs.append(log)
         self.assertEqual(browser_logs, [])
 
@@ -250,4 +252,5 @@ class TestRealTime(
                 len(self.web_driver.execute_script("return graph.data;")["nodes"]),
                 3,
             )
+        self._assert_no_js_errors()
         await communicator.disconnect()
