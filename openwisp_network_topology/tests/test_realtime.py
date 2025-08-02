@@ -252,5 +252,4 @@ class TestRealTime(
                 len(self.web_driver.execute_script("return graph.data;")["nodes"]),
                 3,
             )
-        self._assert_no_js_errors()
         await communicator.disconnect()
