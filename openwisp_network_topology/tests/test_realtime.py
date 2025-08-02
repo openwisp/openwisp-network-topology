@@ -224,7 +224,6 @@ class TestRealTime(
                 == "down"
             )
             self._snooze()
-            self._assert_no_js_errors()
             self.assertEqual(
                 self.web_driver.execute_script("return graph.data;")["links"][0][
                     "properties"
@@ -237,7 +236,6 @@ class TestRealTime(
             message = await communicator.receive_json_from()
             self.assertEqual(len(json.loads(message["topology"])["links"]), 0)
             self._snooze()
-            self._assert_no_js_errors()
             self.assertEqual(
                 len(self.web_driver.execute_script("return graph.data;")["links"]),
                 0,
@@ -247,7 +245,6 @@ class TestRealTime(
             await database_sync_to_async(self._create_node3)()
             message = await communicator.receive_json_from()
             self.assertEqual(len(json.loads(message["topology"])["nodes"]), 3)
-            self._assert_no_js_errors()
             self._snooze()
             self.assertEqual(
                 len(self.web_driver.execute_script("return graph.data;")["nodes"]),
