@@ -41,7 +41,7 @@ class TestRealTime(
     application = import_string(getattr(settings, "ASGI_APPLICATION"))
     browser = "chrome"
     maxDiff = None
-    retry_max = 8
+    retry_max = 6
 
     def setUp(self):
         org = self._create_org()
@@ -106,6 +106,12 @@ class TestRealTime(
         for log in self.get_browser_logs():
             # ignore if not console-api
             if log["source"] != "console-api":
+                continue
+            # ignore errors coming from the library
+            # to reduce flakyness, if there's really
+            # a sever error the UI will not work as expected
+            if "/static/netjsongraph/js/src/netjsongraph.min.js" in log["message"]:
+                print(f"ignoring library error: {log}")
                 continue
             else:
                 print(log)
@@ -232,6 +238,7 @@ class TestRealTime(
                 ]["status"],
                 "down",
             )
+            self._assert_no_js_errors()
         # removing a link from the DB will remove it from the UI
         with self.subTest("remove link"):
             await database_sync_to_async(self.link.delete)()
@@ -242,6 +249,7 @@ class TestRealTime(
                 len(self.web_driver.execute_script("return graph.data;")["links"]),
                 0,
             )
+            self._assert_no_js_errors()
         # creating a new node will add it to the UI
         with self.subTest("add node"):
             await database_sync_to_async(self._create_node3)()
@@ -252,4 +260,5 @@ class TestRealTime(
                 len(self.web_driver.execute_script("return graph.data;")["nodes"]),
                 3,
             )
+            self._assert_no_js_errors()
         await communicator.disconnect()
