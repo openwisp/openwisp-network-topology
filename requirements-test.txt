@@ -1,5 +1,5 @@
 responses~=0.25.7
-freezegun~=1.5.2
+freezegun~=1.5.4
 # Needed to test integrations
 openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/1.2
 openwisp-controller @ https://github.com/openwisp/openwisp-controller/tarball/1.2
