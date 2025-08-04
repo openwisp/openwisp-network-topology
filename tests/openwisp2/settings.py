@@ -16,6 +16,10 @@ DATABASES = {
     }
 }
 
+if TESTING and "--exclude-tag=no_parallel" not in sys.argv:
+    DATABASES["default"]["TEST"] = {
+        "NAME": os.path.join(BASE_DIR, "openwisp_network_topology_tests.db"),
+    }
 
 SECRET_KEY = "@q4z-^s=mv59#o=uutv4*m=h@)ik4%zp1)-k^_(!_7*x_&+ze$"
 
@@ -93,7 +97,13 @@ ROOT_URLCONF = "openwisp2.urls"
 
 ASGI_APPLICATION = "openwisp2.asgi.application"
 
-CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+# Needed to test UI updates via websockets
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": ["redis://localhost/9"]},
+    }
+}
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 LANGUAGE_CODE = "en-gb"

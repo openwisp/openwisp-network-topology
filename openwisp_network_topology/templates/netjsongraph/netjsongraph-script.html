@@ -148,7 +148,7 @@
             const data=JSON.parse(e.data);
             if(data.type==="broadcast_topology"){
                 const topology=JSON.parse(data.topology);
-                window.graph.utils.JSONDataUpdate.call(window.graph, topology);
+                graph.utils.JSONDataUpdate.call(graph, topology);
             }
         }
 
