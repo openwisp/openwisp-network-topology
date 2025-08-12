@@ -93,10 +93,11 @@ class TestWifiMeshIntegration(TopologyTestMixin, TransactionTestCase):
             Node.objects.filter(
                 topology=topology,
                 organization=org,
-                properties__contains=(
-                    '{\n    "ht": true,\n    "vht": null,\n    "mfp": false,\n'
-                    '    "wmm": true,\n    "vendor": "TP-LINK TECHNOLOGIES CO.,LTD."\n}'
-                ),
+                properties__ht=True,
+                properties__vht=None,
+                properties__mfp=False,
+                properties__wmm=True,
+                properties__vendor="TP-LINK TECHNOLOGIES CO.,LTD.",
             ).count(),
             3,
         )
@@ -104,19 +105,18 @@ class TestWifiMeshIntegration(TopologyTestMixin, TransactionTestCase):
             Link.objects.filter(
                 topology=topology,
                 organization=org,
-                properties__contains='"noise": -94',
-            )
-            .filter(properties__contains='"signal": -58')
-            .filter(properties__contains='"mesh_llid": 19500')
-            .filter(properties__contains='"mesh_plid": 24500')
-            .count(),
+                properties__noise=-94,
+                properties__signal=-58,
+                properties__mesh_llid=19500,
+                properties__mesh_plid=24500,
+            ).count(),
             3,
         )
         self.assertEqual(
             Link.objects.filter(
                 topology=topology,
                 organization=org,
-                properties__contains='"mesh_non_peer_ps": "INCONSISTENT: (LISTEN / ACTIVE)"',
+                properties__mesh_non_peer_ps="INCONSISTENT: (LISTEN / ACTIVE)",
             ).count(),
             1,
         )

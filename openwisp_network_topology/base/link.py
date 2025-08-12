@@ -4,13 +4,14 @@ from datetime import timedelta
 
 import swapper
 from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models import Q
+from django.db.models import JSONField, Q, TextField
+from django.db.models.functions import Cast
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
-from jsonfield import JSONField
 from model_utils import Choices
 from model_utils.fields import StatusField
 from rest_framework.utils.encoders import JSONEncoder
@@ -48,16 +49,14 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
     properties = JSONField(
         default=dict,
         blank=True,
-        load_kwargs={"object_pairs_hook": OrderedDict},
-        dump_kwargs={"indent": 4, "cls": JSONEncoder},
+        encoder=DjangoJSONEncoder,
     )
     user_properties = JSONField(
         verbose_name=_("user defined properties"),
         help_text=_("If you need to add additional data to this link use this field"),
         default=dict,
         blank=True,
-        load_kwargs={"object_pairs_hook": OrderedDict},
-        dump_kwargs={"indent": 4, "cls": JSONEncoder},
+        encoder=DjangoJSONEncoder,
     )
     status_changed = models.DateTimeField(auto_now=True)
 
@@ -177,12 +176,20 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
         :param topology: Topology instance
         :returns: Link object or None
         """
-        source = '"{}"'.format(source)
-        target = '"{}"'.format(target)
+        source_needle = '"{}"'.format(source)
+        target_needle = '"{}"'.format(target)
+        qs = cls.objects.annotate(
+            _source_addresses_text=Cast("source__addresses", output_field=TextField()),
+            _target_addresses_text=Cast("target__addresses", output_field=TextField()),
+        )
         q = Q(
-            source__addresses__contains=source, target__addresses__contains=target
-        ) | Q(source__addresses__contains=target, target__addresses__contains=source)
-        return cls.objects.filter(q).filter(topology=topology).first()
+            _source_addresses_text__contains=source_needle,
+            _target_addresses_text__contains=target_needle,
+        ) | Q(
+            _source_addresses_text__contains=target_needle,
+            _target_addresses_text__contains=source_needle,
+        )
+        return qs.filter(q).filter(topology=topology).first()
 
     @classmethod
     def delete_expired_links(cls):

@@ -79,6 +79,10 @@ class BaseUpdateFromDjangoNetjsonGraph(BaseCommand):
         for data in netjsongraph_data:
             data["fields"]["organization"] = str(org.pk)
             data["model"] = f'{self.app_label}.{data["model"].split(".")[1]}'
+            for json_field in ("addresses", "properties"):
+                value = data["fields"].get(json_field)
+                if isinstance(value, str):
+                    data["fields"][json_field] = json.loads(value)
         # Save in anotherfile
         with open(f'{options["backup"]}/netjsongraph_loaded.json', "w") as outfile:
             json.dump(netjsongraph_data, outfile)
