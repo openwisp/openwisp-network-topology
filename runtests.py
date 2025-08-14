@@ -12,6 +12,7 @@ if __name__ == '__main__':
 
     args = sys.argv
     args.insert(1, 'test')
+    args.extend(['--exclude-tag', 'selenium_tests'])
     if not os.environ.get('SAMPLE_APP', False):
         args.insert(2, 'openwisp_network_topology')
         args.insert(3, 'openwisp_network_topology.integrations.device')

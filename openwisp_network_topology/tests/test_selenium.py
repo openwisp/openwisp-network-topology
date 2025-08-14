@@ -1,4 +1,5 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import tag
 from django.urls import reverse
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
@@ -20,6 +21,7 @@ Node = load_model('topology', 'Node')
 Topology = load_model('topology', 'Topology')
 
 
+@tag('selenium_tests')
 class TestTopologyGraphVisualizer(
     TestOrganizationMixin,
     CreateGraphObjectsMixin,
