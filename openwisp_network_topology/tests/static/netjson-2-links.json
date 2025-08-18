@@ -1,45 +1,45 @@
 {
-    "type": "NetworkGraph",
-    "protocol": "OLSR",
-    "version": "0.8",
-    "metric": "ETX",
-    "nodes": [
-        {
-            "id": "192.168.0.1",
-            "local_addresses": ["10.0.0.1"],
-            "properties": {
-                "gateway": true
-            }
-        },
-        {
-            "id": "192.168.0.2",
-            "label": "node2",
-            "local_addresses": ["10.0.0.2"]
-        },
-        {
-            "id": "192.168.0.3",
-            "label": "node3",
-            "local_addresses": ["10.0.0.3"]
-        }
-    ],
-    "links": [
-        {
-            "source": "192.168.0.1",
-            "target": "192.168.0.2",
-            "cost": 1.5,
-            "cost_text": "15 Mbps",
-            "properties": {
-                "pretty": true
-            }
-        },
-        {
-            "source": "192.168.0.1",
-            "target": "192.168.0.3",
-            "cost": 2.0,
-            "cost_text": "20 Mbps",
-            "properties": {
-                "pretty": false
-            }
-        }
-    ]
+  "type": "NetworkGraph",
+  "protocol": "OLSR",
+  "version": "0.8",
+  "metric": "ETX",
+  "nodes": [
+    {
+      "id": "192.168.0.1",
+      "local_addresses": ["10.0.0.1"],
+      "properties": {
+        "gateway": true
+      }
+    },
+    {
+      "id": "192.168.0.2",
+      "label": "node2",
+      "local_addresses": ["10.0.0.2"]
+    },
+    {
+      "id": "192.168.0.3",
+      "label": "node3",
+      "local_addresses": ["10.0.0.3"]
+    }
+  ],
+  "links": [
+    {
+      "source": "192.168.0.1",
+      "target": "192.168.0.2",
+      "cost": 1.5,
+      "cost_text": "15 Mbps",
+      "properties": {
+        "pretty": true
+      }
+    },
+    {
+      "source": "192.168.0.1",
+      "target": "192.168.0.3",
+      "cost": 2.0,
+      "cost_text": "20 Mbps",
+      "properties": {
+        "pretty": false
+      }
+    }
+  ]
 }
