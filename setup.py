@@ -40,7 +40,7 @@ setup(
     zip_safe=False,
     install_requires=get_install_requires(),
     classifiers=[
-        "Development Status :: 5 - Production/Stable ",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: System :: Networking",
