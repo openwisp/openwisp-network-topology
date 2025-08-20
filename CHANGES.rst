@@ -6,6 +6,23 @@ Version 1.2.0 [Unreleased]
 
 Work in progress.
 
+Version 1.1.2 [2025-08-20]
+--------------------------
+
+Changes
+~~~~~~~
+
+Dependencies
+++++++++++++
+
+- Bumped ``openwisp-monitoring~=1.1.1``
+
+Bugfixes
+~~~~~~~~
+
+- Fixed real time updates in non-admin visualizer `#250
+  <https://github.com/openwisp/openwisp-network-topology/issues/250>`_
+
 Version 1.1.1 [2024-11-26]
 --------------------------
 
