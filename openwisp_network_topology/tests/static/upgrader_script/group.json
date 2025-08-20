@@ -1,16 +1,10 @@
 [
-    {
-        "model": "auth.group",
-        "pk": 1,
-        "fields": {
-            "name": "sample",
-            "permissions": [
-                5,
-                9,
-                24,
-                28,
-                32
-            ]
-        }
+  {
+    "model": "auth.group",
+    "pk": 1,
+    "fields": {
+      "name": "sample",
+      "permissions": [5, 9, 24, 28, 32]
     }
+  }
 ]
