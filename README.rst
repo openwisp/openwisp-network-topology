@@ -1,8 +1,8 @@
 openwisp-network-topology
 =========================
 
-.. image:: https://github.com/openwisp/openwisp-network-topology/workflows/OpenWISP%20Network%20Topology%20CI%20Build/badge.svg?branch=master
-    :target: https://github.com/openwisp/openwisp-network-topology/actions?query=OpenWISP+Network+Topology+CI+Build
+.. image:: https://github.com/openwisp/openwisp-network-topology/actions/workflows/ci.yml/badge.svg
+    :target: https://github.com/openwisp/openwisp-network-topology/actions/workflows/ci.yml
     :alt: CI build status
 
 .. image:: https://coveralls.io/repos/github/openwisp/openwisp-network-topology/badge.svg
