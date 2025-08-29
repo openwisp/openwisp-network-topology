@@ -4,7 +4,6 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TESTING = "test" in sys.argv
 
-
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
@@ -66,7 +65,6 @@ INSTALLED_APPS = [
     # channels
     "channels",
 ]
-
 
 EXTENDED_APPS = ["django_x509", "django_loci"]
 

@@ -76,16 +76,9 @@ Run tests with:
 
 .. code-block:: shell
 
-    # Running tests without setting the "WIFI_MESH" environment
-    # variable will not run tests for WiFi Mesh integration.
-    # This is done to avoid slowing down the test suite by adding
-    # dependencies which are only used by the integration.
-    ./runtests.py
-    # You can run the tests only for WiFi mesh integration using
-    # the following command
-    WIFI_MESH=1 ./runtests.py
+    ./runtests
 
-Run QA tests:
+Run QA checks:
 
 .. code-block:: shell
 
