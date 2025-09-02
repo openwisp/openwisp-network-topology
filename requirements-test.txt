@@ -1,4 +1,4 @@
-responses~=0.25.7
+responses~=0.25.8
 freezegun~=1.5.4
 # Needed to test integrations
 openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/1.2
