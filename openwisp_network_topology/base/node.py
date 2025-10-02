@@ -6,12 +6,12 @@ from datetime import timedelta
 import swapper
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import JSONField
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
-from jsonfield import JSONField
 from rest_framework.utils.encoders import JSONEncoder
 
 from openwisp_users.mixins import ShareableOrgMixin
@@ -32,20 +32,16 @@ class AbstractNode(ShareableOrgMixin, TimeStampedEditableModel):
     )
     label = models.CharField(max_length=64, blank=True)
     # netjson ID and local_addresses
-    addresses = JSONField(default=[], blank=True)
+    addresses = JSONField(default=list, blank=True)
     properties = JSONField(
         default=dict,
         blank=True,
-        load_kwargs={"object_pairs_hook": OrderedDict},
-        dump_kwargs={"indent": 4, "cls": JSONEncoder},
     )
     user_properties = JSONField(
         verbose_name=_("user defined properties"),
         help_text=_("If you need to add additional data to this node use this field"),
         default=dict,
         blank=True,
-        load_kwargs={"object_pairs_hook": OrderedDict},
-        dump_kwargs={"indent": 4, "cls": JSONEncoder},
     )
 
     class Meta:
