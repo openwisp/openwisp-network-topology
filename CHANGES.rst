@@ -1,10 +1,23 @@
 Changelog
 =========
 
-Version 1.2.0 [Unreleased]
+Version 1.2.0 [2025-10-24]
 --------------------------
 
-Work in progress.
+Changes
+~~~~~~~
+
+Dependencies
+++++++++++++
+
+- Bumped ``netdiff~=1.2.0``.
+- Bumped ``openwisp-users~=1.2.0``.
+- Bumped ``openwisp-utils~=1.2.0``.
+- Bumped ``django-flat-json-widget~=0.4.0``.
+- Added support for Django ``5.x``.
+- Added support for Python ``3.11``, ``3.12``, and ``3.13``.
+- Dropped support for Django ``3.2`` and ``4.1``.
+- Dropped support for Python ``3.8``.
 
 Version 1.1.2 [2025-08-20]
 --------------------------
