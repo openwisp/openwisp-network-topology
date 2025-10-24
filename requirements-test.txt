@@ -1,8 +1,8 @@
 responses~=0.25.8
 freezegun~=1.5.5
 # Needed to test integrations
-openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/tarball/1.2
-openwisp-controller @ https://github.com/openwisp/openwisp-controller/tarball/1.2
-openwisp-utils[qa,selenium,channels-test] @ https://github.com/openwisp/openwisp-utils/tarball/1.2
+openwisp-monitoring~=1.2.0
+openwisp-controller~=1.2.0
+openwisp-utils[qa,selenium,channels-test]~=1.2.0
 redis~=6.4.0
 django_redis~=6.0.0
