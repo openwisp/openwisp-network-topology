@@ -1,26 +1,26 @@
 .leaflet-control-zoom-in,
 .leaflet-control-zoom-out {
   background: rgba(217, 79, 52, 0.85) !important;
-  color: #fff !important;
+  color: var(--ow-color-white) !important;
 }
 
 .leaflet-control-layers {
   background: rgba(217, 79, 52, 0.85) !important;
-  color: #fff !important;
+  color: var(--ow-color-white) !important;
 }
 
 .switch-wrap {
-  color: #fff;
+  color: var(--ow-color-white);
 }
 
 .switch-wrap label {
   border: 1px solid #dfdfdf;
-  background: #ffffff;
+  background: var(--ow-color-white);
 }
 
 .switch-wrap label::before {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 1);
-  background-color: #fff;
+  background-color: var(--ow-color-white);
 }
 
 .switch-wrap input[type="checkbox"]:checked + label {
@@ -28,12 +28,12 @@
 }
 
 .njg-date {
-  color: #fff;
+  color: var(--ow-color-white);
 }
 
 .njg-selectIcon {
   background: rgba(217, 79, 52, 0.85);
-  color: #ffffff;
+  color: var(--ow-color-white);
 }
 
 .njg-searchBtn {
@@ -41,7 +41,7 @@
 }
 
 .njg-sideBar {
-  background-color: #fff;
+  background-color: var(--ow-color-white);
 }
 
 .sideBarHandle {
@@ -49,7 +49,7 @@
 }
 
 .sideBarHandle::before {
-  color: #fff;
+  color: var(--ow-color-white);
 }
 
 .njg-metaData,
@@ -58,23 +58,23 @@
 }
 
 .njg-tooltip {
-  background: #fff !important;
+  background: var(--ow-color-white) !important;
   border: none !important;
 }
 
 .njg-tooltip-key,
 .njg-tooltip-value {
-  color: #000;
+  color: var(--ow-color-black);
 }
 
 .marker-cluster div {
-  color: #fff;
+  color: var(--ow-color-white);
   background-color: rgba(21, 102, 169, 0.8) !important;
 }
 
 @media only screen and (max-width: 850px) {
   .njg-sideBar {
     background: rgba(255, 255, 255, 0.96);
-    color: #000;
+    color: var(--ow-color-black);
   }
 }
