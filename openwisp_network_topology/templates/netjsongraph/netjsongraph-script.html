@@ -153,8 +153,33 @@
         }
 
         graph.render();
-        window.initTopologyHistory(django.jQuery);
-        return graph
+
+// Allow closing the About panel
+setTimeout(() => {
+    const aboutPanel = document.querySelector('.njg-panel');
+    if (!aboutPanel) return;
+
+    // Avoid adding the button twice
+    if (aboutPanel.querySelector('.njg-close')) return;
+
+    const closeBtn = document.createElement('span');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.className = 'njg-close';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.float = 'right';
+    closeBtn.style.fontSize = '18px';
+    closeBtn.style.marginLeft = '10px';
+
+    closeBtn.onclick = () => {
+        aboutPanel.style.display = 'none';
+    };
+
+    const header = aboutPanel.querySelector('h3') || aboutPanel;
+    header.prepend(closeBtn);
+}, 0);
+
+window.initTopologyHistory(django.jQuery);
+return graph
 
         // Utility function
         function getTopologyIdFromUrl() {
