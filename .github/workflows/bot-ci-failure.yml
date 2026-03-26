@@ -49,7 +49,7 @@ jobs:
           fi
           HEAD_SHA="$EVENT_HEAD_SHA"
           echo "Payload empty. Searching for PR via Commits API..."
-          PR_NUMBER=$(gh api repos/$REPO/commits/$HEAD_SHA/pulls -q '.[0].number' 2>/dev/null || true)
+          PR_NUMBER=$(gh api "repos/$REPO/commits/$HEAD_SHA/pulls" --jq "map(select(.state == \"open\" and .head.sha == \"$HEAD_SHA\"))[0].number // empty" 2>/dev/null || true)
           if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
              echo "Found PR #$PR_NUMBER using Commits API."
              emit_pr "$PR_NUMBER"
