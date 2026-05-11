@@ -166,7 +166,7 @@ class Base(
             name="VPN2",
             type="vpn",
             vpn=vpn2,
-            config=vpn.auto_client(),
+            config=vpn2.auto_client(),
             default=True,
             organization=organization,
         )
