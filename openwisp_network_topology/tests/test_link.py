@@ -118,7 +118,7 @@ class TestLink(TestOrganizationMixin, CreateGraphObjectsMixin, TestCase):
             target=node2,
             cost=1.0,
             cost_text="100mbit/s",
-            properties='{"pretty": true}',
+            properties={"pretty": True},
         )
         link.full_clean()
         link.save()

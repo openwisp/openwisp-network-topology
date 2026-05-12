@@ -2,7 +2,8 @@ import swapper
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
-from django.db.models import Q
+from django.db.models import Q, TextField
+from django.db.models.functions import Cast
 from django.template.response import TemplateResponse
 from django.urls import re_path, reverse
 from django.utils.safestring import mark_safe
@@ -274,7 +275,7 @@ class NodeAdmin(NodeLinkMixin, BaseAdmin):
     form = UserPropertiesForm
     change_form_template = "admin/topology/node/change_form.html"
     list_display = ["get_name", "organization", "topology", "addresses"]
-    search_fields = ["addresses", "label", "properties"]
+    search_fields = ["label", "_addresses_text", "_properties_text"]
     list_filter = [
         (MultitenantOrgFilter),
         (TopologyFilter),
@@ -291,6 +292,14 @@ class NodeAdmin(NodeLinkMixin, BaseAdmin):
         "created",
         "modified",
     ]
+
+    def get_search_results(self, request, queryset, search_term):
+        if search_term:
+            queryset = queryset.annotate(
+                _addresses_text=Cast("addresses", output_field=TextField()),
+                _properties_text=Cast("properties", output_field=TextField()),
+            )
+        return super().get_search_results(request, queryset, search_term)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
@@ -315,10 +324,24 @@ class LinkAdmin(NodeLinkMixin, BaseAdmin):
     search_fields = [
         "source__label",
         "target__label",
-        "source__addresses",
-        "target__addresses",
-        "properties",
+        "_source_addresses_text",
+        "_target_addresses_text",
+        "_properties_text",
     ]
+
+    def get_search_results(self, request, queryset, search_term):
+        if search_term:
+            queryset = queryset.annotate(
+                _source_addresses_text=Cast(
+                    "source__addresses", output_field=TextField()
+                ),
+                _target_addresses_text=Cast(
+                    "target__addresses", output_field=TextField()
+                ),
+                _properties_text=Cast("properties", output_field=TextField()),
+            )
+        return super().get_search_results(request, queryset, search_term)
+
     list_display = [
         "__str__",
         "organization",
