@@ -78,10 +78,6 @@ License
 See `LICENSE
 <https://github.com/openwisp/openwisp-network-topology/blob/master/LICENSE>`_.
 
-This projects bundles third-party javascript libraries in its source code:
-
-- `D3.js (BSD-3-Clause) <https://d3js.org/>`_
-
 Support
 -------
 
