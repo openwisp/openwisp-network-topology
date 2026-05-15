@@ -15,7 +15,7 @@ from openwisp_users.multitenancy import (
     MultitenantOrgFilter,
     MultitenantRelatedOrgFilter,
 )
-from openwisp_utils.admin import ReceiveUrlAdmin, UUIDAdmin
+from openwisp_utils.admin import CopyableFieldsAdmin, ReceiveUrlAdmin
 
 from . import settings as app_settings
 from .contextmanagers import log_failure
@@ -61,7 +61,11 @@ class BaseAdmin(TimeStampedEditableAdmin):
 
 @admin.register(Topology)
 class TopologyAdmin(
-    MultitenantAdminMixin, GraphVisualizerUrls, UUIDAdmin, ReceiveUrlAdmin, BaseAdmin
+    MultitenantAdminMixin,
+    GraphVisualizerUrls,
+    CopyableFieldsAdmin,
+    ReceiveUrlAdmin,
+    BaseAdmin,
 ):
     model = Topology
     list_display = [
@@ -81,6 +85,7 @@ class TopologyAdmin(
         "metric",
         "receive_url",
     ]
+    copyable_fields = ["uuid"]
     list_filter = ["parser", "strategy", MultitenantOrgFilter]
     search_fields = ["label", "id"]
     actions = ["update_selected", "unpublish_selected", "publish_selected"]
