@@ -47,6 +47,7 @@ within the OpenWISP architecture.
     ./user/strategies.rst
     ./user/integrations.rst
     ./user/rest-api.rst
+    ./user/websocket-api.rst
     ./user/settings.rst
     ./user/management-commands.rst
 
