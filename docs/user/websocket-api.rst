@@ -8,25 +8,26 @@ WebSocket API Reference
 Overview
 --------
 
-The WebSocket API provides real-time, push-based topology updates.
+The WebSocket API provides real-time topology updates.
 
-Current endpoint behavior:
+All endpoints:
 
-- Use JSON-encoded messages on the wire.
+- Use JSON-encoded messages on the wire. The payload examples below are
+  shown in JavaScript-style notation with inline comments for readability.
 - Push real-time updates after the connection is established.
-- Do not currently define any client-to-server message contract.
+- Do not accept client messages: any data sent from the client is ignored.
 
 Authentication and Authorization
 --------------------------------
 
-The WebSocket endpoint relies on the standard Django session. When
-authentication is required, connect from a browser context where the user
-is logged in so that the session cookie is sent during the WebSocket
-handshake.
-
-Authorization is controlled by
+Authentication and authorization are controlled by
 ``OPENWISP_NETWORK_TOPOLOGY_API_AUTH_REQUIRED``, documented in
-:doc:`settings`.
+:doc:`settings`. The setting is enabled by default.
+
+When authentication is required, WebSocket connections rely on the
+standard Django session: connect from a browser context where the user is
+logged in to OpenWISP so that the session cookie is sent during the
+WebSocket handshake.
 
 If the requested topology does not exist or the user is not authorized,
 the connection is closed immediately.
@@ -65,11 +66,22 @@ A user is authorized if:
 
   - Is authenticated,
   - Is an organization manager for the topology's organization,
-  - Has the ``view_topology`` permission.
+  - Has the ``topology.view_topology`` permission.
 
 If ``OPENWISP_NETWORK_TOPOLOGY_API_AUTH_REQUIRED`` is set to ``False``,
 any client can connect to an existing topology endpoint, including
 unauthenticated users.
+
+Client Message
+++++++++++++++
+
+The endpoint does not currently expose a request/response message for
+retrieving the current state on demand. Messages are delivered when an
+update event occurs.
+
+.. warning::
+
+    Any message sent by the client is ignored.
 
 Real-time Updates
 +++++++++++++++++
@@ -80,9 +92,9 @@ the following structure:
 .. code-block:: javascript
 
     {
-        "type": "broadcast_topology",
+        "type": "broadcast_topology",     // Message type identifier
         "topology": {
-            "...": "topology data"
+            "...": "topology data"        // Current topology representation
         }
     }
 
@@ -96,11 +108,11 @@ A simplified example looks like this:
     {
         "type": "broadcast_topology",
         "topology": {
-            "type": "NetworkGraph",
-            "protocol": "netjson.org",
-            "version": "1.0",
-            "nodes": [],
-            "links": []
+            "type": "NetworkGraph",       // NetJSON graph type
+            "protocol": "netjson.org",    // NetJSON protocol identifier
+            "version": "1.0",             // NetJSON version
+            "nodes": [],                  // Topology nodes
+            "links": []                   // Topology links
         }
     }
 
@@ -108,13 +120,9 @@ Connected clients receive a new message whenever topology data changes.
 Based on the current implementation and test coverage, updates are sent
 when:
 
-- topology properties change
-- nodes are created, updated, or deleted
-- links are created, updated, or deleted
-
-The connection does not currently expose a request/response message for
-retrieving the current state on demand. Messages are delivered when an
-update event occurs.
+- Topology properties change.
+- Nodes are created, updated, or deleted.
+- Links are created, updated, or deleted.
 
 Relationship with the REST API
 ------------------------------
