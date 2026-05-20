@@ -1,4 +1,6 @@
 # Manually written, used during migrations
+import json
+
 import swapper
 from django.contrib.auth.management import create_permissions
 
@@ -16,7 +18,7 @@ def migrate_addresses(apps, schema_editor):
         if addresses.startswith(";"):
             addresses = addresses[1:]
         addresses = addresses[0:-1].split(";")
-        node.addresses = addresses
+        node.addresses = json.dumps(addresses)
         node.save()
 
 
@@ -24,7 +26,14 @@ def migrate_openvpn_ids_0012(apps, schema_editor):
     Node = get_model(apps, "topology", "Node")
     queryset = Node.objects.filter(topology__parser="netdiff.OpenvpnParser")
     for node in queryset.iterator():
-        node.addresses[0] = node.label
+        # The historical addresses field is now TextField, so the value is
+        # the raw JSON string written by jsonfield in older releases (or by
+        # migrate_addresses above). Decode it before mutating.
+        addresses = node.addresses
+        if isinstance(addresses, str):
+            addresses = json.loads(addresses)
+        addresses[0] = node.label
+        node.addresses = json.dumps(addresses)
         node.full_clean()
         node.save()
 
