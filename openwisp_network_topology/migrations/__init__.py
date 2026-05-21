@@ -32,7 +32,10 @@ def migrate_openvpn_ids_0012(apps, schema_editor):
         addresses = node.addresses
         if isinstance(addresses, str):
             addresses = json.loads(addresses)
-        addresses[0] = node.label
+        if not addresses:
+            addresses = [node.label]
+        else:
+            addresses[0] = node.label
         node.addresses = json.dumps(addresses)
         node.full_clean()
         node.save()

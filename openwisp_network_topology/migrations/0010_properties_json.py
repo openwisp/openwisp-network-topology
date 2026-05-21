@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="node",
             name="addresses",
-            field=models.TextField(blank=True, default=[]),
+            field=models.TextField(blank=True, default=list),
         ),
         migrations.AlterField(
             model_name="node",

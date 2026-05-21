@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="node",
             name="addresses",
-            field=models.TextField(default=[]),
+            field=models.TextField(default=list),
         ),
     ]

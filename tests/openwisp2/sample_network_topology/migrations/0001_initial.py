@@ -236,7 +236,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("label", models.CharField(blank=True, max_length=64)),
-                ("addresses", models.TextField(default=[])),
+                ("addresses", models.TextField(default=list)),
                 (
                     "properties",
                     models.TextField(
