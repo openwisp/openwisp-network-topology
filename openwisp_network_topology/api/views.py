@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from netdiff.exceptions import NetdiffException
-from rest_framework import generics, pagination
+from rest_framework import generics
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -15,6 +15,7 @@ from rest_framework.views import APIView
 from openwisp_users.api.authentication import BearerAuthentication
 from openwisp_users.api.mixins import FilterByOrganizationManaged, ProtectedAPIMixin
 from openwisp_users.api.permissions import DjangoModelPermissions, IsOrganizationManager
+from openwisp_utils.api.pagination import OpenWispPagination
 
 from .. import settings as app_settings
 from ..utils import get_object_or_404
@@ -46,12 +47,6 @@ class RequireAuthentication(APIView):
             IsOrganizationManager,
             DjangoModelPermissions,
         ]
-
-
-class ListViewPagination(pagination.PageNumberPagination):
-    page_size = 10
-    page_size_query_param = "page_size"
-    max_page_size = 100
 
 
 class UnpublishedTopologyFilterMixin:
@@ -188,7 +183,7 @@ class NodeListCreateView(
 ):
     queryset = Node.objects.order_by("-created")
     serializer_class = NodeSerializer
-    pagination_class = ListViewPagination
+    pagination_class = OpenWispPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = NodeFilter
 
@@ -211,7 +206,7 @@ class LinkListCreateView(
         "target",
     ).order_by("-created")
     serializer_class = LinkSerializer
-    pagination_class = ListViewPagination
+    pagination_class = OpenWispPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = LinkFilter
 
