@@ -95,11 +95,27 @@ ROOT_URLCONF = "openwisp2.urls"
 
 ASGI_APPLICATION = "openwisp2.asgi.application"
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost/0",
+        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+    },
+    "sessions": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost/1",
+        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+    },
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "sessions"
+
 # Needed to test UI updates via websockets
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": ["redis://localhost/9"]},
+        "CONFIG": {"hosts": ["redis://localhost/3"]},
     }
 }
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
@@ -223,11 +239,18 @@ if not TESTING or (TESTING and os.environ.get("WIFI_MESH", False)):
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://localhost/9",
+            "LOCATION": "redis://localhost/0",
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
             },
-        }
+        },
+        "sessions": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://localhost/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            },
+        },
     }
 
 if os.environ.get("SAMPLE_APP", False):
