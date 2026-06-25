@@ -63,7 +63,7 @@ class TestTopologyGraphVisualizer(
         self.find_element(By.CLASS_NAME, "sideBarHandle").click()
         self.wait_for_visibility(By.CLASS_NAME, "njg-metaInfoContainer")
         self.wait_for_visibility(By.XPATH, "//div[1]/canvas")
-        self.assertEqual(self.get_browser_logs(), [])
+        self.assertEqual(self.get_browser_errors(), [])
         topology_graph_dict = self.topology.json(dict=True)
         topology_graph_label_keys = self.find_elements(By.CSS_SELECTOR, ".njg-keyLabel")
         topology_graph_label_values = self.find_elements(
@@ -138,5 +138,4 @@ class TestTopologyGraphVisualizer(
         self.find_element(By.CSS_SELECTOR, "input.visualizelink").click()
         self._assert_topology_graph(hide_loading_overlay=False)
         self.find_element(By.CLASS_NAME, "closeBtn").click()
-        console_logs = self.get_browser_logs()
-        self.assertEqual(console_logs, [])
+        self.assertEqual(self.get_browser_errors(), [])
