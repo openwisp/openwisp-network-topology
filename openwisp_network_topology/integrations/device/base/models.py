@@ -199,7 +199,7 @@ class AbstractDeviceNode(UUIDModel):
         Link down action for OpenVPN
         """
         self.device.management_ip = None
-        self.device.save()
+        self.device.save(update_fields=["management_ip"])
 
     def link_up_openvpn(self):
         """
@@ -215,7 +215,7 @@ class AbstractDeviceNode(UUIDModel):
             )
         else:
             self.device.management_ip = str(address)
-            self.device.save()
+            self.device.save(update_fields=["management_ip"])
 
     @classmethod
     def filter_by_link(cls, link):
