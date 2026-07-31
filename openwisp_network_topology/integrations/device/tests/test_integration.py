@@ -1,6 +1,7 @@
 from unittest import mock
 
 import swapper
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
@@ -479,6 +480,12 @@ class TestControllerIntegration(Base, TransactionTestCase):
 
 
 class TestMonitoringIntegration(Base, TransactionTestCase):
+    def test_timeseries_database_configuration(self):
+        self.assertEqual(
+            settings.TIMESERIES_DATABASE["BACKEND"],
+            "openwisp_monitoring.db.backends.influxdb",
+        )
+
     @mock.patch(
         "openwisp_monitoring.device.apps.DeviceMonitoringConfig.connect_device_signals"
     )
