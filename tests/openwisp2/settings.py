@@ -181,6 +181,14 @@ ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 OPENWISP_ORGANIZATION_USER_ADMIN = True
 OPENWISP_ORGANIZATION_OWNER_ADMIN = True
 OPENWISP_USERS_AUTH_API = True
+TIMESERIES_DATABASE = {
+    "BACKEND": "openwisp_monitoring.db.backends.influxdb",
+    "USER": "openwisp",
+    "PASSWORD": "openwisp",
+    "NAME": "openwisp2",
+    "HOST": os.getenv("INFLUXDB_HOST", "localhost"),
+    "PORT": "8086",
+}
 
 # Note that the following celery settings
 # are intended only for development purposes
@@ -211,14 +219,6 @@ if not TESTING or (TESTING and os.environ.get("WIFI_MESH", False)):
     INSTALLED_APPS.insert(openwisp_ipam_index, "openwisp_monitoring.check")
     INSTALLED_APPS.insert(openwisp_ipam_index, "openwisp_monitoring.device")
     INSTALLED_APPS.insert(openwisp_ipam_index, "openwisp_monitoring.monitoring")
-    TIMESERIES_DATABASE = {
-        "BACKEND": "openwisp_monitoring.db.backends.influxdb",
-        "USER": "openwisp",
-        "PASSWORD": "openwisp",
-        "NAME": "openwisp2",
-        "HOST": os.getenv("INFLUXDB_HOST", "localhost"),
-        "PORT": "8086",
-    }
     OPENWISP_MONITORING_MAC_VENDOR_DETECTION = False
     CACHES = {
         "default": {
