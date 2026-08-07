@@ -165,6 +165,13 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         self.assertNotContains(response, "organization_id")
         self.assertContains(response, n.topology.organization.name)
 
+    def test_node_change_form_malformed_uuid(self):
+        path = reverse("{0}_node_change".format(self.prefix), args=[".env"])
+        response = self.client.get(path)
+        self.assertEqual(
+            response.status_code, 404, "Malformed node UUIDs must return 404."
+        )
+
     def test_node_change_list_queries(self):
         path = reverse("{0}_node_changelist".format(self.prefix))
         with self.assertNumQueries(5):
@@ -209,6 +216,13 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         path = reverse("{0}_topology_visualize".format(self.prefix), args=[t.pk])
         response = self.client.get(path)
         self.assertContains(response, "new NetJSONGraph(")
+
+    def test_topology_visualize_view_malformed_uuid(self):
+        path = reverse("{0}_topology_visualize".format(self.prefix), args=[".env"])
+        response = self.client.get(path)
+        self.assertEqual(
+            response.status_code, 404, "Malformed topology UUIDs must return 404."
+        )
 
     def test_update_selected_receive_topology(self):
         t = self.topology_model.objects.first()

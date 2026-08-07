@@ -1,9 +1,12 @@
+import uuid
+
 import swapper
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.db.models import Q, TextField
 from django.db.models.functions import Cast
+from django.http import Http404
 from django.template.response import TemplateResponse
 from django.urls import re_path, reverse
 from django.utils.safestring import mark_safe
@@ -218,6 +221,10 @@ class TopologyAdmin(
         self._message(request, rows_updated, _("successfully unpublished"))
 
     def visualize_view(self, request, pk):
+        try:
+            pk = uuid.UUID(pk)
+        except (TypeError, ValueError):
+            raise Http404
         graph_url, history_url = self.get_graph_urls(request, pk)
         context = self.admin_site.each_context(request)
         opts = self.model._meta
@@ -307,6 +314,10 @@ class NodeAdmin(NodeLinkMixin, BaseAdmin):
         return super().get_search_results(request, queryset, search_term)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
+        try:
+            uuid.UUID(object_id)
+        except (TypeError, ValueError):
+            raise Http404
         extra_context = extra_context or {}
         link_model = self.model.source_link_set.field.model
         admin_url = "admin:{0}_link_change".format(self.opts.app_label)
