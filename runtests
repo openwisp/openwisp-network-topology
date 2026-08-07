@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+coverage erase
+
 coverage run runtests.py --tag=no_parallel
 coverage run runtests.py --parallel --exclude-tag=no_parallel
 WIFI_MESH=1 coverage run runtests.py --parallel \
