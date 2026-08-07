@@ -67,6 +67,11 @@ class TestVisualizer(
         )
         self.assertEqual(response.status_code, 404)
 
+    def test_detail_uppercase_uuid(self):
+        t = self.topology_model.objects.first()
+        response = self.client.get(reverse("topology_detail", args=[str(t.pk).upper()]))
+        self.assertEqual(response.status_code, 200)
+
     def _test_visualizer_with_unauthenticated_user(self, url):
         self.client.logout()
         r = self.client.get(url)

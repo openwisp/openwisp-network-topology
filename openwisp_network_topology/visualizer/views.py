@@ -45,7 +45,7 @@ class TopologyDetailView(View, GraphVisualizerUrls):
                     "which the requested resource belongs."
                 )
                 return HttpResponseForbidden(detail)
-        graph_url, history_url = self.get_graph_urls(request, pk)
+        graph_url, history_url = self.get_graph_urls(request, topology.pk)
         return render(
             request,
             "netjsongraph/detail.html",
