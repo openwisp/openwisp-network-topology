@@ -5,8 +5,8 @@
         <meta charset="utf-8" />
         <script src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
         {% block style %}
-        <link href="{% static 'netjsongraph/css/src/netjsongraph.css' %}" rel="stylesheet" />
-        <link href="{% static 'netjsongraph/css/src/netjsongraph-theme.css' %}" rel="stylesheet" />
+        <link href="{% static 'lib/netjsongraph/css/netjsongraph.css' %}" rel="stylesheet" />
+        <link href="{% static 'lib/netjsongraph/css/netjsongraph-theme.css' %}" rel="stylesheet" />
         <link href="{% static 'netjsongraph/css/lib/jquery-ui.min.css' %}" rel="stylesheet" />
         <link href="{% static VISUALIZER_CSS %}" rel="stylesheet" />
         {% endblock %}
@@ -14,7 +14,8 @@
     <body class="frontend">
         {% block body %}{% endblock %}
         {% block script %}
-        <script src="{% static 'netjsongraph/js/src/netjsongraph.min.js' %}"></script>
+        <script src="{% static 'lib/netjsongraph/js/echarts.min.js' %}"></script>
+        <script src="{% static 'lib/netjsongraph/js/netjsongraph.echarts.min.js' %}"></script>
         <script src="{% static 'netjsongraph/js/topology-history.js' %}"></script>
         {% endblock %}
     </body>
