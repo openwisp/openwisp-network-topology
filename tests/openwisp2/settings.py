@@ -99,7 +99,7 @@ ASGI_APPLICATION = "openwisp2.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": ["redis://localhost/9"]},
+        "CONFIG": {"hosts": ["redis://localhost/3"]},
     }
 }
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
@@ -223,7 +223,7 @@ if not TESTING or (TESTING and os.environ.get("WIFI_MESH", False)):
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://localhost/9",
+            "LOCATION": "redis://localhost/0",
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
             },
