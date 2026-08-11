@@ -53,41 +53,6 @@ search in topology labels, e.g.:
 
     ./manage.py save_snapshot --label mytopology
 
-``upgrade_from_django_netjsongraph``
-------------------------------------
-
-If you are upgrading from django-netjsongraph to
-openwisp-network-topology, there is an easy migration script that will
-import your topologies, users & groups to openwisp-network-topology
-instance:
-
-.. code-block::
-
-    ./manage.py upgrade_from_django_netjsongraph
-
-The management command accepts an argument ``--backup``, that you can pass
-to give the location of the backup files, by default it looks in the
-``tests/`` directory, e.g.:
-
-.. code-block::
-
-    ./manage.py upgrade_from_django_netjsongraph --backup /home/user/django_netjsongraph/
-
-The management command accepts another argument ``--organization``, if you
-want to import data to a specific organization, you can give its UUID for
-the same, by default the data is added to the first found organization,
-e.g.:
-
-.. code-block::
-
-    ./manage.py upgrade_from_django_netjsongraph --organization 900856da-c89a-412d-8fee-45a9c763ca0b
-
-.. note::
-
-    you can follow the `tutorial to migrate database from
-    django-netjsongraph
-    <https://github.com/openwisp/django-netjsongraph/blob/master/README.rst>`_.
-
 .. _network_topology_create_device_nodes:
 
 ``create_device_nodes``
