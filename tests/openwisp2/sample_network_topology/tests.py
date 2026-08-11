@@ -5,9 +5,6 @@ from openwisp_network_topology.tests.test_admin import (
 from openwisp_network_topology.tests.test_api import TestApi as BaseTestApi
 from openwisp_network_topology.tests.test_link import TestLink as BaseTestLink
 from openwisp_network_topology.tests.test_node import TestNode as BaseTestNode
-from openwisp_network_topology.tests.test_removed_management_commands import (
-    TestRemovedManagementCommands as BaseTestRemovedManagementCommands,
-)
 from openwisp_network_topology.tests.test_snapshot import (
     TestSnapshot as BaseTestSnapshot,
 )
@@ -44,10 +41,6 @@ class TestNode(BaseTestNode):
     pass
 
 
-class TestRemovedManagementCommands(BaseTestRemovedManagementCommands):
-    pass
-
-
 class TestTopology(BaseTestTopology):
     pass
 
@@ -73,7 +66,6 @@ del BaseTestMultitenantAdmin
 del BaseTestApi
 del BaseTestLink
 del BaseTestNode
-del BaseTestRemovedManagementCommands
 del BaseTestSnapshot
 del BaseTestTopology
 del BaseTestUtils
