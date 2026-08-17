@@ -77,6 +77,9 @@ jobs:
           pip install -U pip wheel setuptools
           pip install -U -e .
           pip install -U -r requirements-test.txt
+          pip install --upgrade --force-reinstall --no-deps --no-cache-dir https://github.com/openwisp/openwisp-users/tarball/issues/522-disabled-org
+          pip install --upgrade --force-reinstall --no-deps --no-cache-dir https://github.com/openwisp/openwisp-controller/tarball/issues/1393-disabled-org
+          pip install --upgrade --force-reinstall --no-deps --no-cache-dir https://github.com/openwisp/openwisp-controller/tarball/issues/1393-disabled-org
           pip install ${{ matrix.django-version }}
 
       - name: Start InfluxDB
