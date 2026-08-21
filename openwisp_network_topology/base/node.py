@@ -55,11 +55,13 @@ class AbstractNode(ShareableOrgMixin, TimeStampedEditableModel):
         return self.name
 
     def full_clean(self, *args, **kwargs):
-        self.organization_id = self.get_organization_id()
+        if self.topology_id is not None:
+            self.organization_id = self.get_organization_id()
         return super().full_clean(*args, **kwargs)
 
     def clean(self):
-        validate_organization_enabled(self, self.topology)
+        if self.topology_id is not None:
+            validate_organization_enabled(self, self.topology)
         if self.properties is None:
             self.properties = {}
 

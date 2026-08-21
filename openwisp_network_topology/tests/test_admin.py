@@ -460,6 +460,7 @@ class TestMultitenantAdmin(
             ),
             visible=[data["t1"].label],
             hidden=[data["t2"].label, data["t3_inactive"].label],
+            superuser_hidden=[data["t3_inactive"].label],
         )
 
     def test_link_topology_fk_autocomplete_view(self):
@@ -470,6 +471,7 @@ class TestMultitenantAdmin(
             ),
             visible=[data["t1"].label],
             hidden=[data["t2"].label, data["t3_inactive"].label],
+            superuser_hidden=[data["t3_inactive"].label],
         )
 
     def test_node_topology_autocomplete_filter(self):
@@ -479,6 +481,7 @@ class TestMultitenantAdmin(
             url=self._get_autocomplete_view_path(self.app_label, "node", "topology"),
             visible=[data["t1"].label, t_special.label],
             hidden=[data["t2"].label, data["t3_inactive"].label],
+            superuser_hidden=[data["t3_inactive"].label],
         )
 
     def test_link_topology_autocomplete_filter(self):
@@ -488,6 +491,7 @@ class TestMultitenantAdmin(
             url=self._get_autocomplete_view_path(self.app_label, "link", "topology"),
             visible=[data["t1"].label, t_special.label],
             hidden=[data["t2"].label, data["t3_inactive"].label],
+            superuser_hidden=[data["t3_inactive"].label],
         )
 
     @patch.object(Topology, "update")
@@ -554,24 +558,46 @@ class TestMultitenantAdmin(
         self._test_disabled_org_admin_crud(
             obj=topology,
             change_data={"label": "changed"},
+            create_data={
+                "label": "new-topology",
+                "organization": str(org.pk),
+                "parser": "netdiff.OlsrParser",
+                "strategy": "fetch",
+                "url": "http://127.0.0.1:9090",
+                "expiration_time": "0",
+                "published": "on",
+            },
             organization=org,
             unchanged_field="label",
         )
 
     def test_disabled_org_admin_crud_node(self):
-        org, _, node, _ = self._create_disabled_org_objects()
+        org, topology, node, _ = self._create_disabled_org_objects()
         self._test_disabled_org_admin_crud(
             obj=node,
             change_data={"label": "changed"},
+            create_data={
+                "topology": str(topology.pk),
+                "label": "new-node",
+                "addresses": '["192.168.0.3"]',
+                "user_properties": "{}",
+            },
             organization=org,
             unchanged_field="label",
         )
 
     def test_disabled_org_admin_crud_link(self):
-        org, _, _, link = self._create_disabled_org_objects()
+        org, topology, node1, link = self._create_disabled_org_objects()
         self._test_disabled_org_admin_crud(
             obj=link,
             change_data={"cost_text": "changed"},
+            create_data={
+                "source": str(node1.pk),
+                "target": str(link.target.pk),
+                "topology": str(topology.pk),
+                "cost_text": "10",
+                "enabled": "on",
+            },
             organization=org,
             unchanged_field="cost_text",
         )

@@ -78,12 +78,18 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
         return "{0} - {1}".format(self.source.get_name(), self.target.get_name())
 
     def full_clean(self, *args, **kwargs):
-        self.validate_organization()
-        self.validate_topology()
+        has_relations = (
+            self.topology_id is not None
+            and self.source_id is not None
+            and self.target_id is not None
+        )
+        if has_relations:
+            self.validate_organization()
+            self.validate_topology()
         return super().full_clean(*args, **kwargs)
 
     def clean(self):
-        if self.source == self.target or self.source_id == self.target_id:
+        if self.source_id is not None and self.source_id == self.target_id:
             raise ValidationError(_("source and target must not be the same"))
         if self.properties is None:
             self.properties = {}
