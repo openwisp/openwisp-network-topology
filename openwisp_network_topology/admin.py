@@ -45,8 +45,8 @@ class BaseAdmin(TimeStampedEditableAdmin):
     class Media:
         css = {
             "all": [
-                "netjsongraph/css/src/netjsongraph.css",
-                "netjsongraph/css/src/netjsongraph-theme.css",
+                "lib/netjsongraph/css/netjsongraph.css",
+                "lib/netjsongraph/css/netjsongraph-theme.css",
                 "netjsongraph/css/lib/jquery-ui.min.css",
                 "netjsongraph/css/style.css",
                 "netjsongraph/css/admin.css",
@@ -54,8 +54,9 @@ class BaseAdmin(TimeStampedEditableAdmin):
         }
         js = [
             "admin/js/jquery.init.js",
+            "lib/netjsongraph/js/echarts.min.js",
+            "lib/netjsongraph/js/netjsongraph.echarts.min.js",
             "netjsongraph/js/lib/jquery-ui.min.js",
-            "netjsongraph/js/src/netjsongraph.min.js",
             "netjsongraph/js/strategy-switcher.js",
             "netjsongraph/js/topology-history.js",
             "netjsongraph/js/visualize.js",

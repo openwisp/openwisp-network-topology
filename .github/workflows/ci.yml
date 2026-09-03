@@ -77,6 +77,7 @@ jobs:
           pip install -U -e .
           pip install -U -r requirements-test.txt
           pip install ${{ matrix.django-version }}
+          pip install --force-reinstall --no-deps https://github.com/kunalverma2512/openwisp-utils/tarball/feature/517-add-netjsongraph-static
 
       - name: Start InfluxDB
         if: ${{ !cancelled() && steps.deps.conclusion == 'success' }}
