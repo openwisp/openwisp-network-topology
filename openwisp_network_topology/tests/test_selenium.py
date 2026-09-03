@@ -109,7 +109,7 @@ class TestTopologyGraphVisualizer(
         self.find_element(By.XPATH, "//ul[@id='menu']/li/a").click()
         self._assert_topology_graph()
         overlay = self.find_element(By.CSS_SELECTOR, ".djnjg-overlay")
-        self.assertIn("njg-container", overlay.get_attribute("class"))
+        self.assertIn("njg-container", (overlay.get_attribute("class") or "").split())
 
     def test_topology_admin_visualizer_multiple_close_btn_append(self):
         path = reverse(f"{self.prefix}_topology_change", args=[self.topology.pk])
