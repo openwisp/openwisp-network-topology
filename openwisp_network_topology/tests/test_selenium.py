@@ -57,9 +57,11 @@ class TestTopologyGraphVisualizer(
         # Clear the web driver console logs after each test
         self.get_browser_logs()
 
-    def _assert_topology_graph(self, hide_loading_overlay=True):
-        if hide_loading_overlay:
-            self.hide_loading_overlay("loadingContainer")
+    def _assert_topology_graph(self):
+        # netjsongraph.js identifies the loading overlay with a class,
+        # so it cannot be waited on with SeleniumTestMixin.hide_loading_overlay,
+        # which looks the element up by ID.
+        self.wait_for_invisibility(By.CLASS_NAME, "njg-loadingContainer")
         self.find_element(By.CLASS_NAME, "sideBarHandle").click()
         self.wait_for_visibility(By.CLASS_NAME, "njg-metaInfoContainer")
         self.wait_for_visibility(By.XPATH, "//div[1]/canvas")
@@ -106,6 +108,8 @@ class TestTopologyGraphVisualizer(
         self.open(reverse("topology_list"), html_container="body.frontend")
         self.find_element(By.XPATH, "//ul[@id='menu']/li/a").click()
         self._assert_topology_graph()
+        overlay = self.find_element(By.CSS_SELECTOR, ".djnjg-overlay")
+        self.assertIn("njg-container", (overlay.get_attribute("class") or "").split())
 
     def test_topology_admin_visualizer_multiple_close_btn_append(self):
         path = reverse(f"{self.prefix}_topology_change", args=[self.topology.pk])
@@ -136,6 +140,6 @@ class TestTopologyGraphVisualizer(
         # Open the visualizer again and make sure no JS errors
         # are thrown when the visualizer is closed again
         self.find_element(By.CSS_SELECTOR, "input.visualizelink").click()
-        self._assert_topology_graph(hide_loading_overlay=False)
+        self._assert_topology_graph()
         self.find_element(By.CLASS_NAME, "closeBtn").click()
         self.assertEqual(self.get_browser_errors(), [])
