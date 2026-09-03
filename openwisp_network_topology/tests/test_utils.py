@@ -297,3 +297,29 @@ class TestUtils(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         with redirect_stdout(output):
             call_command("save_snapshot")
         self.assertEqual(self.snapshot_model.objects.count(), 1)
+
+    @responses.activate
+    def test_update_all_skips_disabled_organization(self):
+        topology = self.topology_model.objects.first()
+        topology.parser = "netdiff.NetJsonParser"
+        topology.save()
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        responses.add(
+            responses.GET,
+            "http://127.0.0.1:9090",
+            body=self._load("static/netjson-1-link.json"),
+            content_type="application/json",
+        )
+        self.node_model.objects.all().delete()
+        self.topology_model.update_all()
+        self.assertEqual(self.node_model.objects.count(), 0)
+        self.assertEqual(self.link_model.objects.count(), 0)
+
+    def test_save_snapshot_all_skips_disabled_organization(self):
+        topology = self.topology_model.objects.first()
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        self.assertEqual(self.snapshot_model.objects.count(), 0)
+        self.topology_model.save_snapshot_all()
+        self.assertEqual(self.snapshot_model.objects.count(), 0)

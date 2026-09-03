@@ -8,6 +8,7 @@ from django.urls import reverse
 from rest_framework.views import APIView
 
 from openwisp_network_topology.tasks import handle_update_topology
+from openwisp_users.tests.test_api import TestDisabledOrgApiMixin
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.tests import AssertNumQueriesSubTestMixin
 
@@ -27,6 +28,7 @@ class TestApi(
     CreateGraphObjectsMixin,
     UnpublishMixin,
     LoadMixin,
+    TestDisabledOrgApiMixin,
     TestOrganizationMixin,
     TestCase,
 ):
@@ -228,6 +230,18 @@ class TestApi(
             content_type="text/plain",
         )
         self.assertEqual(response.status_code, 403)
+
+    def test_receive_403_disabled_organization(self):
+        self._set_receive()
+        topology = self.topology_model.objects.first()
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        node_count = self.node_model.objects.count()
+        data = self._load("static/netjson-1-link.json")
+        response = self.client.post(self.receive_url, data, content_type="text/plain")
+        self.assertEqual(response.status_code, 403)
+        self.assertIn("organization disabled", response.data["detail"])
+        self.assertEqual(self.node_model.objects.count(), node_count)
 
     def test_receive_options(self):
         self._set_receive()
@@ -721,7 +735,7 @@ class TestApi(
             "properties": {},
             "user_properties": {},
         }
-        with self.assertNumQueries(13):
+        with self.assertNumQueries(14):
             response = self.client.post(path, data, content_type="application/json")
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["topology"], self.topology.pk)
@@ -750,7 +764,7 @@ class TestApi(
 
     def test_node_detail_api(self):
         path = reverse("node_detail", args=(self.node1.pk,))
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["id"], str(self.node1.pk))
@@ -881,7 +895,7 @@ class TestApi(
 
     def test_link_detail_api(self):
         path = reverse("link_detail", args=(self.link.pk,))
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["id"], str(self.link.pk))
@@ -907,7 +921,7 @@ class TestApi(
             "properties": {},
             "user_properties": {"user": "tester"},
         }
-        with self.assertNumQueries(16):
+        with self.assertNumQueries(15):
             response = self.client.put(path, data, content_type="application/json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["cost"], 21.0)
@@ -917,7 +931,7 @@ class TestApi(
     def test_link_patch_api(self):
         path = reverse("link_detail", args=(self.link.pk,))
         data = {"cost": 50.0}
-        with self.assertNumQueries(13):
+        with self.assertNumQueries(12):
             response = self.client.patch(path, data, content_type="application/json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["cost"], 50.0)
@@ -928,3 +942,80 @@ class TestApi(
         response = self.client.delete(path)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Link.objects.count(), 0)
+
+    def _create_disabled_org_objects(self):
+        disabled_org = self._create_org(name="disabled-org")
+        topology = self._create_topology(
+            label="disabled-topology", organization=disabled_org
+        )
+        node1 = self._create_node(
+            label="disabled-node1",
+            addresses=["192.168.10.1"],
+            topology=topology,
+            organization=disabled_org,
+        )
+        node2 = self._create_node(
+            label="disabled-node2",
+            addresses=["192.168.10.2"],
+            topology=topology,
+            organization=disabled_org,
+        )
+        link = self._create_link(
+            source=node1, target=node2, topology=topology, organization=disabled_org
+        )
+        disabled_org.is_active = False
+        disabled_org.save(update_fields=["is_active"])
+        return disabled_org, topology, node1, link
+
+    def test_disabled_org_api_crud_topology(self):
+        disabled_org, topology, _, _ = self._create_disabled_org_objects()
+        self._test_disabled_org_api_crud(
+            obj=topology,
+            detail_url=reverse("network_graph", args=[topology.pk]),
+            list_url=reverse("network_collection"),
+            create_payload={
+                "label": "new-topology",
+                "organization": str(disabled_org.pk),
+                "parser": "netdiff.OlsrParser",
+                "strategy": "fetch",
+                "url": "http://127.0.0.1:9090",
+                "expiration_time": 0,
+                "published": True,
+            },
+            update_payload={"label": "changed"},
+            operations=("retrieve", "create", "update", "delete"),
+            organization=disabled_org,
+            auth_mechanism="session",
+            unchanged_field="label",
+        )
+
+    def test_disabled_org_api_crud_node(self):
+        disabled_org, _, node, _ = self._create_disabled_org_objects()
+        self._test_disabled_org_api_crud(
+            obj=node,
+            detail_url=reverse("node_detail", args=[node.pk]),
+            list_url=reverse("node_list"),
+            create_payload={
+                "topology": str(node.topology_id),
+                "organization": str(disabled_org.pk),
+                "label": "new-node",
+                "addresses": ["192.168.10.3"],
+            },
+            update_payload={"label": "changed"},
+            organization=disabled_org,
+            auth_mechanism="session",
+            unchanged_field="label",
+        )
+
+    def test_disabled_org_api_crud_link(self):
+        disabled_org, _, _, link = self._create_disabled_org_objects()
+        self._test_disabled_org_api_crud(
+            obj=link,
+            detail_url=reverse("link_detail", args=[link.pk]),
+            list_url=reverse("link_list"),
+            update_payload={"cost_text": "changed"},
+            operations=("list", "retrieve", "update", "delete"),
+            organization=disabled_org,
+            auth_mechanism="session",
+            unchanged_field="cost_text",
+        )

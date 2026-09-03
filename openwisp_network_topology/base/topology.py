@@ -1,10 +1,12 @@
 import json
+import logging
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
 import swapper
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
@@ -22,7 +24,9 @@ from ..contextmanagers import log_failure
 from ..settings import PARSERS, TIMEOUT
 from ..signals import update_topology
 from ..tasks import handle_update_topology
-from ..utils import print_info
+from ..utils import is_write_blocked, print_info, validate_organization_enabled
+
+logger = logging.getLogger(__name__)
 
 STRATEGIES = (("fetch", _("FETCH")), ("receive", _("RECEIVE")))
 
@@ -90,6 +94,7 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
         return reverse("topology_detail", args=[self.pk])
 
     def clean(self):
+        validate_organization_enabled(self)
         if self.strategy == "fetch" and not self.url:
             raise ValidationError(
                 {"url": [_("an url must be specified when using FETCH strategy")]}
@@ -310,6 +315,9 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
         Removed nodes are not deleted or modified
         Links are not deleted straightaway but set as "down"
         """
+        if is_write_blocked(self):
+            logger.info("Skipped update of topology %s: organization disabled", self.pk)
+            return
         diff = self.diff(data)
         handle_update_topology.delay(self.pk, diff)
 
@@ -356,6 +364,11 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
         expiration_time > 0 means:
           "if a link is missing, wait expiration_time seconds before marking it as down"
         """
+        if is_write_blocked(self):
+            logger.info(
+                "Skipped receive of topology %s: organization disabled", self.pk
+            )
+            return
         if self.expiration_time > 0:
             data = self.get_topology_data(data)
             Link = self.link_model
@@ -376,7 +389,9 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
         - logs failures
         - calls delete_expired_links()
         """
-        queryset = cls.objects.filter(published=True, strategy="fetch")
+        queryset = cls.objects.filter(published=True, strategy="fetch").filter(
+            Q(organization__is_active=True) | Q(organization__isnull=True)
+        )
         if label:
             queryset = queryset.filter(label__icontains=label)
         for topology in queryset:
@@ -392,7 +407,9 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
         - save snapshots of topoogies
         - logs failures
         """
-        queryset = cls.objects.filter(published=True)
+        queryset = cls.objects.filter(published=True).filter(
+            Q(organization__is_active=True) | Q(organization__isnull=True)
+        )
         if label:
             queryset = queryset.filter(label__icontains=label)
         for topology in queryset:
