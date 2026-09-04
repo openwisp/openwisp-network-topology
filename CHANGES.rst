@@ -1,10 +1,46 @@
 Changelog
 =========
 
-Version 1.3.0 [unreleased]
+Version 1.3.0 [2026-09-04]
 --------------------------
 
-Work in progress.
+Changes
+~~~~~~~
+
+Other changes
++++++++++++++
+
+- Migrated the ``Node`` and ``Link`` JSON fields to `Django's built-in
+  JSONField
+  <https://github.com/openwisp/openwisp-network-topology/issues/253>`_,
+  replacing the deprecated third-party ``jsonfield`` dependency.
+- Migrated the network topology interface to the `OpenWISP theme CSS
+  variables
+  <https://github.com/openwisp/openwisp-network-topology/issues/277>`_.
+- Removed the `obsolete django-netjsongraph upgrade command
+  <https://github.com/openwisp/openwisp-network-topology/issues/319>`_.
+
+Dependencies
+++++++++++++
+
+- Bumped ``openwisp-users`` from ``~=1.2.0`` to `~=1.3.0
+  <https://github.com/openwisp/openwisp-users/blob/1.3.0/CHANGES.rst>`_.
+- Bumped ``netdiff`` from ``~=1.2.0`` to `~=1.3.0
+  <https://github.com/openwisp/netdiff/blob/1.3.0/CHANGES.rst>`__.
+- Bumped ``django-flat-json-widget`` from ``~=0.4.0`` to `~=0.5.0
+  <https://github.com/openwisp/django-flat-json-widget/blob/master/CHANGES.rst>`__.
+- Bumped ``openwisp-utils[celery,channels]`` from ``~=1.2.0`` to `~=1.3.0
+  <https://github.com/openwisp/openwisp-utils/blob/master/CHANGES.rst>`__.
+- Upgraded ``netjsongraph.js`` to `0.4.0
+  <https://github.com/openwisp/netjsongraph.js/blob/master/CHANGELOG.rst>`_.
+- Dropped support for Django ``4.2``.
+- Dropped support for Python ``3.9``.
+
+Bugfixes
+~~~~~~~~
+
+- Fixed malformed UUIDs causing errors when accessing views that accept
+  UUID parameters.
 
 Version 1.2.0 [2025-10-24]
 --------------------------
