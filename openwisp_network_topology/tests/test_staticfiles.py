@@ -23,6 +23,7 @@ class TestStaticFiles(SimpleTestCase):
             "js/src/netjsongraph.min.js",
         )
         with TemporaryDirectory() as static_root, TemporaryDirectory() as staticfiles_dir:
+            static_root = Path(static_root)
             staticfiles_dir = Path(staticfiles_dir)
             for asset in assets:
                 source = app_dir / "static/netjsongraph" / asset
@@ -42,3 +43,10 @@ class TestStaticFiles(SimpleTestCase):
                 },
             ):
                 call_command("collectstatic", interactive=False)
+            for asset in assets:
+                with self.subTest(asset=asset):
+                    self.assertEqual(
+                        (static_root / "netjsongraph" / asset).is_file(),
+                        True,
+                        f"{asset} was not collected",
+                    )
