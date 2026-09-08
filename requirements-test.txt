@@ -1,4 +1,4 @@
-responses~=0.26.2
+responses~=0.26.3
 freezegun~=1.5.5
 # Needed to test integrations
 openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/archive/refs/heads/1.4.tar.gz
