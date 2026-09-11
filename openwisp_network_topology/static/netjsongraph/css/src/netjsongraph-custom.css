@@ -1,0 +1,31 @@
+#content .djnjg-overlay *,
+body.frontend * {
+  outline: none;
+  box-sizing: border-box;
+}
+
+#content .djnjg-overlay,
+body.frontend {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+body {
+  margin: 0;
+}
+
+/*
+The visualizer is also served outside the admin, where
+openwisp-utils' admin theme stylesheet (which declares the
+--ow-color-* variables on :root) is not loaded. The fallback is
+scoped to the frontend so it cannot override the admin theme or a
+stylesheet added through OPENWISP_ADMIN_THEME_LINKS.
+*/
+body.frontend {
+  --ow-color-black: #000;
+  --ow-color-white: #fff;
+}

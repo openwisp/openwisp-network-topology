@@ -21,23 +21,6 @@ network <./user/integrations>`.
 For a comprehensive overview of features, please refer to the
 :doc:`user/intro` page.
 
-The following diagram illustrates the role of the Network Topology module
-within the OpenWISP architecture.
-
-.. figure:: images/architecture-v2-openwisp-network-topology.png
-    :target: ../_images/architecture-v2-openwisp-network-topology.png
-    :align: center
-    :alt: OpenWISP Architecture: Network Topology module
-
-    **OpenWISP Architecture: highlighted network topology module**
-
-.. important::
-
-    For an enhanced viewing experience, open the image above in a new
-    browser tab.
-
-    Refer to :doc:`/general/architecture` for more information.
-
 .. toctree::
     :caption: Network Topology Usage Docs
     :maxdepth: 1
