@@ -16,8 +16,14 @@ def create_device_node_relation(node_pk):
 def trigger_device_updates(link_pk):
     Link = swapper.load_model("topology", "Link")
     DeviceNode = swapper.load_model("topology_device", "DeviceNode")
-    link = Link.objects.select_related("topology").get(pk=link_pk)
+    link = Link.objects.select_related("topology__organization").get(pk=link_pk)
     DeviceNode.trigger_device_updates(link)
+
+
+@shared_task
+def handle_deactivated_device(device_pk):
+    DeviceNode = swapper.load_model("topology_device", "DeviceNode")
+    DeviceNode.mark_device_links_down(device_pk)
 
 
 @shared_task

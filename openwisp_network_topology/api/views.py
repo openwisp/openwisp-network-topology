@@ -14,11 +14,15 @@ from rest_framework.views import APIView
 
 from openwisp_users.api.authentication import BearerAuthentication
 from openwisp_users.api.mixins import FilterByOrganizationManaged, ProtectedAPIMixin
-from openwisp_users.api.permissions import DjangoModelPermissions, IsOrganizationManager
+from openwisp_users.api.permissions import (
+    DisabledOrgReadOnly,
+    DjangoModelPermissions,
+    IsOrganizationManager,
+)
 from openwisp_utils.api.pagination import OpenWispPagination
 
 from .. import settings as app_settings
-from ..utils import get_object_or_404
+from ..utils import get_object_or_404, is_write_blocked
 from .filters import LinkFilter, NetworkCollectionFilter, NodeFilter
 from .parsers import TextParser
 from .serializers import (
@@ -46,7 +50,10 @@ class RequireAuthentication(APIView):
             IsAuthenticated,
             IsOrganizationManager,
             DjangoModelPermissions,
+            DisabledOrgReadOnly,
         ]
+    else:
+        permission_classes = [DisabledOrgReadOnly]
 
 
 class UnpublishedTopologyFilterMixin:
@@ -127,6 +134,9 @@ class ReceiveTopologyView(APIView):
         # wrong key 403
         if topology.key != key:
             return Response({"detail": _("wrong key")}, status=403)
+        # disabled organization 403
+        if is_write_blocked(topology):
+            return Response({"detail": _("error: organization disabled")}, status=403)
         return
 
     def post(self, request, pk, format=None):
@@ -217,9 +227,9 @@ class LinkDetailView(
     generics.RetrieveUpdateDestroyAPIView,
 ):
     queryset = Link.objects.select_related(
-        "topology",
-        "source",
-        "target",
+        "topology__organization",
+        "source__organization",
+        "target__organization",
     )
     serializer_class = LinkSerializer
 
