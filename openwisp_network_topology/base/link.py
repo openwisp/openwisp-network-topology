@@ -21,7 +21,7 @@ from openwisp_utils.base import TimeStampedEditableModel
 
 from .. import settings as app_settings
 from ..signals import update_topology
-from ..utils import link_status_changed, print_info
+from ..utils import link_status_changed, print_info, validate_organization_enabled
 
 
 class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
@@ -78,12 +78,18 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
         return "{0} - {1}".format(self.source.get_name(), self.target.get_name())
 
     def full_clean(self, *args, **kwargs):
-        self.validate_organization()
-        self.validate_topology()
+        has_relations = (
+            self.topology_id is not None
+            and self.source_id is not None
+            and self.target_id is not None
+        )
+        if has_relations:
+            self.validate_organization()
+            self.validate_topology()
         return super().full_clean(*args, **kwargs)
 
     def clean(self):
-        if self.source == self.target or self.source_id == self.target_id:
+        if self.source_id is not None and self.source_id == self.target_id:
             raise ValidationError(_("source and target must not be the same"))
         if self.properties is None:
             self.properties = {}
@@ -102,6 +108,7 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
             raise ValidationError(errors)
 
     def validate_organization(self):
+        validate_organization_enabled(self.topology, self.source, self.target)
         if self.topology.organization_id is None:
             # Shared link is only created between nodes of
             # two different organizations.
@@ -178,7 +185,9 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
         """
         source_needle = '"{}"'.format(source)
         target_needle = '"{}"'.format(target)
-        qs = cls.objects.annotate(
+        qs = cls.objects.select_related(
+            "topology", "source__organization", "target__organization"
+        ).annotate(
             _source_addresses_text=Cast("source__addresses", output_field=TextField()),
             _target_addresses_text=Cast("target__addresses", output_field=TextField()),
         )
@@ -209,6 +218,17 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
                 print_info("Deleting {0} expired links".format(expired_links_length))
                 for link in expired_links:
                     link.delete()
+
+    @classmethod
+    def mark_organization_links_down(cls, organization_id):
+        """
+        Marks the links of a disabled organization as down.
+        """
+        for link in cls.objects.filter(
+            organization_id=organization_id, status="up"
+        ).iterator():
+            link.status = "down"
+            link.save()
 
     @classmethod
     def get_queryset(cls, qs):
