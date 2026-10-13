@@ -37,11 +37,14 @@ Install the system dependencies:
     # openwisp-network-topology and openwisp-monitoring.
     sudo apt install libspatialite-dev libsqlite3-mod-spatialite
 
-Fork and clone the forked repository:
+Fork the `openwisp-network-topology repository
+<https://github.com/openwisp/openwisp-network-topology>`_ on GitHub, then
+clone your fork. Replace ``YOUR_GITHUB_USERNAME`` with your GitHub
+username:
 
 .. code-block:: shell
 
-    git clone git://github.com/<your_fork>/openwisp-network-topology
+    git clone git@github.com:YOUR_GITHUB_USERNAME/openwisp-network-topology.git
 
 Navigate into the cloned repository:
 
@@ -122,8 +125,8 @@ To install the latest development version tarball via HTTPs:
 
     pip install https://github.com/openwisp/openwisp-network-topology/tarball/master
 
-Alternatively you can use the git protocol:
+Alternatively you can install the latest development version from Git:
 
 .. code-block:: shell
 
-    pip install -e git+git://github.com/openwisp/openwisp-network-topology#egg=openwisp_network-topology
+    pip install -e git+https://github.com/openwisp/openwisp-network-topology#egg=openwisp_network-topology
