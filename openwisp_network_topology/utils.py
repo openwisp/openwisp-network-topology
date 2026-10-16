@@ -31,41 +31,67 @@ def get_object_or_404(model, pk, **kwargs):
         raise Http404()
 
 
+def module_distinguisher(default_views_module, views_module, attribute: str):
+    if hasattr(views_module, attribute):
+        handler = getattr(views_module, attribute)
+
+    else:
+        handler = getattr(default_views_module, attribute)
+
+    return handler
+
+
 def get_api_urls(views_module):
     """
     used by third party apps to reduce boilerplate
     """
+    from openwisp_network_topology.api import views as default_views_module
+
     urls = [
         path(
             "network-topology/topology/",
-            views_module.network_collection,
+            module_distinguisher(
+                default_views_module, views_module, "network_collection"
+            ),
             name="network_collection",
         ),
         path(
             "network-topology/topology/<uuid:pk>/",
-            views_module.network_graph,
+            module_distinguisher(default_views_module, views_module, "network_graph"),
             name="network_graph",
         ),
         path(
             "network-topology/topology/<uuid:pk>/history/",
-            views_module.network_graph_history,
+            module_distinguisher(
+                default_views_module, views_module, "network_graph_history"
+            ),
             name="network_graph_history",
         ),
         path(
             "network-topology/topology/<uuid:pk>/receive/",
-            views_module.receive_topology,
+            module_distinguisher(
+                default_views_module, views_module, "receive_topology"
+            ),
             name="receive_topology",
         ),
-        path("network-topology/node/", views_module.node_list, name="node_list"),
+        path(
+            "network-topology/node/",
+            module_distinguisher(default_views_module, views_module, "node_list"),
+            name="node_list",
+        ),
         path(
             "network-topology/node/<uuid:pk>/",
-            views_module.node_detail,
+            module_distinguisher(default_views_module, views_module, "node_detail"),
             name="node_detail",
         ),
-        path("network-topology/link/", views_module.link_list, name="link_list"),
+        path(
+            "network-topology/link/",
+            module_distinguisher(default_views_module, views_module, "link_list"),
+            name="link_list",
+        ),
         path(
             "network-topology/link/<uuid:pk>/",
-            views_module.link_detail,
+            module_distinguisher(default_views_module, views_module, "link_detail"),
             name="link_detail",
         ),
     ]

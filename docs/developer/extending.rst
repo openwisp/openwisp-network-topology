@@ -343,6 +343,12 @@ must match) inside your app, which contains the following:
 
     urlpatterns = get_api_urls(views)
 
+Your custom views module only needs to define the callbacks you want to
+override, using the same names as the default callbacks (for example,
+``network_graph``). For any callback missing from your module,
+``get_api_urls`` falls back to the corresponding callback in
+``openwisp_network_topology.api.views``.
+
 13. Extending Management Commands
 ---------------------------------
 

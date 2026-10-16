@@ -3,12 +3,16 @@ import sys
 from contextlib import contextmanager
 from datetime import timedelta
 from io import StringIO
+from types import ModuleType
 
 import responses
 import swapper
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils.timezone import now
+
+from openwisp_network_topology.api import views as default_views
+from openwisp_network_topology.utils import get_api_urls
 
 from .. import settings as app_settings
 from .utils import CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin
@@ -297,3 +301,41 @@ class TestUtils(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         with redirect_stdout(output):
             call_command("save_snapshot")
         self.assertEqual(self.snapshot_model.objects.count(), 1)
+
+
+class TestApiUrls(SimpleTestCase):
+
+    def test_partial_view_overrides(self):
+        custom_views = ModuleType("custom_views")
+
+        def custom_network_graph(request):
+            pass
+
+        custom_views.network_graph = custom_network_graph
+
+        urls = get_api_urls(custom_views)
+
+        actual_names = []
+
+        expected_names = [
+            "network_collection",
+            "network_graph",
+            "network_graph_history",
+            "receive_topology",
+            "node_list",
+            "node_detail",
+            "link_list",
+            "link_detail",
+        ]
+
+        for route in urls:
+            actual_names.append(route.name)
+
+        self.assertEqual(actual_names, expected_names)
+
+        for route in urls:
+            if route.name == "network_graph":
+                self.assertIs(route.callback, custom_network_graph)
+
+            else:
+                self.assertIs(route.callback, getattr(default_views, route.name))
