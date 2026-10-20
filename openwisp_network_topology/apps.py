@@ -1,7 +1,9 @@
 from django.apps import AppConfig
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from swapper import get_model_name
 
+from openwisp_users.signals import organization_disabled
 from openwisp_utils.admin_theme.menu import register_menu_group
 
 from .settings import SIGNALS
@@ -18,7 +20,22 @@ class OpenwispNetworkTopologyConfig(AppConfig):
         from .signals import broadcast_topology, update_topology
 
         update_topology.connect(broadcast_topology)
+        self.connect_organization_disabled()
         self.register_menu_groups()
+
+    def connect_organization_disabled(self):
+        organization_disabled.connect(
+            self.organization_disabled_receiver,
+            dispatch_uid="network_topology_organization_disabled",
+        )
+
+    @classmethod
+    def organization_disabled_receiver(cls, instance, **kwargs):
+        from .tasks import handle_disabled_organization
+
+        transaction.on_commit(
+            lambda: handle_disabled_organization.delay(str(instance.pk))
+        )
 
     def register_menu_groups(self):
         register_menu_group(

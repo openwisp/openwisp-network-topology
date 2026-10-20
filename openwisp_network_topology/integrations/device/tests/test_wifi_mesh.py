@@ -81,6 +81,34 @@ class TestWifiMeshIntegration(TopologyTestMixin, TransactionTestCase):
                 '"OPENIWSP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION" is set to "False".',
             )
 
+    def test_mesh_excludes_disabled_organization(self):
+        _, org = self._populate_mesh(SIMPLE_MESH_DATA)
+        Topology.objects.filter(organization=org).delete()
+        WifiMesh.objects.all().delete()
+        org.is_active = False
+        org.save(update_fields=["is_active"])
+        create_mesh_topology.delay(organization_ids=(org.id,))
+        self.assertEqual(Topology.objects.filter(organization=org).count(), 0)
+
+    def test_intermediate_topologies_excludes_deactivated_device(self):
+        devices, org = self._populate_mesh(SIMPLE_MESH_DATA)
+        device = devices[0]
+        device_mac = device.mac_address.upper()
+        before = WifiMesh._create_intermediate_topologies(org.id, 360)
+        self.assertNotEqual(before, {})
+        found_before = any(
+            any(v.startswith(f"{device_mac}@") for v in topo["mac_mapping"].values())
+            for topo in before.values()
+        )
+        self.assertTrue(found_before)
+        device.deactivate()
+        after = WifiMesh._create_intermediate_topologies(org.id, 360)
+        found_after = any(
+            any(v.startswith(f"{device_mac}@") for v in topo["mac_mapping"].values())
+            for topo in after.values()
+        )
+        self.assertFalse(found_after)
+
     def test_simple_mesh(self):
         devices, org = self._populate_mesh(SIMPLE_MESH_DATA)
         self.assertEqual(Topology.objects.filter(organization=org).count(), 1)

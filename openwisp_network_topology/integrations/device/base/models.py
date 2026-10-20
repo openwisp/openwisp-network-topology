@@ -11,6 +11,7 @@ from swapper import get_model_name, load_model
 
 from openwisp_utils.base import UUIDModel
 
+from ....utils import is_write_blocked
 from .. import settings as app_settings
 
 logger = logging.getLogger(__name__)
@@ -77,6 +78,19 @@ class AbstractDeviceNode(UUIDModel):
             return getattr(cls, opts["auto_create"])(node)
 
     @classmethod
+    def _device_filter(cls, node):
+        """
+        Base Device queryset filter shared by all ``auto_create_*``
+        methods: excludes deactivated devices and devices belonging to
+        a disabled organization, and narrows down to the node's
+        organization when the node is not shared.
+        """
+        device_filter = models.Q(_is_deactivated=False, organization__is_active=True)
+        if node.organization_id:
+            device_filter &= models.Q(organization_id=node.organization_id)
+        return device_filter
+
+    @classmethod
     def auto_create_openvpn(cls, node):
         """
         Implementation of the integration between
@@ -88,9 +102,9 @@ class AbstractDeviceNode(UUIDModel):
             return
 
         Device = load_model("config", "Device")
-        device_filter = models.Q(config__vpnclient__cert__common_name=common_name)
-        if node.organization_id:
-            device_filter &= models.Q(organization_id=node.organization_id)
+        device_filter = models.Q(
+            config__vpnclient__cert__common_name=common_name
+        ) & cls._device_filter(node)
         device = (
             Device.objects.only(
                 "id", "name", "last_ip", "management_ip", "organization_id"
@@ -116,9 +130,9 @@ class AbstractDeviceNode(UUIDModel):
             except ValueError:
                 # invalid IP address
                 continue
-        device_filter = models.Q(config__vpnclient__ip__ip_address__in=ip_addresses)
-        if node.organization_id:
-            device_filter &= models.Q(organization_id=node.organization_id)
+        device_filter = models.Q(
+            config__vpnclient__ip__ip_address__in=ip_addresses
+        ) & cls._device_filter(node)
         device = (
             Device.objects.only(
                 "id", "name", "last_ip", "management_ip", "organization_id"
@@ -144,9 +158,7 @@ class AbstractDeviceNode(UUIDModel):
         Device = load_model("config", "Device")
         device_filter = models.Q(
             config__vpnclient__secret__startswith=zerotier_member_id
-        )
-        if node.organization_id:
-            device_filter &= models.Q(organization_id=node.organization_id)
+        ) & cls._device_filter(node)
         device = (
             Device.objects.only(
                 "id", "name", "last_ip", "management_ip", "organization_id"
@@ -169,9 +181,7 @@ class AbstractDeviceNode(UUIDModel):
         Device = load_model("config", "Device")
         device_filter = models.Q(
             mac_address__iexact=node.addresses[0].rpartition("@")[0]
-        )
-        if node.organization_id:
-            device_filter &= models.Q(organization_id=node.organization_id)
+        ) & cls._device_filter(node)
         device = (
             Device.objects.only(
                 "id", "name", "last_ip", "management_ip", "organization_id"
@@ -226,7 +236,21 @@ class AbstractDeviceNode(UUIDModel):
         return cls.objects.filter(
             models.Q(node__source_link_set__pk=link.pk)
             | models.Q(node__target_link_set__pk=link.pk)
-        ).select_related("device", "node")
+        ).select_related("device__organization", "node")
+
+    @classmethod
+    def mark_device_links_down(cls, device_id):
+        """
+        Marks the links of a deactivated device's nodes as down.
+        """
+        Link = load_model("topology", "Link")
+        node_ids = cls.objects.filter(device_id=device_id).values_list(
+            "node_id", flat=True
+        )
+        Link.objects.filter(
+            models.Q(source_id__in=node_ids) | models.Q(target_id__in=node_ids),
+            status="up",
+        ).update(status="down", status_changed=now(), modified=now())
 
     @classmethod
     def trigger_device_updates(cls, link):
@@ -236,7 +260,11 @@ class AbstractDeviceNode(UUIDModel):
         """
         if link.topology.parser not in cls.ENABLED_PARSERS:
             return
+        if is_write_blocked(link.topology):
+            return
         for device_node in cls.filter_by_link(link):
+            if is_write_blocked(device_node.device):
+                continue
             device_node.link_action(link, link.status)
             # triggers monitoring checks if OpenWISP Monitoring is enabled
             if "openwisp_monitoring.device" in settings.INSTALLED_APPS:
@@ -282,6 +310,10 @@ class AbstractWifiMesh(UUIDModel):
                 '"OPENIWSP_NETWORK_TOPOLOGY_WIFI_MESH_INTEGRATION" is set to "False".'
             )
         Link = load_model("topology", "Link")
+        Organization = load_model("openwisp_users", "Organization")
+        organization_ids = Organization.active.filter(
+            pk__in=organization_ids
+        ).values_list("pk", flat=True)
         for org_id in organization_ids:
             intermediate_topologies = cls._create_intermediate_topologies(
                 org_id, discard_older_data_time
@@ -311,9 +343,9 @@ class AbstractWifiMesh(UUIDModel):
         """
         DeviceData = load_model("device_monitoring", "DeviceData")
         intermediate_topologies = {}
-        query = DeviceData.objects.filter(organization_id=organization_id).only(
-            "mac_address"
-        )
+        query = DeviceData.objects.filter(
+            organization_id=organization_id, _is_deactivated=False
+        ).only("mac_address")
         discard_older_data_time = now() - timedelta(seconds=discard_older_data_time)
         for device_data in query.iterator():
             try:

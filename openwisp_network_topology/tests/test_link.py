@@ -261,3 +261,42 @@ class TestLink(TestOrganizationMixin, CreateGraphObjectsMixin, TestCase):
             data = link.json(dict=True, original=True)
             self.assertIn("wired", data["properties"])
             self.assertNotIn("user_property", data["properties"])
+
+    def test_clean_disabled_organization(self):
+        topology = self.topology_model.objects.first()
+        node1, node2 = self._get_nodes()
+        link = topology._create_link(source=node1, target=node2, cost=1.0)
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        with self.assertRaises(ValidationError):
+            link.full_clean()
+
+    def test_mark_organization_links_down(self):
+        topology = self.topology_model.objects.first()
+        node1, node2 = self._get_nodes()
+        link = topology._create_link(source=node1, target=node2, cost=1.0, status="up")
+        link.full_clean()
+        link.save()
+        with catch_signal(link_status_changed) as handler:
+            self.link_model.mark_organization_links_down(topology.organization_id)
+        handler.assert_called_once_with(
+            link=link, sender=self.link_model, signal=link_status_changed
+        )
+        link.refresh_from_db()
+        self.assertEqual(link.status, "down")
+
+    def test_organization_disabled_signal_marks_links_down(self):
+        topology = self.topology_model.objects.first()
+        node1, node2 = self._get_nodes()
+        link = topology._create_link(source=node1, target=node2, cost=1.0, status="up")
+        link.full_clean()
+        link.save()
+        with catch_signal(link_status_changed) as handler:
+            with self.captureOnCommitCallbacks(execute=True):
+                topology.organization.is_active = False
+                topology.organization.save(update_fields=["is_active"])
+        handler.assert_called_once_with(
+            link=link, sender=self.link_model, signal=link_status_changed
+        )
+        link.refresh_from_db()
+        self.assertEqual(link.status, "down")

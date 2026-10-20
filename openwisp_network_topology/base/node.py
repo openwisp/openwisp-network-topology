@@ -21,7 +21,7 @@ from openwisp_utils.base import TimeStampedEditableModel
 
 from .. import settings as app_settings
 from ..signals import update_topology
-from ..utils import print_info
+from ..utils import print_info, validate_organization_enabled
 
 
 class AbstractNode(ShareableOrgMixin, TimeStampedEditableModel):
@@ -55,10 +55,13 @@ class AbstractNode(ShareableOrgMixin, TimeStampedEditableModel):
         return self.name
 
     def full_clean(self, *args, **kwargs):
-        self.organization_id = self.get_organization_id()
+        if self.topology_id is not None:
+            self.organization_id = self.get_organization_id()
         return super().full_clean(*args, **kwargs)
 
     def clean(self):
+        if self.topology_id is not None:
+            validate_organization_enabled(self, self.topology)
         if self.properties is None:
             self.properties = {}
 
@@ -141,6 +144,7 @@ class AbstractNode(ShareableOrgMixin, TimeStampedEditableModel):
         needle = '"{}"'.format(address)
         return (
             cls.objects.filter(topology=topology)
+            .select_related("organization", "topology")
             .annotate(_addresses_text=Cast("addresses", output_field=TextField()))
             .filter(_addresses_text__contains=needle)
             .first()

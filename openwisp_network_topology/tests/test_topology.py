@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest import mock
 
 import responses
 import swapper
@@ -9,6 +10,7 @@ from netdiff import OlsrParser
 
 from openwisp_utils.tests import capture_any_output
 
+from ..tasks import handle_update_topology
 from .utils import CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin
 
 Link = swapper.load_model("topology", "Link")
@@ -556,3 +558,45 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
             link.refresh_from_db()
             self.assertEqual(link.status, "down")
             self.assertNotEqual(link.modified, modified)
+
+    def test_clean_disabled_organization(self):
+        topology = self.topology_model.objects.first()
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        with self.assertRaises(ValidationError):
+            topology.full_clean()
+
+    @mock.patch("openwisp_network_topology.base.topology.handle_update_topology.delay")
+    def test_update_skipped_disabled_organization(self, mocked_delay):
+        topology = self.topology_model.objects.first()
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        topology.update()
+        mocked_delay.assert_not_called()
+
+    def test_receive_skipped_disabled_organization(self):
+        topology = self._set_receive()
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        node_count = self.node_model.objects.count()
+        link_count = self.link_model.objects.count()
+        data = self._load("static/netjson-1-link.json")
+        topology.receive(data)
+        self.assertEqual(self.node_model.objects.count(), node_count)
+        self.assertEqual(self.link_model.objects.count(), link_count)
+
+    def test_handle_update_topology_skipped_disabled_organization(self):
+        topology = self.topology_model.objects.first()
+        topology.parser = "netdiff.NetJsonParser"
+        topology.save()
+        diff = topology.diff(self._load("static/netjson-1-link.json"))
+        node_count = self.node_model.objects.count()
+        link_count = self.link_model.objects.count()
+        # organization is disabled after the diff has been calculated
+        # (simulates the async race window between ``update()`` queueing
+        # the task and the task actually running)
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        handle_update_topology(topology.pk, diff)
+        self.assertEqual(self.node_model.objects.count(), node_count)
+        self.assertEqual(self.link_model.objects.count(), link_count)
