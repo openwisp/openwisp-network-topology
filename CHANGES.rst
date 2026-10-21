@@ -1,6 +1,19 @@
 Changelog
 =========
 
+Version 1.3.1 [2026-10-21]
+--------------------------
+
+Changes
+~~~~~~~
+
+Dependencies
+++++++++++++
+
+- Updated minimum netdiff version to 1.3.1
+
+  See: https://github.com/openwisp/netdiff/releases/tag/1.3.1
+
 Version 1.3.0 [2026-09-04]
 --------------------------
 
