@@ -1,4 +1,5 @@
 openwisp-users @ https://github.com/openwisp/openwisp-users/archive/refs/heads/1.4.tar.gz
 netdiff @ https://github.com/openwisp/netdiff/archive/refs/heads/1.4.tar.gz
+openvpn-status-reader>=0.3,<0.4
 django-flat-json-widget @ https://github.com/openwisp/django-flat-json-widget/archive/refs/heads/0.6.tar.gz
 openwisp-utils[celery,channels] @ https://github.com/openwisp/openwisp-utils/archive/refs/heads/1.4.tar.gz

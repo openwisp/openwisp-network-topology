@@ -1,4 +1,5 @@
-from datetime import timedelta
+import re
+from datetime import datetime, timedelta
 
 import responses
 import swapper
@@ -330,6 +331,34 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
 
     def test_receive_changed(self):
         self._test_receive_changed()
+
+    def test_receive_openvpn_timestamp_formats(self):
+        legacy_format = "%a %b %d %H:%M:%S %Y"
+        for version, timestamp_format in [
+            ("2.4", legacy_format),
+            ("2.5", "%Y-%m-%d %H:%M:%S"),
+        ]:
+            with self.subTest(openvpn=version):
+                topology = self._set_receive(parser="netdiff.OpenvpnParser")
+                topology.node_set.all().delete()
+                data = re.sub(
+                    r"\w{3} \w{3} +\d{1,2} \d{2}:\d{2}:\d{2} \d{4}",
+                    lambda match: datetime.strptime(
+                        match.group(), legacy_format
+                    ).strftime(timestamp_format),
+                    self._load("static/openvpn.txt"),
+                )
+                topology.receive(data)
+                self.assertEqual(topology.node_set.count(), 4)
+                self.assertEqual(topology.link_set.filter(status="up").count(), 3)
+                node = topology.node_set.get(label="Syskrack")
+                self.assertEqual(node.netjson_id, "Syskrack")
+                self.assertEqual(
+                    node.properties["connected_since"], "2017-10-08T08:39:11Z"
+                )
+                self.assertEqual(node.properties["real_address"], "87.7.9.213")
+                self.assertEqual(node.properties["bytes_received"], 417209)
+                self.assertEqual(node.properties["bytes_sent"], 6046898)
 
     def test_receive_removed(self):
         t = self._set_receive()
