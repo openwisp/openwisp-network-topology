@@ -11,6 +11,13 @@ on:
       - master
       - "[0-9]+.[0-9]+"
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.repository }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Python==${{ matrix.python-version }} | ${{ matrix.django-version }}
@@ -18,7 +25,7 @@ jobs:
 
     services:
       redis:
-        image: redis
+        image: redis@sha256:13ad9044b4b2fd2abe4c5aad8c384b0504a71006fa33f023fc68998453a2eeca # latest
         ports:
           - 6379:6379
 
@@ -34,12 +41,13 @@ jobs:
           - django~=5.2.0
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
@@ -47,7 +55,7 @@ jobs:
             **/requirements*.txt
 
       - name: Cache APT packages
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: /var/cache/apt/archives
           key: apt-${{ runner.os }}-${{ hashFiles('.github/workflows/ci.yml') }}
@@ -61,6 +69,8 @@ jobs:
 
       - name: Install Dependencies
         id: deps
+        env:
+          DJANGO_VERSION: ${{ matrix.django-version }}
         run: |
           sudo apt update -qq
           sudo apt -qq install \
@@ -74,7 +84,7 @@ jobs:
           pip install -U pip wheel setuptools
           pip install -U -e .
           pip install -U -r requirements-test.txt
-          pip install ${{ matrix.django-version }}
+          pip install "$DJANGO_VERSION"
 
       - name: Start InfluxDB
         if: ${{ !cancelled() && steps.deps.conclusion == 'success' }}
@@ -98,7 +108,7 @@ jobs:
 
       - name: Upload Coverage
         if: ${{ success() }}
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
         with:
           parallel: true
           format: cobertura
@@ -106,10 +116,11 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
   coveralls:
+    name: Finalize Coveralls report
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
         with:
           parallel-finished: true
