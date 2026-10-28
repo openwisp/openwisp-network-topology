@@ -123,11 +123,13 @@ class TopologyAdmin(
             fields.remove("receive_url")
         return fields
 
-    def get_actions(self, request):
+    def get_actions(self, request, action_location=None):
         """
         move delete action to last position
         """
-        actions = super().get_actions(request)
+        # for Django <= 6.0, which does not accept action_location
+        kwargs = {"action_location": action_location} if action_location else {}
+        actions = super().get_actions(request, **kwargs)
         if "delete_selected" in actions:
             delete = actions["delete_selected"]
             del actions["delete_selected"]
