@@ -24,6 +24,12 @@ within the OpenWISP architecture.
     :depth: 2
     :local:
 
+Dependencies
+------------
+
+- Python >= 3.11 (Django >= 6.0 requires Python >= 3.12)
+- Django >= 5.2, < 6.2
+
 Installing for Development
 --------------------------
 
