@@ -21,9 +21,13 @@ from openwisp_network_topology.tests.utils import CreateGraphObjectsMixin
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.admin_theme.dashboard import DASHBOARD_CHARTS, DASHBOARD_TEMPLATES
 from openwisp_utils.admin_theme.menu import MENU
+from openwisp_utils.tests import catch_signal
 
+from ....signals import update_topology
+from ....utils import link_status_changed
 from ..base.models import logger as models_logger
 from ..base.models import trigger_device_checks_path
+from ..tasks import handle_deactivated_device
 
 Node = swapper.load_model("topology", "Node")
 Link = swapper.load_model("topology", "Link")
@@ -477,6 +481,152 @@ class TestControllerIntegration(Base, TransactionTestCase):
         org2_node = DeviceNode.objects.get(device=org2_device).node
         self.assertEqual(org1_node.organization, org1)
         self.assertEqual(org2_node.get_organization_id(), org2.id)
+
+    def test_auto_create_openvpn_deactivated_device(self):
+        topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
+        device.deactivate()
+        self._init_test_node(topology, common_name=cert.common_name)
+        self.assertEqual(DeviceNode.objects.count(), 0)
+
+    def test_auto_create_openvpn_disabled_organization(self):
+        # the device's organization is disabled while the topology/node
+        # stay shared (organization=None), otherwise node creation
+        # itself would already be blocked by the disabled organization
+        org = self._create_org(name="devorg")
+        shared_vpn = self._create_vpn(name="test VPN", organization=None)
+        self._create_template(
+            name="VPN",
+            type="vpn",
+            vpn=shared_vpn,
+            config=shared_vpn.auto_client(),
+            default=True,
+            organization=None,
+        )
+        device = self._create_device(organization=org)
+        self._create_config(device=device)
+        cert = device.config.vpnclient_set.first().cert
+        shared_topology = self._create_topology(
+            organization=None, parser="netdiff.OpenvpnParser"
+        )
+        org.is_active = False
+        org.save(update_fields=["is_active"])
+        self._init_test_node(shared_topology, common_name=cert.common_name)
+        self.assertEqual(DeviceNode.objects.count(), 0)
+
+    def _create_openvpn_up_link(self, topology, device, cert):
+        node = self._init_test_node(
+            topology, addresses=["netjson_id", "10.0.0.2"], common_name=cert.common_name
+        )
+        node2 = self._init_test_node(topology, addresses=["netjson_id2"], label="test2")
+        device.management_ip = None
+        device.save()
+        link = Link(
+            source=node,
+            target=node2,
+            status="down",
+            topology=topology,
+            organization=topology.organization,
+            cost=1,
+        )
+        link.full_clean()
+        link.save()
+        return link
+
+    @mock.patch(f"{trigger_device_checks_path}.delay")
+    def test_trigger_device_updates_deactivated_device(self, mocked_run_checks):
+        topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
+        link = self._create_openvpn_up_link(topology, device, cert)
+        device.deactivate()
+        link.status = "up"
+        link.save()
+        device.refresh_from_db()
+        self.assertEqual(device.management_ip, None)
+        mocked_run_checks.assert_not_called()
+
+    @mock.patch(f"{trigger_device_checks_path}.delay")
+    def test_trigger_device_updates_disabled_organization(self, mocked_run_checks):
+        topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
+        link = self._create_openvpn_up_link(topology, device, cert)
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        link.status = "up"
+        link.save()
+        device.refresh_from_db()
+        self.assertEqual(device.management_ip, None)
+        mocked_run_checks.assert_not_called()
+
+    def test_device_deactivated_marks_links_down(self):
+        topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
+        node = self._init_test_node(topology, common_name=cert.common_name)
+        node2 = self._init_test_node(topology, addresses=["netjson_id2"], label="test2")
+        peer = self._create_device(name="peer", mac_address="00:11:22:33:44:56")
+        peer.management_ip = "10.0.0.4"
+        peer.save(update_fields=["management_ip"])
+        DeviceNode.objects.create(device=peer, node=node2)
+        link = Link(
+            source=node,
+            target=node2,
+            status="up",
+            topology=topology,
+            organization=topology.organization,
+            cost=1,
+        )
+        link.full_clean()
+        link.save()
+        with catch_signal(link_status_changed) as status_handler:
+            with catch_signal(update_topology) as topology_handler:
+                device.deactivate()
+        link.refresh_from_db()
+        self.assertEqual(link.status, "down")
+        status_handler.assert_called_once()
+        topology_handler.assert_called()
+        peer.refresh_from_db()
+        self.assertEqual(peer.management_ip, None)
+
+    def test_delayed_device_cleanup_skips_reactivated_device(self):
+        topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
+        node = self._init_test_node(topology, common_name=cert.common_name)
+        node2 = self._init_test_node(topology, addresses=["netjson_id2"], label="test2")
+        link = Link(topology=topology, source=node, target=node2, cost=1)
+        link.full_clean()
+        link.save()
+        device.deactivate()
+        device.activate()
+        link.status = "up"
+        link.save()
+        handle_deactivated_device(device.pk)
+        link.refresh_from_db()
+        self.assertEqual(link.status, "up")
+
+    @mock.patch(
+        "openwisp_network_topology.integrations.device.apps.handle_deactivated_device.delay"
+    )
+    def test_device_cleanup_not_queued_after_rollback(self, mocked_delay):
+        _, device, _ = self._create_test_env(parser="netdiff.OpenvpnParser")
+        with self.assertRaisesMessage(ValueError, "rollback"):
+            with transaction.atomic():
+                device.deactivate()
+                raise ValueError("rollback")
+        mocked_delay.assert_not_called()
+
+    def test_create_device_nodes_command_skips_deactivated_device(self):
+        topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
+        properties = {"common_name": cert.common_name}
+        node = self._create_node(topology=topology, properties=properties)
+        DeviceNode.objects.all().delete()
+        device.deactivate()
+        call_command("create_device_nodes")
+        self.assertEqual(DeviceNode.objects.filter(node=node).count(), 0)
+
+    def test_create_device_nodes_command_skips_disabled_organization(self):
+        topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
+        properties = {"common_name": cert.common_name}
+        node = self._create_node(topology=topology, properties=properties)
+        DeviceNode.objects.all().delete()
+        device.organization.is_active = False
+        device.organization.save(update_fields=["is_active"])
+        call_command("create_device_nodes")
+        self.assertEqual(DeviceNode.objects.filter(node=node).count(), 0)
 
 
 class TestMonitoringIntegration(Base, TransactionTestCase):

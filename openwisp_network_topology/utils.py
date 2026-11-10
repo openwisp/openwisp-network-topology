@@ -5,11 +5,37 @@ from django.dispatch import Signal
 from django.http import Http404
 from django.shortcuts import get_object_or_404 as get_obj_or_404
 from django.urls import path, re_path
+from django.utils.translation import gettext_lazy as _
 
 link_status_changed = Signal()
 link_status_changed.__doc__ = """
 Providing arguments: ['link']
 """
+
+DISABLED_ORGANIZATION_ERROR = _(
+    "This object belongs to a disabled organization and cannot be modified."
+)
+
+
+def is_write_blocked(obj):
+    """
+    Prevent updates to disabled organizations' objects and deactivated devices.
+
+    Shared objects have no organization, so their own organization does not
+    block writes. Callers must also check any related objects they modify.
+    """
+    if obj is None:
+        return False
+    if hasattr(obj, "is_deactivated") and obj.is_deactivated():
+        return True
+    organization = getattr(obj, "organization", None)
+    return organization is not None and not organization.is_active
+
+
+def validate_organization_enabled(*objects):
+    for obj in objects:
+        if is_write_blocked(obj):
+            raise ValidationError(DISABLED_ORGANIZATION_ERROR)
 
 
 def print_info(message):  # pragma no cover

@@ -204,6 +204,17 @@ class LinkSerializer(BaseNodeLinkSerializer):
         help_text=_("If you need to add additional data to this link use this field"),
     )
 
+    def get_fields(self):
+        # organizations are needed by AbstractLink.clean() to check
+        # whether writes are blocked; select_related() here avoids a
+        # separate query per field when a new instance is validated
+        fields = super().get_fields()
+        for field_name in ("topology", "source", "target"):
+            fields[field_name].queryset = fields[field_name].queryset.select_related(
+                "organization"
+            )
+        return fields
+
     class Meta:
         model = Link
         fields = (

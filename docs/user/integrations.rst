@@ -8,7 +8,8 @@ available in ``openwisp_network_topology.integrations.device``.
 
 This additional and optional module provides the following features:
 
-- whenever the status of a link changes:
+- whenever the status of a link changes (unless the device is deactivated
+  or its organization or the topology's organization is disabled):
 
   - the management IP address of the related device is updated
     straightaway
@@ -24,6 +25,8 @@ This additional and optional module provides the following features:
 
 This integration makes the whole system a lot faster in detecting
 important events in the network.
+
+When a device is deactivated, its links are marked down.
 
 .. include:: /partials/settings-note.rst
 

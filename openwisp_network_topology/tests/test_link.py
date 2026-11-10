@@ -1,11 +1,15 @@
+from unittest import mock
+
 import swapper
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.test import TestCase
 
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.tests import catch_signal
 
-from ..utils import link_status_changed
+from ..tasks import handle_disabled_organization
+from ..utils import is_write_blocked, link_status_changed
 from .utils import CreateGraphObjectsMixin
 
 Link = swapper.load_model("topology", "Link")
@@ -122,7 +126,11 @@ class TestLink(TestOrganizationMixin, CreateGraphObjectsMixin, TestCase):
         )
         link.full_clean()
         link.save()
-        link = self.link_model.get_from_nodes("192.168.0.1", "192.168.0.2", t)
+        with self.assertNumQueries(1):
+            link = self.link_model.get_from_nodes("192.168.0.1", "192.168.0.2", t)
+            self.assertEqual(is_write_blocked(link.topology), False)
+            self.assertEqual(is_write_blocked(link.source), False)
+            self.assertEqual(is_write_blocked(link.target), False)
         self.assertIsInstance(link, self.link_model)
         link = self.link_model.get_from_nodes("wrong", "wrong", t)
         self.assertIsNone(link)
@@ -261,3 +269,87 @@ class TestLink(TestOrganizationMixin, CreateGraphObjectsMixin, TestCase):
             data = link.json(dict=True, original=True)
             self.assertIn("wired", data["properties"])
             self.assertNotIn("user_property", data["properties"])
+
+    def test_clean_disabled_organization(self):
+        topology = self.topology_model.objects.first()
+        node1, node2 = self._get_nodes()
+        link = topology._create_link(source=node1, target=node2, cost=1.0)
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        with self.assertRaises(ValidationError):
+            link.full_clean()
+
+    def test_mark_organization_links_down(self):
+        topology = self.topology_model.objects.first()
+        node1, node2 = self._get_nodes()
+        link = topology._create_link(source=node1, target=node2, cost=1.0, status="up")
+        link.full_clean()
+        link.save()
+        with catch_signal(link_status_changed) as handler:
+            self.link_model.mark_organization_links_down(topology.organization_id)
+        handler.assert_called_once_with(
+            link=link, sender=self.link_model, signal=link_status_changed
+        )
+        link.refresh_from_db()
+        self.assertEqual(link.status, "down")
+
+    def test_organization_disabled_signal_marks_links_down(self):
+        topology = self.topology_model.objects.first()
+        node1, node2 = self._get_nodes()
+        link = topology._create_link(source=node1, target=node2, cost=1.0, status="up")
+        link.full_clean()
+        link.save()
+        with catch_signal(link_status_changed) as handler:
+            with self.captureOnCommitCallbacks(execute=True):
+                topology.organization.is_active = False
+                topology.organization.save(update_fields=["is_active"])
+        handler.assert_called_once_with(
+            link=link, sender=self.link_model, signal=link_status_changed
+        )
+        link.refresh_from_db()
+        self.assertEqual(link.status, "down")
+
+    def test_disabled_organization_cleanup_includes_shared_link_endpoints(self):
+        organization = self._create_org(name="shared-disabled")
+        active_org = self._create_org(name="shared-active")
+        topology = self._create_topology(label="shared", organization=None)
+        source = self._create_node(topology=topology, organization=organization)
+        target = self._create_node(
+            topology=topology, organization=active_org, addresses=["10.0.0.2"]
+        )
+        source_link = self._create_link(topology=topology, source=source, target=target)
+        other = self._create_node(
+            topology=topology, organization=active_org, addresses=["10.0.0.3"]
+        )
+        target_link = self._create_link(topology=topology, source=other, target=source)
+        organization.is_active = False
+        organization.save(update_fields=["is_active"])
+        handle_disabled_organization(organization.pk)
+        source_link.refresh_from_db()
+        target_link.refresh_from_db()
+        self.assertEqual(source_link.status, "down")
+        self.assertEqual(target_link.status, "down")
+
+    def test_delayed_organization_cleanup_skips_reenabled_organization(self):
+        topology = self.topology_model.objects.first()
+        source, target = self._get_nodes()
+        link = self._create_link(topology=topology, source=source, target=target)
+        organization = topology.organization
+        organization.is_active = False
+        organization.save(update_fields=["is_active"])
+        organization.is_active = True
+        organization.save(update_fields=["is_active"])
+        handle_disabled_organization(organization.pk)
+        link.refresh_from_db()
+        self.assertEqual(link.status, "up")
+
+    @mock.patch("openwisp_network_topology.tasks.handle_disabled_organization.delay")
+    def test_organization_cleanup_not_queued_after_rollback(self, mocked_delay):
+        organization = self.topology_model.objects.first().organization
+        with self.captureOnCommitCallbacks(execute=True):
+            with self.assertRaisesMessage(ValueError, "rollback"):
+                with transaction.atomic():
+                    organization.is_active = False
+                    organization.save(update_fields=["is_active"])
+                    raise ValueError("rollback")
+        mocked_delay.assert_not_called()
