@@ -78,6 +78,8 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
         return "{0} - {1}".format(self.source.get_name(), self.target.get_name())
 
     def full_clean(self, *args, **kwargs):
+        # Relation checks access all three objects. Let Django report missing
+        # required fields instead of accessing a relation that was not supplied.
         has_relations = (
             self.topology_id is not None
             and self.source_id is not None

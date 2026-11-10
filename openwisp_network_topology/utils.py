@@ -19,11 +19,10 @@ DISABLED_ORGANIZATION_ERROR = _(
 
 def is_write_blocked(obj):
     """
-    Whether write operations must be skipped for ``obj``.
+    Prevent updates to disabled organizations' objects and deactivated devices.
 
-    Duck-typed so it works for both topology objects and devices: a
-    deactivated device, or an object belonging to a disabled
-    organization, blocks writes; shared objects (no organization) do not.
+    Shared objects have no organization, so their own organization does not
+    block writes. Callers must also check any related objects they modify.
     """
     if obj is None:
         return False

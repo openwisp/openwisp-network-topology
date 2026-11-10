@@ -58,6 +58,28 @@ class CreateGraphObjectsMixin(object):
         link.save()
         return link
 
+    def _create_disabled_org_objects(self):
+        org = self._create_org(name="disabled-org")
+        topology = self._create_topology(label="disabled-topology", organization=org)
+        node1 = self._create_node(
+            label="disabled-node1",
+            addresses=["192.168.10.1"],
+            topology=topology,
+            organization=org,
+        )
+        node2 = self._create_node(
+            label="disabled-node2",
+            addresses=["192.168.10.2"],
+            topology=topology,
+            organization=org,
+        )
+        link = self._create_link(
+            topology=topology, organization=org, source=node1, target=node2
+        )
+        org.is_active = False
+        org.save(update_fields=["is_active"])
+        return org, topology, node1, link
+
 
 class LoggingDisabledTestRunner(TimeLoggingTestRunner):
     def run_tests(self, test_labels, **kwargs):

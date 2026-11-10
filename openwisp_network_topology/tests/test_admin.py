@@ -564,22 +564,6 @@ class TestMultitenantAdmin(
             required_perms=["change"],
         )
 
-    def _create_disabled_org_objects(self):
-        org = self._create_org(name="disabled-org")
-        topology = self._create_topology(label="disabled-topology", organization=org)
-        node1 = self._create_node(
-            label="disabled-node1", topology=topology, organization=org
-        )
-        node2 = self._create_node(
-            label="disabled-node2", topology=topology, organization=org
-        )
-        link = self._create_link(
-            topology=topology, organization=org, source=node1, target=node2
-        )
-        org.is_active = False
-        org.save(update_fields=["is_active"])
-        return org, topology, node1, link
-
     def test_disabled_org_admin_crud_topology(self):
         org, topology, _, _ = self._create_disabled_org_objects()
         self._test_disabled_org_admin_crud(

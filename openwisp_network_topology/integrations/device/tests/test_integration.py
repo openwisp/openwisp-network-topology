@@ -486,7 +486,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
         device.deactivate()
         self._init_test_node(topology, common_name=cert.common_name)
-        self.assertFalse(DeviceNode.objects.exists())
+        self.assertEqual(DeviceNode.objects.count(), 0)
 
     def test_auto_create_openvpn_disabled_organization(self):
         # the device's organization is disabled while the topology/node
@@ -511,7 +511,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         org.is_active = False
         org.save(update_fields=["is_active"])
         self._init_test_node(shared_topology, common_name=cert.common_name)
-        self.assertFalse(DeviceNode.objects.exists())
+        self.assertEqual(DeviceNode.objects.count(), 0)
 
     def _create_openvpn_up_link(self, topology, device, cert):
         node = self._init_test_node(
@@ -540,7 +540,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         link.status = "up"
         link.save()
         device.refresh_from_db()
-        self.assertIsNone(device.management_ip)
+        self.assertEqual(device.management_ip, None)
         mocked_run_checks.assert_not_called()
 
     @mock.patch(f"{trigger_device_checks_path}.delay")
@@ -552,7 +552,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         link.status = "up"
         link.save()
         device.refresh_from_db()
-        self.assertIsNone(device.management_ip)
+        self.assertEqual(device.management_ip, None)
         mocked_run_checks.assert_not_called()
 
     def test_device_deactivated_marks_links_down(self):
@@ -581,7 +581,7 @@ class TestControllerIntegration(Base, TransactionTestCase):
         status_handler.assert_called_once()
         topology_handler.assert_called()
         peer.refresh_from_db()
-        self.assertIsNone(peer.management_ip)
+        self.assertEqual(peer.management_ip, None)
 
     def test_delayed_device_cleanup_skips_reactivated_device(self):
         topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")

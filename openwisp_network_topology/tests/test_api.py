@@ -968,30 +968,6 @@ class TestApi(
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Link.objects.count(), 0)
 
-    def _create_disabled_org_objects(self):
-        disabled_org = self._create_org(name="disabled-org")
-        topology = self._create_topology(
-            label="disabled-topology", organization=disabled_org
-        )
-        node1 = self._create_node(
-            label="disabled-node1",
-            addresses=["192.168.10.1"],
-            topology=topology,
-            organization=disabled_org,
-        )
-        node2 = self._create_node(
-            label="disabled-node2",
-            addresses=["192.168.10.2"],
-            topology=topology,
-            organization=disabled_org,
-        )
-        link = self._create_link(
-            source=node1, target=node2, topology=topology, organization=disabled_org
-        )
-        disabled_org.is_active = False
-        disabled_org.save(update_fields=["is_active"])
-        return disabled_org, topology, node1, link
-
     def test_disabled_org_api_crud_topology(self):
         disabled_org, topology, _, _ = self._create_disabled_org_objects()
         self._test_disabled_org_api_crud(
