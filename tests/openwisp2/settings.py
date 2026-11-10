@@ -107,7 +107,6 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 LANGUAGE_CODE = "en-gb"
 TIME_ZONE = "UTC"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 STATIC_URL = "/static/"
 

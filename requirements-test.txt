@@ -1,8 +1,8 @@
-responses~=0.26.2
+responses~=0.26.3
 freezegun~=1.5.5
 # Needed to test integrations
 openwisp-monitoring @ https://github.com/openwisp/openwisp-monitoring/archive/refs/heads/1.4.tar.gz
 openwisp-controller @ https://github.com/openwisp/openwisp-controller/archive/refs/heads/1.4.tar.gz
 openwisp-utils[qa,selenium,channels-test] @ https://github.com/openwisp/openwisp-utils/archive/refs/heads/1.4.tar.gz
-redis~=8.0.1
+redis~=8.1.0
 django_redis~=7.0.0

@@ -1,11 +1,14 @@
 import re
+from unittest import skipUnless
 from unittest.mock import patch
 
+import django
 import responses
 import swapper
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 from openwisp_users.tests.utils import TestMultitenantAdminMixin, TestOrganizationMixin
@@ -44,6 +47,30 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         )
         self.client.force_login(self.user_model.objects.get(username="admin"))
         self.changelist_path = reverse("{0}_topology_changelist".format(self.prefix))
+
+    @skipUnless(
+        django.VERSION >= (6, 1),
+        "ActionLocation is only available on Django 6.1 and later",
+    )
+    def test_topology_admin_delete_selected_by_action_location(self):
+        # ActionLocation was added in Django 6.1, so it is imported inside
+        # this version-guarded test to avoid an ImportError on older Django
+        from django.contrib.admin import ActionLocation
+
+        model_admin = admin.site._registry[self.topology_model]
+        request = RequestFactory().get(
+            reverse(f"admin:{self.app_label}_topology_changelist")
+        )
+        request.user = self.user_model.objects.get(username="admin")
+        changelist_actions = model_admin.get_actions(
+            request, ActionLocation.CHANGE_LIST
+        )
+        self.assertIn("delete_selected", changelist_actions)
+        self.assertEqual(list(changelist_actions)[-1], "delete_selected")
+        self.assertNotIn(
+            "delete_selected",
+            model_admin.get_actions(request, ActionLocation.CHANGE_FORM),
+        )
 
     def test_unpublish_selected(self):
         t = self.topology_model.objects.first()
