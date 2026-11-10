@@ -9,7 +9,7 @@ from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.tests import catch_signal
 
 from ..tasks import handle_disabled_organization
-from ..utils import link_status_changed
+from ..utils import is_write_blocked, link_status_changed
 from .utils import CreateGraphObjectsMixin
 
 Link = swapper.load_model("topology", "Link")
@@ -126,7 +126,11 @@ class TestLink(TestOrganizationMixin, CreateGraphObjectsMixin, TestCase):
         )
         link.full_clean()
         link.save()
-        link = self.link_model.get_from_nodes("192.168.0.1", "192.168.0.2", t)
+        with self.assertNumQueries(1):
+            link = self.link_model.get_from_nodes("192.168.0.1", "192.168.0.2", t)
+            self.assertEqual(is_write_blocked(link.topology), False)
+            self.assertEqual(is_write_blocked(link.source), False)
+            self.assertEqual(is_write_blocked(link.target), False)
         self.assertIsInstance(link, self.link_model)
         link = self.link_model.get_from_nodes("wrong", "wrong", t)
         self.assertIsNone(link)

@@ -188,7 +188,7 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
         source_needle = '"{}"'.format(source)
         target_needle = '"{}"'.format(target)
         qs = cls.objects.select_related(
-            "topology", "source__organization", "target__organization"
+            "topology__organization", "source__organization", "target__organization"
         ).annotate(
             _source_addresses_text=Cast("source__addresses", output_field=TextField()),
             _target_addresses_text=Cast("target__addresses", output_field=TextField()),

@@ -583,9 +583,11 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         topology.refresh_from_db()
         self.assertEqual(topology.organization.name, "active")
 
-    def test_snapshot_skipped_disabled_organization(self):
+    @mock.patch("openwisp_network_topology.base.topology.logger.info")
+    def test_snapshot_skipped_disabled_organization(self, mocked_info):
         topology = self.topology_model.objects.first()
         topology.save_snapshot()
+        mocked_info.assert_not_called()
         snapshot = topology.snapshot_set.get()
         original_data = snapshot.data
         original_modified = snapshot.modified
@@ -593,11 +595,15 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         topology.organization.save(update_fields=["is_active"])
         topology.label = "changed"
         topology.save_snapshot()
+        mocked_info.assert_called_once_with(
+            "Skipped snapshot of topology %s: organization disabled", topology.pk
+        )
         snapshot.refresh_from_db()
         self.assertEqual(snapshot.data, original_data)
         self.assertEqual(snapshot.modified, original_modified)
         snapshot.delete()
         topology.save_snapshot()
+        self.assertEqual(mocked_info.call_count, 2)
         self.assertEqual(topology.snapshot_set.count(), 0)
 
     @mock.patch("openwisp_network_topology.base.topology.handle_update_topology.delay")

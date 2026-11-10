@@ -1033,4 +1033,5 @@ class TestApi(
             auth_mechanism="session",
             unchanged_field="cost_text",
         )
+        # Creation is blocked, but the helper deletes the existing link.
         self.assertEqual(self.link_model.objects.count(), count_before - 1)

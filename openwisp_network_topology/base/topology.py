@@ -336,6 +336,9 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
         Saves the snapshot of topology
         """
         if is_write_blocked(self):
+            logger.info(
+                "Skipped snapshot of topology %s: organization disabled", self.pk
+            )
             return
         Snapshot = self.snapshot_model
         date = datetime.now().date()
