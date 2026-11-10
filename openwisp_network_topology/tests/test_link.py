@@ -1,10 +1,14 @@
+from unittest import mock
+
 import swapper
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.test import TestCase
 
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.tests import catch_signal
 
+from ..tasks import handle_disabled_organization
 from ..utils import link_status_changed
 from .utils import CreateGraphObjectsMixin
 
@@ -300,3 +304,48 @@ class TestLink(TestOrganizationMixin, CreateGraphObjectsMixin, TestCase):
         )
         link.refresh_from_db()
         self.assertEqual(link.status, "down")
+
+    def test_disabled_organization_cleanup_includes_shared_link_endpoints(self):
+        organization = self._create_org(name="shared-disabled")
+        active_org = self._create_org(name="shared-active")
+        topology = self._create_topology(label="shared", organization=None)
+        source = self._create_node(topology=topology, organization=organization)
+        target = self._create_node(
+            topology=topology, organization=active_org, addresses=["10.0.0.2"]
+        )
+        source_link = self._create_link(topology=topology, source=source, target=target)
+        other = self._create_node(
+            topology=topology, organization=active_org, addresses=["10.0.0.3"]
+        )
+        target_link = self._create_link(topology=topology, source=other, target=source)
+        organization.is_active = False
+        organization.save(update_fields=["is_active"])
+        handle_disabled_organization(organization.pk)
+        source_link.refresh_from_db()
+        target_link.refresh_from_db()
+        self.assertEqual(source_link.status, "down")
+        self.assertEqual(target_link.status, "down")
+
+    def test_delayed_organization_cleanup_skips_reenabled_organization(self):
+        topology = self.topology_model.objects.first()
+        source, target = self._get_nodes()
+        link = self._create_link(topology=topology, source=source, target=target)
+        organization = topology.organization
+        organization.is_active = False
+        organization.save(update_fields=["is_active"])
+        organization.is_active = True
+        organization.save(update_fields=["is_active"])
+        handle_disabled_organization(organization.pk)
+        link.refresh_from_db()
+        self.assertEqual(link.status, "up")
+
+    @mock.patch("openwisp_network_topology.tasks.handle_disabled_organization.delay")
+    def test_organization_cleanup_not_queued_after_rollback(self, mocked_delay):
+        organization = self.topology_model.objects.first().organization
+        with self.captureOnCommitCallbacks(execute=True):
+            with self.assertRaisesMessage(ValueError, "rollback"):
+                with transaction.atomic():
+                    organization.is_active = False
+                    organization.save(update_fields=["is_active"])
+                    raise ValueError("rollback")
+        mocked_delay.assert_not_called()

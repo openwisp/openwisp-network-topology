@@ -95,6 +95,16 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
 
     def clean(self):
         validate_organization_enabled(self)
+        if not self._state.adding:
+            # Reassignment must not move a topology out of a disabled organization.
+            previous = (
+                type(self)
+                .objects.select_related("organization")
+                .filter(pk=self.pk)
+                .first()
+            )
+            if previous and previous.organization_id != self.organization_id:
+                validate_organization_enabled(previous)
         if self.strategy == "fetch" and not self.url:
             raise ValidationError(
                 {"url": [_("an url must be specified when using FETCH strategy")]}
@@ -325,6 +335,8 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
         """
         Saves the snapshot of topology
         """
+        if is_write_blocked(self):
+            return
         Snapshot = self.snapshot_model
         date = datetime.now().date()
         options = dict(topology=self, date=date)
@@ -378,7 +390,10 @@ class AbstractTopology(ShareableOrgMixin, TimeStampedEditableModel):
                 link = Link.get_from_nodes(
                     link_dict["source"], link_dict["target"], topology=self
                 )
-                if link:
+                if link and not any(
+                    is_write_blocked(obj)
+                    for obj in (link.topology, link.source, link.target)
+                ):
                     link.save()
         self.update(data)
 

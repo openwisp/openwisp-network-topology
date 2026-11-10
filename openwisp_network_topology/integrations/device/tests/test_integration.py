@@ -21,9 +21,13 @@ from openwisp_network_topology.tests.utils import CreateGraphObjectsMixin
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.admin_theme.dashboard import DASHBOARD_CHARTS, DASHBOARD_TEMPLATES
 from openwisp_utils.admin_theme.menu import MENU
+from openwisp_utils.tests import catch_signal
 
+from ....signals import update_topology
+from ....utils import link_status_changed
 from ..base.models import logger as models_logger
 from ..base.models import trigger_device_checks_path
+from ..tasks import handle_deactivated_device
 
 Node = swapper.load_model("topology", "Node")
 Link = swapper.load_model("topology", "Link")
@@ -555,6 +559,10 @@ class TestControllerIntegration(Base, TransactionTestCase):
         topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
         node = self._init_test_node(topology, common_name=cert.common_name)
         node2 = self._init_test_node(topology, addresses=["netjson_id2"], label="test2")
+        peer = self._create_device(name="peer", mac_address="00:11:22:33:44:56")
+        peer.management_ip = "10.0.0.4"
+        peer.save(update_fields=["management_ip"])
+        DeviceNode.objects.create(device=peer, node=node2)
         link = Link(
             source=node,
             target=node2,
@@ -565,9 +573,41 @@ class TestControllerIntegration(Base, TransactionTestCase):
         )
         link.full_clean()
         link.save()
-        device.deactivate()
+        with catch_signal(link_status_changed) as status_handler:
+            with catch_signal(update_topology) as topology_handler:
+                device.deactivate()
         link.refresh_from_db()
         self.assertEqual(link.status, "down")
+        status_handler.assert_called_once()
+        topology_handler.assert_called()
+        peer.refresh_from_db()
+        self.assertIsNone(peer.management_ip)
+
+    def test_delayed_device_cleanup_skips_reactivated_device(self):
+        topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
+        node = self._init_test_node(topology, common_name=cert.common_name)
+        node2 = self._init_test_node(topology, addresses=["netjson_id2"], label="test2")
+        link = Link(topology=topology, source=node, target=node2, cost=1)
+        link.full_clean()
+        link.save()
+        device.deactivate()
+        device.activate()
+        link.status = "up"
+        link.save()
+        handle_deactivated_device(device.pk)
+        link.refresh_from_db()
+        self.assertEqual(link.status, "up")
+
+    @mock.patch(
+        "openwisp_network_topology.integrations.device.apps.handle_deactivated_device.delay"
+    )
+    def test_device_cleanup_not_queued_after_rollback(self, mocked_delay):
+        _, device, _ = self._create_test_env(parser="netdiff.OpenvpnParser")
+        with self.assertRaisesMessage(ValueError, "rollback"):
+            with transaction.atomic():
+                device.deactivate()
+                raise ValueError("rollback")
+        mocked_delay.assert_not_called()
 
     def test_create_device_nodes_command_skips_deactivated_device(self):
         topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")

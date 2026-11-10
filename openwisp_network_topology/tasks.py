@@ -39,9 +39,13 @@ def handle_update_topology(topology_pk, diff):
 
 @shared_task
 def handle_disabled_organization(organization_id):
+    """Mark links down so they no longer appear active and can expire.
+
+    This task runs after an organization is disabled. Skip cleanup if it was
+    re-enabled before the task ran.
     """
-    A Celery task that marks the links of a disabled
-    organization's topologies as down.
-    """
+    Organization = load_model("openwisp_users", "Organization")
+    if not Organization.objects.filter(pk=organization_id, is_active=False).exists():
+        return
     Link = load_model("topology", "Link")
     Link.mark_organization_links_down(organization_id)

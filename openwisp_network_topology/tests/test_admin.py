@@ -152,11 +152,13 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         for action in ("publish_selected", "unpublish_selected", "update_selected"):
             with self.subTest(action):
                 published_before = active_topology.published
-                response = self.client.post(
-                    self.changelist_path,
-                    {"action": action, "_selected_action": selected},
-                    follow=True,
-                )
+                with patch.object(self.topology_model, "update") as mocked_update:
+                    response = self.client.post(
+                        self.changelist_path,
+                        {"action": action, "_selected_action": selected},
+                        follow=True,
+                    )
+                    mocked_update.assert_not_called()
                 active_topology.refresh_from_db()
                 self.assertEqual(active_topology.published, published_before)
                 messages = [m.message for m in response.context["messages"]]
@@ -508,7 +510,6 @@ class TestMultitenantAdmin(
             url=self._get_autocomplete_view_path(self.app_label, "node", "topology"),
             visible=[data["t1"].label, t_special.label],
             hidden=[data["t2"].label, data["t3_inactive"].label],
-            superuser_hidden=[data["t3_inactive"].label],
         )
 
     def test_link_topology_autocomplete_filter(self):
@@ -518,7 +519,6 @@ class TestMultitenantAdmin(
             url=self._get_autocomplete_view_path(self.app_label, "link", "topology"),
             visible=[data["t1"].label, t_special.label],
             hidden=[data["t2"].label, data["t3_inactive"].label],
-            superuser_hidden=[data["t3_inactive"].label],
         )
 
     @patch.object(Topology, "update")

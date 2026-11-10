@@ -566,6 +566,40 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         with self.assertRaises(ValidationError):
             topology.full_clean()
 
+    def test_cannot_move_topology_from_disabled_organization(self):
+        topology = self.topology_model.objects.first()
+        active_org = self._create_org(name="active")
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        topology.organization = active_org
+        with self.assertRaises(ValidationError):
+            topology.full_clean()
+
+    def test_can_move_topology_between_active_organizations(self):
+        topology = self.topology_model.objects.first()
+        topology.organization = self._create_org(name="active")
+        topology.full_clean()
+        topology.save()
+        topology.refresh_from_db()
+        self.assertEqual(topology.organization.name, "active")
+
+    def test_snapshot_skipped_disabled_organization(self):
+        topology = self.topology_model.objects.first()
+        topology.save_snapshot()
+        snapshot = topology.snapshot_set.get()
+        original_data = snapshot.data
+        original_modified = snapshot.modified
+        topology.organization.is_active = False
+        topology.organization.save(update_fields=["is_active"])
+        topology.label = "changed"
+        topology.save_snapshot()
+        snapshot.refresh_from_db()
+        self.assertEqual(snapshot.data, original_data)
+        self.assertEqual(snapshot.modified, original_modified)
+        snapshot.delete()
+        topology.save_snapshot()
+        self.assertEqual(topology.snapshot_set.count(), 0)
+
     @mock.patch("openwisp_network_topology.base.topology.handle_update_topology.delay")
     def test_update_skipped_disabled_organization(self, mocked_delay):
         topology = self.topology_model.objects.first()
@@ -584,6 +618,47 @@ class TestTopology(CreateOrgMixin, CreateGraphObjectsMixin, LoadMixin, TestCase)
         topology.receive(data)
         self.assertEqual(self.node_model.objects.count(), node_count)
         self.assertEqual(self.link_model.objects.count(), link_count)
+
+    @mock.patch("openwisp_network_topology.base.topology.handle_update_topology.delay")
+    def test_receive_does_not_refresh_links_with_disabled_endpoints(self, mocked_delay):
+        disabled_org = self._create_org(name="disabled")
+        active_org = self._create_org(name="active")
+        topology = self._create_topology(
+            label="shared",
+            organization=None,
+            strategy="receive",
+            key="test",
+            parser="netdiff.NetJsonParser",
+            expiration_time=60,
+        )
+        disabled_node = self._create_node(
+            topology=topology, organization=disabled_org, addresses=["10.0.0.1"]
+        )
+        active_node = self._create_node(
+            topology=topology, organization=active_org, addresses=["10.0.0.2"]
+        )
+        other_node = self._create_node(
+            topology=topology, organization=active_org, addresses=["10.0.0.3"]
+        )
+        blocked_link = self._create_link(
+            topology=topology, source=disabled_node, target=active_node
+        )
+        active_link = self._create_link(
+            topology=topology, source=active_node, target=other_node
+        )
+        data = topology.json()
+        disabled_org.is_active = False
+        disabled_org.save(update_fields=["is_active"])
+        blocked_modified = blocked_link.modified
+        active_modified = active_link.modified
+        with freeze_time() as frozen_time:
+            frozen_time.tick(timedelta(seconds=5))
+            topology.receive(data)
+        blocked_link.refresh_from_db()
+        active_link.refresh_from_db()
+        self.assertEqual(blocked_link.modified, blocked_modified)
+        self.assertGreater(active_link.modified, active_modified)
+        mocked_delay.assert_called_once()
 
     def test_handle_update_topology_skipped_disabled_organization(self):
         topology = self.topology_model.objects.first()

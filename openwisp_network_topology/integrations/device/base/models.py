@@ -247,10 +247,10 @@ class AbstractDeviceNode(UUIDModel):
         node_ids = cls.objects.filter(device_id=device_id).values_list(
             "node_id", flat=True
         )
-        Link.objects.filter(
-            models.Q(source_id__in=node_ids) | models.Q(target_id__in=node_ids),
-            status="up",
-        ).update(status="down", status_changed=now(), modified=now())
+        links = Link.objects.filter(
+            models.Q(source_id__in=node_ids) | models.Q(target_id__in=node_ids)
+        )
+        Link.mark_down(links)
 
     @classmethod
     def trigger_device_updates(cls, link):

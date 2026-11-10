@@ -220,15 +220,22 @@ class AbstractLink(ShareableOrgMixin, TimeStampedEditableModel):
                     link.delete()
 
     @classmethod
+    def mark_down(cls, queryset):
+        for link in queryset.filter(status="up").select_related("topology").iterator():
+            link.status = "down"
+            link.save()
+
+    @classmethod
     def mark_organization_links_down(cls, organization_id):
         """
         Marks the links of a disabled organization as down.
         """
-        for link in cls.objects.filter(
-            organization_id=organization_id, status="up"
-        ).iterator():
-            link.status = "down"
-            link.save()
+        links = cls.objects.filter(
+            Q(organization_id=organization_id)
+            | Q(source__organization_id=organization_id)
+            | Q(target__organization_id=organization_id)
+        )
+        cls.mark_down(links)
 
     @classmethod
     def get_queryset(cls, qs):

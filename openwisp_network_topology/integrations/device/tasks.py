@@ -22,6 +22,9 @@ def trigger_device_updates(link_pk):
 
 @shared_task
 def handle_deactivated_device(device_pk):
+    Device = swapper.load_model("config", "Device")
+    if not Device.objects.filter(pk=device_pk, _is_deactivated=True).exists():
+        return
     DeviceNode = swapper.load_model("topology_device", "DeviceNode")
     DeviceNode.mark_device_links_down(device_pk)
 

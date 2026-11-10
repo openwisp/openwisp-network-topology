@@ -1,3 +1,4 @@
+import importlib.util
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -5,13 +6,16 @@ import swapper
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.views import APIView
 
-from openwisp_network_topology.tasks import handle_update_topology
 from openwisp_users.tests.test_api import TestDisabledOrgApiMixin
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.tests import AssertNumQueriesSubTestMixin
 
+from .. import settings as app_settings
+from ..api import views
+from ..tasks import handle_update_topology
 from .utils import CreateGraphObjectsMixin, LoadMixin, UnpublishMixin
 
 Link = swapper.load_model("topology", "Link")
@@ -426,6 +430,27 @@ class TestApi(
         self._successful_api_tests()
         self.client.force_login(user)
 
+    def test_disabled_organization_write_with_auth_disabled(self):
+        self.topology.organization.is_active = False
+        self.topology.organization.save(update_fields=["is_active"])
+        original_label = self.topology.label
+        with patch.object(app_settings, "TOPOLOGY_API_AUTH_REQUIRED", False):
+            spec = importlib.util.spec_from_file_location(
+                "openwisp_network_topology.api.auth_disabled_views", views.__file__
+            )
+            auth_disabled_views = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(auth_disabled_views)
+            request = APIRequestFactory().patch(
+                "/", {"label": "changed"}, format="json"
+            )
+            force_authenticate(request, user=self._create_admin())
+            response = auth_disabled_views.NetworkGraphView.as_view()(
+                request, pk=self.topology.pk
+            )
+            self.assertEqual(response.status_code, 403)
+            self.topology.refresh_from_db()
+            self.assertEqual(self.topology.label, original_label)
+
     def test_superuser_with_api_auth_enabled(self):
         user = self._create_admin(username="superapi", email="superapi@email.com")
         self.client.force_login(user)
@@ -523,7 +548,7 @@ class TestApi(
             "organization": self._get_org().pk,
             "parser": "netdiff.OlsrParser",
         }
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(13):
             response = self.client.put(path, data, content_type="application/json")
         self.topology.refresh_from_db()
         self.assertEqual(self.topology.label, "ChangeTestNetwork")
@@ -579,7 +604,7 @@ class TestApi(
             "strategy": "fetch",
             "url": "http://127.0.0.1:9090",
         }
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(13):
             response = self.client.put(path, data, content_type="application/json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["strategy"], "fetch")
@@ -598,7 +623,7 @@ class TestApi(
             "strategy": "receive",
             "key": 12345,
         }
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(13):
             response = self.client.put(path, data, content_type="application/json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["strategy"], "receive")
@@ -610,7 +635,7 @@ class TestApi(
         data = {
             "label": "ChangeTestNetwork",
         }
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(12):
             response = self.client.patch(path, data, content_type="application/json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["label"], "ChangeTestNetwork")
@@ -1009,13 +1034,27 @@ class TestApi(
 
     def test_disabled_org_api_crud_link(self):
         disabled_org, _, _, link = self._create_disabled_org_objects()
+        count_before = self.link_model.objects.count()
         self._test_disabled_org_api_crud(
             obj=link,
             detail_url=reverse("link_detail", args=[link.pk]),
             list_url=reverse("link_list"),
+            create_payload={
+                "topology": str(link.topology_id),
+                "source": str(link.source_id),
+                "target": str(link.target_id),
+                "cost": 1,
+            },
             update_payload={"cost_text": "changed"},
-            operations=("list", "retrieve", "update", "delete"),
+            superuser_expected={
+                "create": {
+                    "status": 400,
+                    "error_field": "topology",
+                    "error_contains": "does not exist",
+                }
+            },
             organization=disabled_org,
             auth_mechanism="session",
             unchanged_field="cost_text",
         )
+        self.assertEqual(self.link_model.objects.count(), count_before - 1)

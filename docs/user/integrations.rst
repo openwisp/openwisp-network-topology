@@ -25,6 +25,8 @@ This additional and optional module provides the following features:
 This integration makes the whole system a lot faster in detecting
 important events in the network.
 
+When a device is deactivated, its links are marked down.
+
 .. include:: /partials/settings-note.rst
 
 In order to use this module simply add
