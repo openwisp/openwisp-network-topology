@@ -6,8 +6,14 @@ from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 
+from openwisp_controller.config.signals import device_deactivated
+
 from ...utils import link_status_changed
-from .tasks import create_device_node_relation, trigger_device_updates
+from .tasks import (
+    create_device_node_relation,
+    handle_deactivated_device,
+    trigger_device_updates,
+)
 
 
 class OpenwispTopologyDeviceConfig(AppConfig):
@@ -22,6 +28,7 @@ class OpenwispTopologyDeviceConfig(AppConfig):
     def connect_signals(self):
         Node = swapper.load_model("topology", "Node")
         Link = swapper.load_model("topology", "Link")
+        Device = swapper.load_model("config", "Device")
 
         post_save.connect(
             self.create_device_rel, sender=Node, dispatch_uid="node_to_device_rel"
@@ -30,6 +37,11 @@ class OpenwispTopologyDeviceConfig(AppConfig):
             self.link_status_changed_receiver,
             sender=Link,
             dispatch_uid="controller_integration_link_status_chaged",
+        )
+        device_deactivated.connect(
+            self.device_deactivated_receiver,
+            sender=Device,
+            dispatch_uid="topology_device_deactivated",
         )
 
     @classmethod
@@ -41,6 +53,10 @@ class OpenwispTopologyDeviceConfig(AppConfig):
     @classmethod
     def link_status_changed_receiver(cls, link, **kwargs):
         transaction.on_commit(lambda: trigger_device_updates.delay(link.pk))
+
+    @classmethod
+    def device_deactivated_receiver(cls, instance, **kwargs):
+        transaction.on_commit(lambda: handle_deactivated_device.delay(instance.pk))
 
     def override_node_label(self):
         import_module("openwisp_network_topology.integrations.device.overrides")

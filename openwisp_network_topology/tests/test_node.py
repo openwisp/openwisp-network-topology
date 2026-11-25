@@ -214,3 +214,12 @@ class TestNode(CreateGraphObjectsMixin, TestOrganizationMixin, TestCase):
                     topology=org_topology,
                     organization=self._get_org("default"),
                 )
+
+    def test_clean_disabled_organization(self):
+        org = self._get_org()
+        org.is_active = False
+        org.save(update_fields=["is_active"])
+        topology = self.topology_model.objects.first()
+        node = topology._create_node(addresses=["192.168.0.10"], label="test node")
+        with self.assertRaises(ValidationError):
+            node.full_clean()

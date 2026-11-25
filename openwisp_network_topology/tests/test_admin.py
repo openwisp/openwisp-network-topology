@@ -137,6 +137,38 @@ class TestAdmin(CreateGraphObjectsMixin, CreateOrgMixin, LoadMixin, TestCase):
         self.assertEqual(message.tags, "error")
         self.assertIn("not updated", message.message)
 
+    def test_bulk_actions_blocked_for_disabled_organization(self):
+        disabled_org = self._create_org(name="disabled-org")
+        disabled_topology = self._create_topology(
+            label="disabled-topology", organization=disabled_org
+        )
+        disabled_org.is_active = False
+        disabled_org.save(update_fields=["is_active"])
+        active_topology = self.topology_model.objects.exclude(
+            pk=disabled_topology.pk
+        ).first()
+        selected = [str(active_topology.pk), str(disabled_topology.pk)]
+
+        for action in ("publish_selected", "unpublish_selected", "update_selected"):
+            with self.subTest(action):
+                published_before = active_topology.published
+                with patch.object(self.topology_model, "update") as mocked_update:
+                    response = self.client.post(
+                        self.changelist_path,
+                        {"action": action, "_selected_action": selected},
+                        follow=True,
+                    )
+                    mocked_update.assert_not_called()
+                active_topology.refresh_from_db()
+                self.assertEqual(active_topology.published, published_before)
+                messages = [m.message for m in response.context["messages"]]
+                self.assertTrue(
+                    any(
+                        "cannot modify objects of disabled organizations" in m
+                        for m in messages
+                    )
+                )
+
     def test_topology_viewonsite(self):
         topology = self.topology_model.objects.first()
         path = reverse("{0}_topology_change".format(self.prefix), args=[topology.pk])
@@ -336,7 +368,10 @@ class TestMultitenantAdmin(
     def _create_multitenancy_test_env(self):
         org1 = self._create_org(name="test1org")
         org2 = self._create_org(name="test2org")
-        inactive = self._create_org(name="inactive-org", is_active=False)
+        # Objects can be created only for active organizations, thus an
+        # active organization is created which is later updated with
+        # is_active=False
+        inactive = self._create_org(name="inactive-org")
         operator = self._create_operator(organizations=[org1, inactive])
         administrator = self._create_administrator(organizations=[org1, inactive])
         t1 = self._create_topology(label="topology1org", organization=org1)
@@ -357,6 +392,8 @@ class TestMultitenantAdmin(
         l3 = self._create_link(
             topology=t3, organization=inactive, source=n31, target=n32
         )
+        inactive.is_active = False
+        inactive.save(update_fields=["is_active"])
         data = dict(
             t1=t1,
             t2=t2,
@@ -452,6 +489,7 @@ class TestMultitenantAdmin(
             ),
             visible=[data["t1"].label],
             hidden=[data["t2"].label, data["t3_inactive"].label],
+            superuser_hidden=[data["t3_inactive"].label],
         )
 
     def test_link_topology_fk_autocomplete_view(self):
@@ -462,6 +500,7 @@ class TestMultitenantAdmin(
             ),
             visible=[data["t1"].label],
             hidden=[data["t2"].label, data["t3_inactive"].label],
+            superuser_hidden=[data["t3_inactive"].label],
         )
 
     def test_node_topology_autocomplete_filter(self):
@@ -523,4 +562,53 @@ class TestMultitenantAdmin(
             obj=topology,
             message="1 topology was successfully unpublished",
             required_perms=["change"],
+        )
+
+    def test_disabled_org_admin_crud_topology(self):
+        org, topology, _, _ = self._create_disabled_org_objects()
+        self._test_disabled_org_admin_crud(
+            obj=topology,
+            change_data={"label": "changed"},
+            create_data={
+                "label": "new-topology",
+                "organization": str(org.pk),
+                "parser": "netdiff.OlsrParser",
+                "strategy": "fetch",
+                "url": "http://127.0.0.1:9090",
+                "expiration_time": "0",
+                "published": "on",
+            },
+            organization=org,
+            unchanged_field="label",
+        )
+
+    def test_disabled_org_admin_crud_node(self):
+        org, topology, node, _ = self._create_disabled_org_objects()
+        self._test_disabled_org_admin_crud(
+            obj=node,
+            change_data={"label": "changed"},
+            create_data={
+                "topology": str(topology.pk),
+                "label": "new-node",
+                "addresses": '["192.168.0.3"]',
+                "user_properties": "{}",
+            },
+            organization=org,
+            unchanged_field="label",
+        )
+
+    def test_disabled_org_admin_crud_link(self):
+        org, topology, node1, link = self._create_disabled_org_objects()
+        self._test_disabled_org_admin_crud(
+            obj=link,
+            change_data={"cost_text": "changed"},
+            create_data={
+                "source": str(node1.pk),
+                "target": str(link.target.pk),
+                "topology": str(topology.pk),
+                "cost_text": "10",
+                "enabled": "on",
+            },
+            organization=org,
+            unchanged_field="cost_text",
         )
