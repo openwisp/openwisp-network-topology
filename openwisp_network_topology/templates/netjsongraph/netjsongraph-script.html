@@ -152,6 +152,10 @@
             }
         }
 
+        // Lets integrations extend the graph before it renders,
+        // e.g. the device integration links each node to its device.
+        const extensions = window.netjsongraphExtensions || [];
+        extensions.forEach((extend) => extend(graph));
         graph.render();
         window.initTopologyHistory(django.jQuery);
         return graph

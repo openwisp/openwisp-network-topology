@@ -15,5 +15,11 @@ class WifiMeshInlineAdmin(admin.StackedInline):
     max_num = 1
 
 
+class TopologyAdminMedia:
+    js = ["topology-device/js/device-link.js"]
+
+
+TopologyAdmin.Media = TopologyAdminMedia
+
 if app_settings.WIFI_MESH_INTEGRATION:
     TopologyAdmin.inlines = list(TopologyAdmin.inlines) + [WifiMeshInlineAdmin]

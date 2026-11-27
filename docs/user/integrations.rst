@@ -15,6 +15,10 @@ This additional and optional module provides the following features:
   - if OpenWISP Monitoring is enabled, the device checks are triggered
     (e.g.: ping)
 
+- in the topology visualizer of the admin, the details of a node related
+  to a device show a **View device** button, which opens the device's
+  admin page; the NetJSON of the node carries the device in its ``device``
+  key (``id`` and ``url``)
 - if :doc:`OpenWISP Monitoring </monitoring/index>` is installed and
   enabled, the system can automatically create topology for the WiFi Mesh
   (802.11s) interfaces using the monitoring data provided by the agent.
