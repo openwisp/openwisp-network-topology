@@ -1,5 +1,9 @@
+import json
+
 import swapper
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from rest_framework.utils.encoders import JSONEncoder
 
 Node = swapper.load_model("topology", "Node")
 Link = swapper.load_model("topology", "Link")
@@ -10,6 +14,29 @@ def get_name(self):
     if hasattr(self, "devicenode"):
         return self.devicenode.device.name
     return super(Node, self).get_name()
+
+
+def node_json(self, dict=False, original=False, **kwargs):
+    """
+    Overrides Node.json to add the related device (its id and the
+    URL of its admin page) outside of ``properties``, so the visualizer
+    can link to it without listing it among the node details.
+    Left out of the ``original`` data, which is compared with what
+    the network reports.
+    """
+    netjson = super(Node, self).json(dict=True, original=original)
+    if not original and hasattr(self, "devicenode"):
+        device = self.devicenode.device
+        opts = device._meta
+        netjson["device"] = {
+            "id": str(device.pk),
+            "url": reverse(
+                f"admin:{opts.app_label}_{opts.model_name}_change", args=[device.pk]
+            ),
+        }
+    if dict:
+        return netjson
+    return json.dumps(netjson, cls=JSONEncoder, **kwargs)
 
 
 def node_get_organization_id(self):
@@ -110,6 +137,7 @@ def link_get_queryset(cls, qs):
 Node.get_name = get_name
 Node.get_name.short_description = _("label")
 Node.get_organization_id = node_get_organization_id
+Node.json = node_json
 Node.get_queryset = node_get_queryset
 Link.get_queryset = link_get_queryset
 Topology.get_nodes_queryset = topology_get_nodes_queryset

@@ -1,15 +1,19 @@
+import json
 from unittest import mock
 
 import swapper
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import transaction
-from django.test import TransactionTestCase
+from django.test import TransactionTestCase, tag
 from django.urls import reverse
 from django.utils.module_loading import import_string
 from openwisp_ipam.tests import CreateModelsMixin as SubnetIpamMixin
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 
 from openwisp_controller.config.tests.utils import (
     CreateConfigTemplateMixin,
@@ -21,6 +25,7 @@ from openwisp_network_topology.tests.utils import CreateGraphObjectsMixin
 from openwisp_users.tests.utils import TestOrganizationMixin
 from openwisp_utils.admin_theme.dashboard import DASHBOARD_CHARTS, DASHBOARD_TEMPLATES
 from openwisp_utils.admin_theme.menu import MENU
+from openwisp_utils.tests import SeleniumTestMixin
 
 from ..base.models import logger as models_logger
 from ..base.models import trigger_device_checks_path
@@ -422,6 +427,36 @@ class TestControllerIntegration(Base, TransactionTestCase):
                 json = topology.json(dict=True)
         self.assertEqual(json["nodes"][0]["label"], device.name)
 
+    def test_node_json_device(self):
+        topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
+        node = self._init_test_node(topology, common_name=cert.common_name)
+        opts = device._meta
+        expected = {
+            "id": str(device.pk),
+            "url": reverse(
+                f"admin:{opts.app_label}_{opts.model_name}_change", args=[device.pk]
+            ),
+        }
+        node.refresh_from_db()
+
+        with self.subTest("node related to a device"):
+            netjson = node.json(dict=True)
+            self.assertEqual(netjson["device"], expected)
+            self.assertNotIn("device", netjson["properties"])
+            self.assertEqual(json.loads(node.json())["device"], expected)
+
+        with self.subTest("original data"):
+            self.assertNotIn("device", node.json(dict=True, original=True))
+
+        with self.subTest("topology json"):
+            self.assertEqual(topology.json(dict=True)["nodes"][0]["device"], expected)
+
+        with self.subTest("node without a device"):
+            other = self._init_test_node(
+                topology, addresses=["netjson_id2"], label="other"
+            )
+            self.assertNotIn("device", other.json(dict=True))
+
     def test_create_device_nodes_command(self):
         topology, _, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
         properties = {"common_name": cert.common_name}
@@ -638,3 +673,53 @@ class TestAdmin(Base, TransactionTestCase):
         response = self.client.get(reverse(f"{self.prefix}_node_changelist"))
         self.assertNotContains(response, "<span>Get name</span>", html=True)
         self.assertContains(response, "<span>Label</span>", html=True)
+
+
+@tag("selenium_tests")
+class TestDeviceLinkSelenium(Base, SeleniumTestMixin, StaticLiveServerTestCase):
+    def _open_node(self, label):
+        self.web_driver.execute_script(
+            "const node = window.graph.data.nodes.find((n) => n.label === arguments[0]);"
+            "window.graph.config.onClickElement.call(window.graph, 'node', node);",
+            label,
+        )
+        self.wait_for_visibility(By.CLASS_NAME, "njg-infoContainer")
+
+    def test_node_details_link_to_device(self):
+        topology, device, cert = self._create_test_env(parser="netdiff.OpenvpnParser")
+        self._init_test_node(topology, common_name=cert.common_name)
+        self._init_test_node(topology, addresses=["netjson_id2"], label="other")
+        opts = device._meta
+        device_url = reverse(
+            f"admin:{opts.app_label}_{opts.model_name}_change", args=[device.pk]
+        )
+        self.login()
+        self.open(reverse("admin:topology_topology_change", args=[topology.pk]))
+        self.find_element(By.CSS_SELECTOR, "input.visualizelink").click()
+        WebDriverWait(self.web_driver, 5).until(
+            lambda driver: driver.execute_script(
+                "return Boolean(window.graph && window.graph.data && window.graph.data.nodes)"
+            )
+        )
+
+        with self.subTest("node related to a device"):
+            self._open_node(device.name)
+            link = self.find_element(
+                By.CSS_SELECTOR, ".njg-infoContainer .njg-device-link"
+            )
+            self.assertEqual(link.text, "View device")
+            self.assertTrue(link.get_attribute("href").endswith(device_url))
+            labels = [
+                e.text
+                for e in self.find_elements(
+                    By.CSS_SELECTOR, ".njg-infoContainer .njg-keyLabel"
+                )
+            ]
+            self.assertNotIn("device", labels)
+
+        with self.subTest("node without a device"):
+            self._open_node("other")
+            self.assertEqual(
+                self.web_driver.find_elements(By.CSS_SELECTOR, ".njg-device-link"), []
+            )
+        self.assertEqual(self.get_browser_errors(), [])
