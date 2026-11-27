@@ -104,6 +104,10 @@ Run tests with:
 
     ./runtests
 
+To run a focused Django test, pass its dotted module, class, or method
+path to ``./runtests``. Run sample app tests separately because they use
+different models. Websocket tests use pytest rather than Django's runner.
+
 Run QA checks:
 
 .. code-block:: shell
