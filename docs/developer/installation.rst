@@ -98,7 +98,7 @@ Create database:
 
 You can access the admin interface at ``http://127.0.0.1:8000/admin/``.
 
-Run tests with:
+From the repository root, run tests with:
 
 .. code-block:: shell
 
@@ -107,6 +107,7 @@ Run tests with:
 To run a focused Django test, pass its dotted module, class, or method
 path to ``./runtests``. Run sample app tests separately because they use
 different models. Websocket tests use pytest rather than Django's runner.
+Set ``WIFI_MESH=1`` for focused WiFi mesh integration tests.
 
 Run QA checks:
 
