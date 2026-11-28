@@ -19,9 +19,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  test:
     name: Python==${{ matrix.python-version }} | ${{ matrix.django-version }}
     runs-on: ubuntu-24.04
+    env:
+      AI_REVIEW_BROWSERS: firefox
+      AI_REVIEW_SERVICES: redis,influxdb
+      AI_REVIEW_SYSTEM_DEPS: "true"
 
     services:
       redis:
@@ -45,6 +49,10 @@ jobs:
             django-version: django~=6.0.0
           - python-version: "3.11"
             django-version: django~=6.1.0
+        include:
+          - python-version: "3.13"
+            django-version: django~=6.1.0
+            review_default: true # Used by on-demand AI reviews
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -53,20 +61,32 @@ jobs:
           persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}
+        id: python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
-          cache-dependency-path: |
-            **/requirements*.txt
+
+      - name: Identify runner image
+        id: platform
+        run: echo "image_os=$ImageOS" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pip downloads
+        id: cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/pip
+          key: >-
+            ${{ format('{0}-{1}-{2}-pip-{3}-{4}-{5}', runner.os, runner.arch,
+                steps.platform.outputs.image_os, steps.python.outputs.python-version,
+                matrix.django-version, hashFiles('setup.py', 'requirements-test.txt',
+                'requirements.txt', 'install-ci-deps.sh')) }}
 
       - name: Cache APT packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: /var/cache/apt/archives
-          key: apt-${{ runner.os }}-${{ hashFiles('.github/workflows/ci.yml') }}
-          restore-keys: |
-            apt-${{ runner.os }}-
+          key: >-
+            apt-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.github/workflows/ci.yml', 'install-ci-deps.sh') }}
 
       - name: Disable man page auto-update
         run: |
@@ -77,20 +97,7 @@ jobs:
         id: deps
         env:
           DJANGO_VERSION: ${{ matrix.django-version }}
-        run: |
-          sudo apt update -qq
-          sudo apt -qq install \
-            sqlite3 \
-            gdal-bin \
-            libproj-dev \
-            libgeos-dev \
-            libspatialite-dev \
-            spatialite-bin \
-            libsqlite3-mod-spatialite
-          pip install -U pip wheel setuptools
-          pip install -U -e .
-          pip install -U -r requirements-test.txt
-          pip install "$DJANGO_VERSION"
+        run: ./install-ci-deps.sh
 
       - name: Start InfluxDB
         if: ${{ !cancelled() && steps.deps.conclusion == 'success' }}
@@ -118,12 +125,12 @@ jobs:
         with:
           parallel: true
           format: cobertura
-          flag-name: python-${{ matrix.env.env }}
+          flag-name: python-${{ matrix.python-version }}-${{ matrix.django-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
   coveralls:
     name: Finalize Coveralls report
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
